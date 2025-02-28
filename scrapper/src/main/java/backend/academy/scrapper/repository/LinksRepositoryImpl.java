@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 public class LinksRepositoryImpl implements LinksRepository {
@@ -55,4 +56,31 @@ public class LinksRepositoryImpl implements LinksRepository {
     public Optional<List<Link>> findAllLinksById(long chatId) {
         return Optional.ofNullable(userLinks.get(chatId));
     }
+
+    @Override
+    public List<Long> getAllChatIds(){
+        return userLinks.keySet().stream().toList();
+    }
+
+    @Override
+    public List<Link> getAllLinks() {
+        return userLinks
+            .values()
+            .stream()
+            .flatMap(List::stream)
+            .distinct()
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Long> getAllChatIdByLink(String uri) {
+        return userLinks
+            .entrySet()
+            .stream()
+            .filter(entry ->  entry.getValue().stream().anyMatch(link -> uri.equals(link.url())))
+            .map(Map.Entry::getKey)
+            .collect(Collectors.toList());
+    }
+
+
 }

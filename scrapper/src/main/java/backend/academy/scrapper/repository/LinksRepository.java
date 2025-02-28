@@ -17,4 +17,10 @@ public interface LinksRepository {
 
     Optional<List<Link>> findAllLinksById(long chatId);
 
+    List<Long> getAllChatIds();
+
+    List<Link> getAllLinks();
+
+    List<Long> getAllChatIdByLink(String uri);
+
 }

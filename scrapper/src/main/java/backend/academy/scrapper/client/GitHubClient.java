@@ -17,8 +17,9 @@ import org.springframework.stereotype.Service;
 public class GitHubClient implements Client{
     private final GithubProxy githubProxy;
 
-
-    public OffsetDateTime getLastUpdateDate(URI repoUrl) {
+    @Override
+    public OffsetDateTime getLastUpdateDate(String uri) {
+        URI repoUrl = URI.create(uri);
         if (isCorrectUri(repoUrl)) {
             RepoInfo repoInfo = getRepoInfo(repoUrl);
             GitHubCommit[] lastCommitRequest = githubProxy.getLastCommitRequest(repoInfo.owner, repoInfo.repo);

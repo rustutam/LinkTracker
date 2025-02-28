@@ -9,7 +9,7 @@ import java.util.List;
  */
 public record LinkUpdate(
     Long id,
-    URI url,
+    String url,
     String description,
     @Valid
     List<Long> tgChatIds
