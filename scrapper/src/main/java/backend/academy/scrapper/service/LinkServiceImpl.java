@@ -1,10 +1,14 @@
 package backend.academy.scrapper.service;
 
+import backend.academy.scrapper.exceptions.NotExistLinkException;
+import backend.academy.scrapper.exceptions.NotExistTgChatException;
+import backend.academy.scrapper.exceptions.NotTrackLinkException;
 import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.LinkInfo;
 import backend.academy.scrapper.repository.LinksRepository;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.ThreadLocalRandom;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,31 +18,30 @@ public class LinkServiceImpl implements LinkService {
     private final LinksRepository linksRepository;
 
     @Override
-    public Link addLink(long chatId, String link, List<String> tags, List<String> filters) {
-        // TODO проверять что если чата нет то мы не сможем добавить
-        long randomLong = ThreadLocalRandom.current().nextLong();
-        Link linkModel = new Link(randomLong, link, tags, filters);
-        return linksRepository.saveLink(chatId, linkModel);
+    public LinkInfo addLink(long chatId, Link link) {
+        linksRepository.findById(chatId)
+            .orElseThrow(NotExistTgChatException::new);
+
+        LinkInfo linkInfo = new LinkInfo();
+        linkInfo.link(link);
+        linkInfo.lastUpdateTime(OffsetDateTime.now());
+
+        return linksRepository.saveLink(chatId, linkInfo);
     }
 
     @Override
-    public Link removeLink(long chatId, String uri) {
-        Optional<Link> link = linksRepository.deleteLink(chatId, uri);
+    public LinkInfo removeLink(long chatId, String uri) {
+        linksRepository.findById(chatId)
+            .orElseThrow(NotExistTgChatException::new);
 
-        if (link.isEmpty()) {
-            return null;
-        }
-        return link.get();
+        return linksRepository.deleteLink(chatId, uri)
+            .orElseThrow(NotTrackLinkException::new);
     }
 
     @Override
-    public List<Link> getListLinks(long chatId) {
-        Optional<List<Link>> allLinksById = linksRepository.findAllLinksById(chatId);
-        if (allLinksById.isEmpty()) {
-            //TODO выкидываем ошибку что у чата нет активных ссылок
-            return null;
-        }
-        return allLinksById.get();
+    public List<LinkInfo> getLinks(long chatId) {
+        return linksRepository.findById(chatId)
+            .orElseThrow(NotExistTgChatException::new);
     }
 
 }

@@ -1,14 +1,15 @@
 package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.LinkInfo;
 
 import java.util.List;
 
 public interface LinkService extends EndpointControleService {
 
-    Link addLink(long chatId, String link, List<String> tags, List<String> filters);
+    LinkInfo addLink(long chatId, Link link);
 
-    Link removeLink(long chatId, String link);
+    LinkInfo removeLink(long chatId, String link);
 
-    List<Link> getListLinks(long chatId);
+    List<LinkInfo> getLinks(long chatId);
 }
