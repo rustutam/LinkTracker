@@ -1,11 +1,13 @@
 package backend.academy.scrapper.models.api.response;
 
 import jakarta.validation.Valid;
+import lombok.Builder;
 import java.util.List;
 
 /**
  * ApiErrorResponse
  */
+@Builder
 public record ApiErrorResponse(
     String description,
     String code,
