@@ -10,18 +10,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ScrapperServiceImpl implements ScrapperService {
+public class LinkServiceImpl implements LinkService {
     private final LinksRepository linksRepository;
-
-    @Override
-    public void register(long chatId) {
-        linksRepository.register(chatId);
-    }
-
-    @Override
-    public void unRegister(long chatId) {
-        linksRepository.unRegister(chatId);
-    }
 
     @Override
     public Link addLink(long chatId, String link, List<String> tags, List<String> filters) {
