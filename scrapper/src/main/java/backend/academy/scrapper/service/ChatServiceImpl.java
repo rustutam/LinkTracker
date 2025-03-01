@@ -13,25 +13,17 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void register(long chatId) {
-        var optionalLinks =  linksRepository.findById(chatId);
+        var optionalLinks = linksRepository.findById(chatId)
+            .orElseThrow(DoubleRegistrationException::new);
 
-        if (optionalLinks.isPresent()) {
-            throw new DoubleRegistrationException();
-        } else {
-            linksRepository.register(chatId);
-        }
-
+        linksRepository.register(chatId);
     }
 
     @Override
     public void unRegister(long chatId) {
-        var optionalLinks =  linksRepository.findById(chatId);
+        var optionalLinks = linksRepository.findById(chatId)
+            .orElseThrow(NotExistTgChatException::new);
 
-        if (optionalLinks.isEmpty()) {
-            throw new NotExistTgChatException();
-        }
-        else {
-            linksRepository.unRegister(chatId);
-        }
+        linksRepository.unRegister(chatId);
     }
 }

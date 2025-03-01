@@ -1,4 +1,4 @@
-package backend.academy.scrapper.external.models.github;
+package backend.academy.scrapper.models.external.github;
 
 import java.net.URI;
 
