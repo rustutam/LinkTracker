@@ -1,4 +1,4 @@
-package backend.academy.scrapper.exseptions.github;
+package backend.academy.scrapper.exseptions2.github;
 
 public class NoCommitsException extends RuntimeException {
     public NoCommitsException() {

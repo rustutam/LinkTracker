@@ -1,4 +1,4 @@
-package backend.academy.scrapper.exseptions.github;
+package backend.academy.scrapper.exseptions2.github;
 
 import org.springframework.http.HttpStatusCode;
 
