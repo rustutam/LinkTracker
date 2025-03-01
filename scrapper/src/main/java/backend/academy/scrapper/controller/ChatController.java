@@ -1,32 +1,30 @@
 package backend.academy.scrapper.controller;
 
-import backend.academy.scrapper.service.ScrapperService;
+import backend.academy.scrapper.handler.ChatHandler;
+import backend.academy.scrapper.service.LinkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
-import reactor.core.publisher.Mono;
+
+import java.util.logging.Handler;
 
 @RestController
 @RequiredArgsConstructor
-public class ChatController {
-    //    private final ChatService chatService;
-    private final ScrapperService service;
+public class ChatController implements Controller{
+    private final ChatHandler chatHandler;
 
     @PostMapping("/tg-chat/{id}")
     public ResponseEntity<Void> tgChatIdPost(@PathVariable Long id) {
-        service.register(id);
-        // TODO возвращать не только ok
+        chatHandler.register(id);
         return ResponseEntity.ok().build();
-
     }
 
     @DeleteMapping("/tg-chat/{id}")
     public ResponseEntity<Void> tgChatIdDelete(@PathVariable Long id) {
-        service.unRegister(id);
-        //TODO возвращать не только ok
+        chatHandler.unregister(id);
         return ResponseEntity.ok().build();
     }
 }
