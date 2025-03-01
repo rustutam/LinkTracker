@@ -2,6 +2,7 @@ package backend.academy.scrapper.repository;
 
 
 import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.LinkInfo;
 import java.util.List;
 import java.util.Optional;
 
@@ -11,15 +12,15 @@ public interface LinksRepository {
 
     void unRegister(long chatId);
 
-    Link saveLink(long chatId, Link link);
+    LinkInfo saveLink(long chatId, LinkInfo link);
 
-    Optional<Link> deleteLink(long chatId, String url);
+    Optional<LinkInfo> deleteLink(long chatId, String url);
 
-    Optional<List<Link>> findAllLinksById(long chatId);
+    Optional<List<LinkInfo>> findById(long chatId);
 
     List<Long> getAllChatIds();
 
-    List<Link> getAllLinks();
+    List<LinkInfo> getAllLinks();
 
     List<Long> getAllChatIdByLink(String uri);
 

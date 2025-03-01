@@ -1,24 +1,25 @@
 package backend.academy.scrapper.repository;
 
+import backend.academy.scrapper.exceptions.NotExistLinkException;
 import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.LinkInfo;
 import lombok.val;
 import org.springframework.stereotype.Repository;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 @Repository
 public class LinksRepositoryImpl implements LinksRepository {
-    private Map<Long, List<Link>> userLinks = new HashMap<>();
+    private Map<Long, List<LinkInfo>> userLinks = new HashMap<>();
+    private final AtomicLong idGenerator = new AtomicLong(1);
 
     @Override
     public void register(long chatId) {
-        if (userLinks.containsKey(chatId)) {
-            //TODO выкидывать ошибку что пользователь уже существует
-            return;
-        }
         userLinks.put(chatId, List.of());
 
     }
@@ -29,31 +30,29 @@ public class LinksRepositoryImpl implements LinksRepository {
     }
 
     @Override
-    public Link saveLink(long chatId, Link link) {
-        val links = userLinks.get(chatId);
-        if (links == null) {
-            //TODO выкидывать ошибку что пользователь не существует
-            return null;
-        }
+    public LinkInfo saveLink(long chatId, LinkInfo linkInfo) {
+        long id = idGenerator.getAndIncrement();
+        linkInfo.id(id);
 
-        links.add(link);
-        return link;
+        val links = userLinks.get(chatId);
+        links.add(linkInfo);
+        return linkInfo;
     }
 
     @Override
-    public Optional<Link> deleteLink(long chatId, String url) {
-        List<Link> links = userLinks.get(chatId);
-        Optional<Link> linkToDelete = links.stream()
-            .filter(link -> link.url().equals(url))
+    public Optional<LinkInfo> deleteLink(long chatId, String url) {
+        List<LinkInfo> linksInfo = userLinks.get(chatId);
+        Optional<LinkInfo> optionalLinkToDelete = linksInfo.stream()
+            .filter(linkInfo -> linkInfo.link().url().toString().equals(url))
             .findFirst();
 
-        linkToDelete.ifPresent(links::remove);
+        optionalLinkToDelete.ifPresent(linksInfo::remove);
 
-        return linkToDelete;
+        return optionalLinkToDelete;
     }
 
     @Override
-    public Optional<List<Link>> findAllLinksById(long chatId) {
+    public Optional<List<LinkInfo>> findById(long chatId) {
         return Optional.ofNullable(userLinks.get(chatId));
     }
 
@@ -63,7 +62,7 @@ public class LinksRepositoryImpl implements LinksRepository {
     }
 
     @Override
-    public List<Link> getAllLinks() {
+    public List<LinkInfo> getAllLinks() {
         return userLinks
             .values()
             .stream()
@@ -77,7 +76,7 @@ public class LinksRepositoryImpl implements LinksRepository {
         return userLinks
             .entrySet()
             .stream()
-            .filter(entry ->  entry.getValue().stream().anyMatch(link -> uri.equals(link.url())))
+            .filter(entry ->  entry.getValue().stream().anyMatch(link -> uri.equals(link.link().url().toString())))
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
     }
