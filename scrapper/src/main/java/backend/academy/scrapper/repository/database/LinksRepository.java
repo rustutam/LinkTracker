@@ -1,8 +1,8 @@
-package backend.academy.scrapper.repository;
+package backend.academy.scrapper.repository.database;
 
 
-import backend.academy.scrapper.models.Link;
 import backend.academy.scrapper.models.LinkInfo;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +16,7 @@ public interface LinksRepository {
 
     Optional<LinkInfo> deleteLink(long chatId, String url);
 
-    Optional<List<LinkInfo>> findById(long chatId);
+    List<LinkInfo> findById(long chatId);
 
     List<Long> getAllChatIds();
 
@@ -24,4 +24,9 @@ public interface LinksRepository {
 
     List<Long> getAllChatIdByLink(String uri);
 
+    List<LinkInfo> getGitHubLinks();
+
+    List<LinkInfo> getStackOverflowLinks();
+
+    void updateLastUpdateTime(long id, OffsetDateTime time);
 }
