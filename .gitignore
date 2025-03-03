@@ -23,5 +23,4 @@ dependency-reduced-pom.xml
 *.log
 hs_err_pid*
 
-### properties ###
-/bot/src/main/resources/config.properties
+*.env

@@ -9,32 +9,30 @@ import backend.academy.scrapper.models.api.response.ListLinksResponse;
 import backend.academy.scrapper.service.LinkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import java.security.SecureRandom;
-import java.time.OffsetDateTime;
+
 import java.util.List;
 
 @Component
 @RequiredArgsConstructor
 public class LinkHandlerImpl implements LinkHandler {
     private final LinkService linkService;
-    private final SecureRandom random;
 
     @Override
     public LinkResponse addLink(long tgChatId, AddLinkRequest addLinkRequest) {
         //TODO подумать какую валидацию данных сделать
         Link link = new Link(
-            addLinkRequest.link(),
-            addLinkRequest.tags(),
-            addLinkRequest.filters()
+                addLinkRequest.link(),
+                addLinkRequest.tags(),
+                addLinkRequest.filters()
         );
 
         LinkInfo linkInfo = linkService.addLink(tgChatId, link);
 
         return new LinkResponse(
-            linkInfo.id(),
-            linkInfo.link().url(),
-            linkInfo.link().tags(),
-            linkInfo.link().filters()
+                linkInfo.id(),
+                linkInfo.link().uri(),
+                linkInfo.link().tags(),
+                linkInfo.link().filters()
         );
     }
 
@@ -43,10 +41,10 @@ public class LinkHandlerImpl implements LinkHandler {
         LinkInfo linkInfo = linkService.removeLink(tgChatId, removeLinkRequest.link().toString());
 
         return new LinkResponse(
-            linkInfo.id(),
-            linkInfo.link().url(),
-            linkInfo.link().tags(),
-            linkInfo.link().filters()
+                linkInfo.id(),
+                linkInfo.link().uri(),
+                linkInfo.link().tags(),
+                linkInfo.link().filters()
         );
     }
 
@@ -55,19 +53,19 @@ public class LinkHandlerImpl implements LinkHandler {
         List<LinkInfo> links = linkService.getLinks(tgChatId);
 
         List<LinkResponse> linkResponses = links.stream()
-            .map(linkInfo ->
-                new LinkResponse(
-                    linkInfo.id(),
-                    linkInfo.link().url(),
-                    linkInfo.link().tags(),
-                    linkInfo.link().filters()
-                ))
-            .toList();
+                .map(linkInfo ->
+                        new LinkResponse(
+                                linkInfo.id(),
+                                linkInfo.link().uri(),
+                                linkInfo.link().tags(),
+                                linkInfo.link().filters()
+                        ))
+                .toList();
 
         //TODO: убрать хардкод с size
         return new ListLinksResponse(
-            linkResponses,
-            5
+                linkResponses,
+                5
         );
     }
 }
