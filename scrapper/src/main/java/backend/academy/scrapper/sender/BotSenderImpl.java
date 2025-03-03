@@ -1,6 +1,6 @@
 package backend.academy.scrapper.sender;
 
-import backend.academy.scrapper.client.BotClient;
+import backend.academy.scrapper.client.TgBotClient;
 import backend.academy.scrapper.models.LinkUpdateNotification;
 import backend.academy.scrapper.models.api.LinkUpdate;
 import backend.academy.scrapper.models.api.response.ApiErrorResponse;
@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class BotSenderImpl implements Sender {
-    private final BotClient botClient;
+    private final TgBotClient tgBotClient;
 
     @Override
     public void send(List<LinkUpdateNotification> linkUpdateNotifications) {
         for (LinkUpdateNotification linkUpdateNotification : linkUpdateNotifications) {
-            botClient.send(toLinkUpdateMapper(linkUpdateNotification));
+            tgBotClient.send(toLinkUpdateMapper(linkUpdateNotification));
         }
     }
 

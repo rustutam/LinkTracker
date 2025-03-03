@@ -1,10 +1,9 @@
 package backend.academy.scrapper.client;
 
+import backend.academy.scrapper.configuration.GitHubConfig;
 import backend.academy.scrapper.models.external.github.CommitDto;
 import backend.academy.scrapper.models.external.github.IssueDto;
 import backend.academy.scrapper.models.external.github.RepositoryDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
@@ -12,8 +11,11 @@ import org.springframework.web.client.RestClient;
 public class GithubClient {
     private final RestClient restClient;
 
-    public GithubClient(@Qualifier("githubRestClient") RestClient restClient) {
-        this.restClient = restClient;
+    public GithubClient(GitHubConfig gitHubConfig) {
+        restClient = RestClient.builder()
+            .baseUrl(gitHubConfig.baseUrl())
+            .defaultHeader("Authorization", gitHubConfig.githubToken())
+            .build();
     }
 
     public CommitDto[] commitsRequest(String owner, String repository) {
