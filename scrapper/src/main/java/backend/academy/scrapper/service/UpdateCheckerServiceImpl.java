@@ -20,7 +20,6 @@ public class UpdateCheckerServiceImpl implements UpdateCheckerService {
     private final GitHubExternalDataRepository gitHubExternalDataRepository;
     private final StackOverflowExternalDataRepository stackOverflowExternalDataRepository;
 
-    @Scheduled(cron = "@hourly")
     public void updateData() {
         List<LinkInfo> linksForUpdate = new ArrayList<>();
 

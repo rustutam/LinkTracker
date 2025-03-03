@@ -1,4 +1,6 @@
 app:
+  scheduler:
+    interval: 10s
   github-token: ${GITHUB_TOKEN} # env variable
   github-uri: https://api.github.com
   stackoverflow:
