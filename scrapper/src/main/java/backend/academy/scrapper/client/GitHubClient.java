@@ -1,47 +1,43 @@
 package backend.academy.scrapper.client;
 
-import backend.academy.scrapper.exseptions.github.InvalidGitHubUrlException;
-import backend.academy.scrapper.exseptions.github.NoCommitsException;
-import backend.academy.scrapper.external.models.github.GitHubCommit;
-import backend.academy.scrapper.proxies.GithubProxy;
-import java.net.URI;
-import java.time.OffsetDateTime;
-import java.util.Arrays;
-import java.util.Optional;
-import java.util.stream.Stream;
+import backend.academy.scrapper.models.external.github.CommitDto;
+import backend.academy.scrapper.models.external.github.IssueDto;
+import backend.academy.scrapper.models.external.github.RepositoryDto;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestClient;
 
-@Service
-@RequiredArgsConstructor
-public class GitHubClient implements Client{
-    private final GithubProxy githubProxy;
+@Component
+public class GithubClient {
+    private final RestClient restClient;
 
-    @Override
-    public OffsetDateTime getLastUpdateDate(String uri) {
-        URI repoUrl = URI.create(uri);
-        if (isCorrectUri(repoUrl)) {
-            RepoInfo repoInfo = getRepoInfo(repoUrl);
-            GitHubCommit[] lastCommitRequest = githubProxy.getLastCommitRequest(repoInfo.owner, repoInfo.repo);
-            return Optional.ofNullable(lastCommitRequest)
-                .map(Arrays::stream)
-                .flatMap(Stream::findFirst)
-                .map(GitHubCommit::getCommitTime)
-                .orElseThrow(NoCommitsException::new);
-        } else {
-            throw new InvalidGitHubUrlException("Not a GitHub URL");
-        }
+    public GithubClient(@Qualifier("githubRestClient") RestClient restClient) {
+        this.restClient = restClient;
     }
 
-    private boolean isCorrectUri(URI repoUrl) {
-        return repoUrl.getHost().equals("github.com");
+    public CommitDto[] commitsRequest(String owner, String repository) {
+        return restClient
+            .get()
+            .uri("repos/{owner}/{repo}/commits?per_page=1", owner, repository)
+            .retrieve()
+            .body(CommitDto[].class);
     }
 
-    private RepoInfo getRepoInfo(URI repoUrl) {
-        String[] parts = repoUrl.getPath().split("/");
-        return new RepoInfo(parts[0], parts[1]);
+    public IssueDto[] issuesRequest(String owner, String repository) {
+        return restClient
+            .get()
+            .uri("repos/{owner}/{repo}/issues?per_page=1", owner, repository)
+            .retrieve()
+            .body(IssueDto[].class);
     }
 
-    private record RepoInfo(String owner, String repo) {
+    public RepositoryDto repoRequest(String owner, String repository) {
+        return restClient
+            .get()
+            .uri("repos/{owner}/{repo}", owner, repository)
+            .retrieve()
+            .body(RepositoryDto.class);
     }
+
 }
