@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class LinkNotificationService {
+public class SenderNotificationServiceImpl implements SenderNotificationService {
     private final LinksRepository linkRepository;
     private final Sender sender;
 
-    public void notifyAboutUpdate(List<LinkInfo> updatedLinks) {
+    public void notifySender(List<LinkInfo> updatedLinks) {
         sender.send(linkUpdateNotificationMapper(updatedLinks));
     }
 

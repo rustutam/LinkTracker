@@ -9,20 +9,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class UpdateCheckerServiceImpl implements UpdateCheckerService {
-    private final LinkNotificationService linkNotificationService;
+public class ChangesDetectServiceImpl implements ChangesDetectService {
     private final LinksRepository repository;
     private final GitHubExternalDataRepository gitHubExternalDataRepository;
     private final StackOverflowExternalDataRepository stackOverflowExternalDataRepository;
 
-    public void updateData() {
+    public List<LinkInfo> detectChanges() {
         List<LinkInfo> linksForUpdate = new ArrayList<>();
-
 
         //Обработка ссылок с гита
         List<LinkInfo> gitHubLinks = repository.getGitHubLinks();
@@ -36,9 +33,9 @@ public class UpdateCheckerServiceImpl implements UpdateCheckerService {
         Map<Long, OffsetDateTime> StackLastUpdateDates = stackOverflowExternalDataRepository.getLastUpdateDates(stackOverflowLinks);
         linksForUpdate.addAll(getLinksForUpdate(stackOverflowLinks, StackLastUpdateDates));
 
-        linkNotificationService.notifyAboutUpdate(linksForUpdate);
+//        botNotificationService.notifyAboutUpdate(linksForUpdate);
 
-
+        return linksForUpdate;
     }
 
 
