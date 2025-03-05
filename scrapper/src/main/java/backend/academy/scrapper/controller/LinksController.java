@@ -27,7 +27,7 @@ public class LinksController implements Controller {
     }
 
     @PostMapping("/links")
-    public ResponseEntity<LinkResponse> postLinks(
+    public ResponseEntity<LinkResponse> addLinks(
             @RequestHeader(value = "Tg-Chat-Id", required = true) Long tgChatId,
             @Valid @RequestBody AddLinkRequest addLinkRequest
     ) {

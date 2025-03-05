@@ -1,10 +1,11 @@
 package backend.academy.scrapper.service;
 
+import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
 import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.exceptions.NotTrackLinkException;
 import backend.academy.scrapper.models.Link;
-import backend.academy.scrapper.models.LinkInfo;
 import backend.academy.scrapper.repository.database.LinksRepository;
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,23 +17,30 @@ public class LinkServiceImpl implements LinkService {
     private final LinksRepository linksRepository;
 
     @Override
-    public LinkInfo addLink(long chatId, Link link) {
-        List<LinkInfo> linksById = linksRepository.findById(chatId);
+    public Link addLink(long chatId, Link link) {
 
-        if (linksById.isEmpty()){
+        if (!linksRepository.isRegistered(chatId)){
             throw new NotExistTgChatException();
         }
 
-        LinkInfo linkInfo = new LinkInfo();
-        linkInfo.link(link);
-        linkInfo.lastUpdateTime(OffsetDateTime.now());
+        List<String> links = linksRepository.findById(chatId)
+            .stream()
+            .map(Link::uri)
+            .map(URI::toString)
+            .toList();
 
-        return linksRepository.saveLink(chatId, linkInfo);
+        if (links.contains(link.uri().toString())) {
+            throw new AlreadyTrackLinkException();
+        }
+
+        link.lastUpdateTime(OffsetDateTime.now());
+
+        return linksRepository.saveLink(chatId, link);
     }
 
     @Override
-    public LinkInfo removeLink(long chatId, String uri) {
-        List<LinkInfo> linksById = linksRepository.findById(chatId);
+    public Link removeLink(long chatId, String uri) {
+        List<Link> linksById = linksRepository.findById(chatId);
 
         if (linksById.isEmpty()){
             throw new NotExistTgChatException();
@@ -43,8 +51,8 @@ public class LinkServiceImpl implements LinkService {
     }
 
     @Override
-    public List<LinkInfo> getLinks(long chatId) {
-        List<LinkInfo> linksById = linksRepository.findById(chatId);
+    public List<Link> getLinks(long chatId) {
+        List<Link> linksById = linksRepository.findById(chatId);
 
         if (linksById.isEmpty()){
             throw new NotExistTgChatException();

@@ -1,6 +1,6 @@
 package backend.academy.scrapper.scheduler;
 
-import backend.academy.scrapper.models.LinkInfo;
+import backend.academy.scrapper.models.Link;
 import backend.academy.scrapper.service.ChangesDetectService;
 import backend.academy.scrapper.service.SenderNotificationService;
 import java.util.List;
@@ -16,7 +16,7 @@ public class LinkUpdaterScheduler {
 
     @Scheduled(cron = "@hourly")
     public void update() {
-        List<LinkInfo> updatedLinks = updateCheckerService.detectChanges();
+        List<Link> updatedLinks = updateCheckerService.detectChanges();
         senderNotificationService.notifySender(updatedLinks);
     }
 

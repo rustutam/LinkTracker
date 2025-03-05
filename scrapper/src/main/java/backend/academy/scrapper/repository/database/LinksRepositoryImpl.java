@@ -1,6 +1,6 @@
 package backend.academy.scrapper.repository.database;
 
-import backend.academy.scrapper.models.LinkInfo;
+import backend.academy.scrapper.models.Link;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -10,12 +10,11 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import lombok.val;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public class LinksRepositoryImpl implements LinksRepository {
-    private Map<Long, List<LinkInfo>> userLinks = new HashMap<>();
+    private Map<Long, List<Link>> userLinks = new HashMap<>();
     private final AtomicLong linksIdGenerator = new AtomicLong(1);
 
     @Override
@@ -30,29 +29,35 @@ public class LinksRepositoryImpl implements LinksRepository {
     }
 
     @Override
-    public LinkInfo saveLink(long chatId, LinkInfo linkInfo) {
-        List<LinkInfo> allLinks = getAllLinks();
-        Optional<LinkInfo> optionalLinkInfo = allLinks.stream()
-            .filter(linkInfo1 -> linkInfo1.id() == linkInfo.id())
-            .findFirst();
-
-        if (optionalLinkInfo.isPresent()) {
-            linkInfo.id(optionalLinkInfo.get().id());
-        } else {
-            long linkId = linksIdGenerator.getAndIncrement();
-            linkInfo.id(linkId);
-        }
-
-        List<LinkInfo> links = userLinks.get(chatId);
-        links.add(linkInfo);
-        return linkInfo;
+    public boolean isRegistered(long chatId) {
+        List<Long> allChatIds = userLinks.keySet().stream().toList();
+        return allChatIds.contains(chatId);
     }
 
     @Override
-    public Optional<LinkInfo> deleteLink(long chatId, String url) {
-        List<LinkInfo> linksInfo = userLinks.get(chatId);
-        Optional<LinkInfo> optionalLinkToDelete = linksInfo.stream()
-            .filter(linkInfo -> linkInfo.link().uri().toString().equals(url))
+    public Link saveLink(long chatId, Link link) {
+        List<Link> allLinks = getAllLinks();
+        Optional<Link> optionalLinkInfo = allLinks.stream()
+            .filter(linkInfo1 -> linkInfo1.id() == link.id())
+            .findFirst();
+
+        if (optionalLinkInfo.isPresent()) {
+            link.id(optionalLinkInfo.get().id());
+        } else {
+            long linkId = linksIdGenerator.getAndIncrement();
+            link.id(linkId);
+        }
+
+        List<Link> links = userLinks.get(chatId);
+        links.add(link);
+        return link;
+    }
+
+    @Override
+    public Optional<Link> deleteLink(long chatId, String url) {
+        List<Link> linksInfo = userLinks.get(chatId);
+        Optional<Link> optionalLinkToDelete = linksInfo.stream()
+            .filter(linkInfo -> linkInfo.uri().toString().equals(url))
             .findFirst();
 
         optionalLinkToDelete.ifPresent(linksInfo::remove);
@@ -61,7 +66,7 @@ public class LinksRepositoryImpl implements LinksRepository {
     }
 
     @Override
-    public List<LinkInfo> findById(long chatId) {
+    public List<Link> findById(long chatId) {
 
         return userLinks.getOrDefault(chatId, List.of());
     }
@@ -72,13 +77,13 @@ public class LinksRepositoryImpl implements LinksRepository {
     }
 
     @Override
-    public List<LinkInfo> getAllLinks() {
+    public List<Link> getAllLinks() {
         //возвращаем сслыки с уникальными id
         return userLinks.values().stream()
             .flatMap(List::stream)
             .collect(Collectors.collectingAndThen(
                 Collectors.toMap(
-                    LinkInfo::id,          // ключ - id
+                    Link::id,          // ключ - id
                     Function.identity(),  // значение - сам объект
                     (existing, replacement) -> existing // при конфликте оставляем существующий
                 ),
@@ -91,22 +96,22 @@ public class LinksRepositoryImpl implements LinksRepository {
         return userLinks
             .entrySet()
             .stream()
-            .filter(entry -> entry.getValue().stream().anyMatch(link -> uri.equals(link.link().uri().toString())))
+            .filter(entry -> entry.getValue().stream().anyMatch(link -> uri.equals(link.uri().toString())))
             .map(Map.Entry::getKey)
             .collect(Collectors.toList());
     }
 
     @Override
-    public List<LinkInfo> getGitHubLinks() {
+    public List<Link> getGitHubLinks() {
         return getAllLinks().stream()
-            .filter(linkInfo -> linkInfo.link().uri().getHost().equals("github.com"))
+            .filter(linkInfo -> linkInfo.uri().getHost().equals("github.com"))
             .toList();
     }
 
     @Override
-    public List<LinkInfo> getStackOverflowLinks() {
+    public List<Link> getStackOverflowLinks() {
         return getAllLinks().stream()
-            .filter(linkInfo -> linkInfo.link().uri().getHost().equals("stackoverflow.com"))
+            .filter(linkInfo -> linkInfo.uri().getHost().equals("stackoverflow.com"))
             .toList();
     }
 

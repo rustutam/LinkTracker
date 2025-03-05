@@ -1,7 +1,7 @@
 package backend.academy.scrapper.repository.api;
 
 import backend.academy.scrapper.client.StackoverflowClient;
-import backend.academy.scrapper.models.LinkInfo;
+import backend.academy.scrapper.models.Link;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import java.time.OffsetDateTime;
@@ -14,7 +14,7 @@ public class StackOverflowExternalDataRepository implements ExternalDataReposito
     private final StackoverflowClient stackoverflowClient;
 
     @Override
-    public Map<Long, OffsetDateTime> getLastUpdateDates(List<LinkInfo> linkInfoList) {
+    public Map<Long, OffsetDateTime> getLastUpdateDates(List<Link> linkList) {
         return Map.of();
     }
 }

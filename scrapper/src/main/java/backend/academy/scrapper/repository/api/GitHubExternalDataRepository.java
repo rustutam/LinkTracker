@@ -1,7 +1,7 @@
 package backend.academy.scrapper.repository.api;
 
 import backend.academy.scrapper.client.GithubClient;
-import backend.academy.scrapper.models.LinkInfo;
+import backend.academy.scrapper.models.Link;
 import backend.academy.scrapper.models.external.github.RepositoryDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -18,15 +18,15 @@ public class GitHubExternalDataRepository implements ExternalDataRepository {
     private final GithubClient githubClient;
 
     @Override
-    public Map<Long, OffsetDateTime> getLastUpdateDates(List<LinkInfo> linkInfoList) {
+    public Map<Long, OffsetDateTime> getLastUpdateDates(List<Link> linkList) {
         Map<Long, OffsetDateTime> updatedTimes = new HashMap<>();
 
-        for (LinkInfo linkInfo : linkInfoList) {
-            RepoInfo repoInfo = getRepoInfo(linkInfo.link().uri());
+        for (Link link : linkList) {
+            RepoInfo repoInfo = getRepoInfo(link.uri());
             RepositoryDto repositoryDto = githubClient.repoRequest(repoInfo.owner, repoInfo.repo);
             OffsetDateTime updatedTime = repositoryDto.updatedAt();
 
-            updatedTimes.put(linkInfo.id(),updatedTime);
+            updatedTimes.put(link.id(),updatedTime);
         }
 
         return updatedTimes;
