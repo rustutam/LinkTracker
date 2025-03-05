@@ -24,9 +24,7 @@ public class ChangesDetectServiceImpl implements ChangesDetectService {
         //Обработка ссылок с гита
         List<LinkInfo> gitHubLinks = repository.getGitHubLinks();
         Map<Long, OffsetDateTime> gitHubLastUpdateDates = gitHubExternalDataRepository.getLastUpdateDates(gitHubLinks);
-
         linksForUpdate.addAll(getLinksForUpdate(gitHubLinks, gitHubLastUpdateDates));
-
 
         //Обработка ссылок с ст
         List<LinkInfo> stackOverflowLinks = repository.getStackOverflowLinks();
@@ -41,7 +39,6 @@ public class ChangesDetectServiceImpl implements ChangesDetectService {
 
     private List<LinkInfo> getLinksForUpdate(List<LinkInfo> links, Map<Long, OffsetDateTime> lastUpdateDates) {
         List<LinkInfo> updatedLinks = new ArrayList<>();
-
 
         for (LinkInfo linkInfo : links) {
             OffsetDateTime updatedTime = lastUpdateDates.get(linkInfo.id());

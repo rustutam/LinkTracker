@@ -1,22 +1,17 @@
 package backend.academy.scrapper.repository.database;
 
 import backend.academy.scrapper.models.LinkInfo;
-import backend.academy.scrapper.models.entity.FiltersEntity;
-import backend.academy.scrapper.models.entity.LinkEntity;
-import backend.academy.scrapper.models.entity.TagsEntity;
-import lombok.val;
-import org.springframework.stereotype.Repository;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import lombok.val;
+import org.springframework.stereotype.Repository;
 
 @Repository
 public class LinksRepositoryImpl implements LinksRepository {
@@ -42,14 +37,13 @@ public class LinksRepositoryImpl implements LinksRepository {
             .findFirst();
 
         if (optionalLinkInfo.isPresent()) {
-            linkInfo.id( optionalLinkInfo.get().id());
-        }
-        else {
+            linkInfo.id(optionalLinkInfo.get().id());
+        } else {
             long linkId = linksIdGenerator.getAndIncrement();
             linkInfo.id(linkId);
         }
 
-        val links = userLinks.get(chatId);
+        List<LinkInfo> links = userLinks.get(chatId);
         links.add(linkInfo);
         return linkInfo;
     }
@@ -68,7 +62,8 @@ public class LinksRepositoryImpl implements LinksRepository {
 
     @Override
     public List<LinkInfo> findById(long chatId) {
-        return userLinks.get(chatId);
+
+        return userLinks.getOrDefault(chatId, List.of());
     }
 
     @Override
@@ -121,9 +116,8 @@ public class LinksRepositoryImpl implements LinksRepository {
             .stream()
             .flatMap(List::stream)
             .filter(linkInfo -> id == linkInfo.id())
-            .map(linkInfo -> linkInfo.lastUpdateTime(time));
+            .forEach(linkInfo -> linkInfo.lastUpdateTime(time));
     }
-
 
 
 }

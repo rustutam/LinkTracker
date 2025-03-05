@@ -19,7 +19,7 @@ public class ChatServiceImpl implements ChatService {
     public void register(long chatId) {
         List<LinkInfo> linksById = linksRepository.findById(chatId);
 
-        if (linksById.isEmpty()){
+        if (!linksById.isEmpty()){
             throw new DoubleRegistrationException();
         }
 
