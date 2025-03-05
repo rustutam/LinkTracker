@@ -55,12 +55,12 @@ public class LinksRepositoryImpl implements LinksRepository {
 
     @Override
     public Optional<Link> deleteLink(long chatId, String url) {
-        List<Link> linksInfo = userLinks.get(chatId);
-        Optional<Link> optionalLinkToDelete = linksInfo.stream()
+        List<Link> links = userLinks.get(chatId);
+        Optional<Link> optionalLinkToDelete = links.stream()
             .filter(linkInfo -> linkInfo.uri().toString().equals(url))
             .findFirst();
 
-        optionalLinkToDelete.ifPresent(linksInfo::remove);
+        optionalLinkToDelete.ifPresent(links::remove);
 
         return optionalLinkToDelete;
     }

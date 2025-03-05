@@ -40,9 +40,7 @@ public class LinkServiceImpl implements LinkService {
 
     @Override
     public Link removeLink(long chatId, String uri) {
-        List<Link> linksById = linksRepository.findById(chatId);
-
-        if (linksById.isEmpty()){
+        if (!linksRepository.isRegistered(chatId)){
             throw new NotExistTgChatException();
         }
 
@@ -52,12 +50,10 @@ public class LinkServiceImpl implements LinkService {
 
     @Override
     public List<Link> getLinks(long chatId) {
-        List<Link> linksById = linksRepository.findById(chatId);
-
-        if (linksById.isEmpty()){
+        if (!linksRepository.isRegistered(chatId)){
             throw new NotExistTgChatException();
         }
-        return linksById;
+        return linksRepository.findById(chatId);
     }
 
 }
