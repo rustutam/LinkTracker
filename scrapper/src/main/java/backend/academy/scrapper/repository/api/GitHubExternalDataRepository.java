@@ -1,16 +1,14 @@
 package backend.academy.scrapper.repository.api;
 
 import backend.academy.scrapper.client.GithubClient;
-import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.LinkMetadata;
 import backend.academy.scrapper.models.external.github.RepositoryDto;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
-
 import java.net.URI;
 import java.time.OffsetDateTime;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
@@ -18,22 +16,23 @@ public class GitHubExternalDataRepository implements ExternalDataRepository {
     private final GithubClient githubClient;
 
     @Override
-    public Map<Long, OffsetDateTime> getLastUpdateDates(List<Link> linkList) {
-        Map<Long, OffsetDateTime> updatedTimes = new HashMap<>();
+    public List<LinkMetadata> getLinkLastUpdateDates(List<LinkMetadata> linkList) {
+        return linkList.stream()
+            .filter(linkMetadata -> isProcessingUri(linkMetadata.linkUri()))
+            .map(linkMetadata ->
+                new LinkMetadata(
+                    linkMetadata.id(),
+                    linkMetadata.linkUri(),
+                    getLinkUpdatedDate(linkMetadata.linkUri())
+                )
+            )
+            .toList();
+    }
 
-        for (Link link : linkList) {
-            if (!isProcessingUri(link.uri())) {
-                continue;
-            }
-
-            RepoInfo repoInfo = getRepoInfo(link.uri());
-            RepositoryDto repositoryDto = githubClient.repoRequest(repoInfo.owner, repoInfo.repo);
-            OffsetDateTime updatedTime = repositoryDto.updatedAt();
-
-            updatedTimes.put(link.id(),updatedTime);
-        }
-
-        return updatedTimes;
+    private OffsetDateTime getLinkUpdatedDate(URI uri) {
+        RepoInfo repoInfo = getRepoInfo(uri);
+        RepositoryDto repositoryDto = githubClient.repoRequest(repoInfo.owner, repoInfo.repo);
+        return repositoryDto.updatedAt();
     }
 
     @Override

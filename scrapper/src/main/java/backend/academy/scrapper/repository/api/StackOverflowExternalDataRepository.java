@@ -6,6 +6,7 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import backend.academy.scrapper.models.LinkMetadata;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -15,8 +16,8 @@ public class StackOverflowExternalDataRepository implements ExternalDataReposito
     private final StackoverflowClient stackoverflowClient;
 
     @Override
-    public Map<Long, OffsetDateTime> getLastUpdateDates(List<Link> linkList) {
-        return Map.of();
+    public List<LinkMetadata> getLinkLastUpdateDates(List<LinkMetadata> linkList) {
+        return List.of();
     }
 
     @Override

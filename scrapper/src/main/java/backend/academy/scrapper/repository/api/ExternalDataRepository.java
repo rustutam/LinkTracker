@@ -1,13 +1,11 @@
 package backend.academy.scrapper.repository.api;
 
-import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.LinkMetadata;
 import java.net.URI;
-import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 
 public interface ExternalDataRepository {
-    Map<Long, OffsetDateTime> getLastUpdateDates(List<Link> linkList);
+    List<LinkMetadata> getLinkLastUpdateDates(List<LinkMetadata> linkList);
 
     boolean isProcessingUri(URI uri);
 }
