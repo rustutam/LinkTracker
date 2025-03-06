@@ -16,6 +16,10 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
     private final Sender sender;
 
     public void notifySender(List<Link> updatedLinks) {
+        if (updatedLinks.isEmpty()) {
+            return;
+        }
+
         sender.send(linkUpdateNotificationMapper(updatedLinks));
     }
 
