@@ -11,7 +11,7 @@ public class SchedulerConfig {
     private final ScrapperConfig scrapperConfig;
 
     @Bean("schedulerIntervalMs")
-    public long schedulerIntervalMs(ScrapperConfig config) {
-        return config.scheduler().interval().toMillis();
+    public long schedulerIntervalMs() {
+        return scrapperConfig.scheduler().interval().toMillis();
     }
 }

@@ -1,13 +1,16 @@
 package backend.academy.scrapper.controller;
 
+import backend.academy.scrapper.configuration.GitHubConfig;
 import backend.academy.scrapper.handler.ChatHandler;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ChatController implements Controller{

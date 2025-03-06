@@ -31,8 +31,6 @@ public class ChangesDetectServiceImpl implements ChangesDetectService {
         Map<Long, OffsetDateTime> StackLastUpdateDates = stackOverflowExternalDataRepository.getLastUpdateDates(stackOverflowLinks);
         linksForUpdate.addAll(getLinksForUpdate(stackOverflowLinks, StackLastUpdateDates));
 
-//        botNotificationService.notifyAboutUpdate(linksForUpdate);
-
         return linksForUpdate;
     }
 
