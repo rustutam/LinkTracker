@@ -2,6 +2,8 @@ package backend.academy.scrapper.repository.database;
 
 
 import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.LinkMetadata;
+import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -20,15 +22,11 @@ public interface LinksRepository {
 
     List<Link> findById(long chatId);
 
-    List<Long> getAllChatIds();
-
-    List<Link> getAllLinks();
-
     List<Long> getAllChatIdByLink(String uri);
 
-    List<Link> getGitHubLinks();
+    List<LinkMetadata> getGitHubLinks();
 
-    List<Link> getStackOverflowLinks();
+    List<LinkMetadata> getStackOverflowLinks();
 
-    void updateLastUpdateTime(long id, OffsetDateTime time);
+    void updateLinksLastUpdateTime(List<LinkMetadata> updatedLinks);
 }
