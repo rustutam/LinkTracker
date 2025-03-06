@@ -22,6 +22,10 @@ public class GitHubExternalDataRepository implements ExternalDataRepository {
         Map<Long, OffsetDateTime> updatedTimes = new HashMap<>();
 
         for (Link link : linkList) {
+            if (!isProcessingUri(link.uri())) {
+                continue;
+            }
+
             RepoInfo repoInfo = getRepoInfo(link.uri());
             RepositoryDto repositoryDto = githubClient.repoRequest(repoInfo.owner, repoInfo.repo);
             OffsetDateTime updatedTime = repositoryDto.updatedAt();
@@ -30,6 +34,11 @@ public class GitHubExternalDataRepository implements ExternalDataRepository {
         }
 
         return updatedTimes;
+    }
+
+    @Override
+    public boolean isProcessingUri(URI uri) {
+        return uri.getHost().equals("github.com");
     }
 
 
