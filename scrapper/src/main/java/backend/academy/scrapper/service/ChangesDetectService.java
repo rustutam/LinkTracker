@@ -1,8 +1,8 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.LinkMetadata;
 import java.util.List;
 
 public interface ChangesDetectService {
-    List<Link> detectChanges();
+    List<LinkMetadata> detectChanges();
 }
