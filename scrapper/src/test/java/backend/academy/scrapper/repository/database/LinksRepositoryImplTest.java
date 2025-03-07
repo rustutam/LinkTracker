@@ -99,6 +99,8 @@ class LinksRepositoryImplTest {
         assertFalse(userLinksEntities.stream()
                 .anyMatch(entity -> entity.chatId() == 1L));
     }
+
+
 //
 //    @Test
 //    @DisplayName("Должен сохранять ссылку и присваивать ID")
@@ -109,7 +111,7 @@ class LinksRepositoryImplTest {
 //
 //        assertTrue(linksRepository.findById(chatId).contains(savedLink));
 //        assertTrue(savedLink.id() > 0);
-    }
+//    }
 //
 //    @Test
 //    @DisplayName("Должен удалять ссылку")

@@ -14,7 +14,6 @@ public class GithubClient {
     public GithubClient(GitHubConfig gitHubConfig) {
         restClient = RestClient.builder()
             .baseUrl(gitHubConfig.baseUrl())
-            .defaultHeader("Authorization", gitHubConfig.githubToken())
             .build();
     }
 
@@ -35,11 +34,13 @@ public class GithubClient {
     }
 
     public RepositoryDto repoRequest(String owner, String repository) {
-        return restClient
+        RepositoryDto body = restClient
             .get()
             .uri("repos/{owner}/{repo}", owner, repository)
             .retrieve()
             .body(RepositoryDto.class);
+
+        return body;
     }
 
 }

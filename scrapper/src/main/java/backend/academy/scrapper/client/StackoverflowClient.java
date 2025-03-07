@@ -12,8 +12,6 @@ public class StackoverflowClient {
     public StackoverflowClient(StackOverflowConfig stackoverflowConfig) {
         restClient = RestClient.builder()
             .baseUrl(stackoverflowConfig.baseUrl())
-            .defaultHeader("key", stackoverflowConfig.key())
-            .defaultHeader("access_token", stackoverflowConfig.accessToken())
             .build();
     }
 

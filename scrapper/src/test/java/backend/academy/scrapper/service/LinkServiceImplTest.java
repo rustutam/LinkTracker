@@ -1,6 +1,7 @@
 package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
+import backend.academy.scrapper.exceptions.InvalidLinkException;
 import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.exceptions.NotTrackLinkException;
 import backend.academy.scrapper.models.Link;
@@ -43,7 +44,7 @@ class LinkServiceImplTest {
         long chatId = 123L;
         Link link = new Link(
             0,
-            URI.create("https://example.com"),
+            URI.create("https://github.com/repo"),
             List.of(),
             List.of(),
             null);
@@ -61,7 +62,7 @@ class LinkServiceImplTest {
         long chatId = 123L;
         Link link = new Link(
             0,
-            URI.create("https://example.com"),
+            URI.create("https://github.com/repo"),
             List.of(),
             List.of(),
             null);
@@ -69,7 +70,7 @@ class LinkServiceImplTest {
         List<Link> existingLinks = List.of(
             new Link(
                 0,
-                URI.create("https://example.com"),
+                URI.create("https://github.com/repo"),
                 List.of(),
                 List.of(),
                 null
@@ -84,12 +85,26 @@ class LinkServiceImplTest {
     }
 
     @Test
+    @DisplayName("Выбросить InvalidLinkException, если ссылка невальная")
+    void whenLinkInvalidThenThrowInvalidLinkException() {
+        long chatId = 123L;
+        Link link = new Link(
+            0,
+            URI.create("https://test.com/repo"),
+            List.of(),
+            List.of(),
+            null);
+
+        assertThrows(InvalidLinkException.class, () -> linkService.addLink(chatId, link));
+    }
+
+    @Test
     @DisplayName("Сохранить ссылку, если её нет в списке отслеживаемых")
     void addLink_ShouldSaveLink_WhenNotAlreadyTracked() {
         long chatId = 123L;
         Link link = new Link(
             0,
-            URI.create("https://example.com"),
+            URI.create("https://stackoverflow.com/repo"),
             List.of(),
             List.of(),
             null);
@@ -97,7 +112,7 @@ class LinkServiceImplTest {
         List<Link> existingLinks = List.of(
             new Link(
                 0,
-                URI.create("https://tbank.com"),
+                URI.create("https://github.com/repo"),
                 List.of(),
                 List.of(),
                 null
@@ -106,7 +121,7 @@ class LinkServiceImplTest {
 
         Link expectedLink = new Link(
             0,
-            URI.create("https://example.com"),
+            URI.create("https://stackoverflow.com/repo"),
             List.of(),
             List.of(),
             OffsetDateTime.now());

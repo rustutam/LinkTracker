@@ -7,9 +7,11 @@ import backend.academy.scrapper.models.api.response.LinkResponse;
 import backend.academy.scrapper.models.api.response.ListLinksResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class LinksController implements Controller {
@@ -31,6 +33,7 @@ public class LinksController implements Controller {
             @RequestHeader(value = "Tg-Chat-Id", required = true) Long tgChatId,
             @Valid @RequestBody AddLinkRequest addLinkRequest
     ) {
+        log.info("Добавление ссылки{}",addLinkRequest.link());
         LinkResponse linkResponse = linkHandler.addLink(tgChatId, addLinkRequest);
         return ResponseEntity
                 .ok()

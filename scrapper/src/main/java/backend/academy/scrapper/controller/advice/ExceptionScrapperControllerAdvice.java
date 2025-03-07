@@ -4,6 +4,7 @@ package backend.academy.scrapper.controller.advice;
 import java.util.Arrays;
 import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
+import backend.academy.scrapper.exceptions.InvalidLinkException;
 import backend.academy.scrapper.exceptions.NotExistLinkException;
 import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.exceptions.NotTrackLinkException;
@@ -102,6 +103,20 @@ public class ExceptionScrapperControllerAdvice {
                 .exceptionMessage(LINK_NOT_FOUND_DESCRIPTION)
                 .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
                 .build());
+    }
+
+    @ExceptionHandler(InvalidLinkException.class)
+    public ResponseEntity<ApiErrorResponse> invalidLinkException(InvalidLinkException e) {
+        return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(ApiErrorResponse.builder()
+                .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
+                .code(BAD_REQUEST_HTTP_CODE)
+                .exceptionName(e.getClass().getName())
+                .exceptionMessage(e.getMessage())
+                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
+                .build()
+            );
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)

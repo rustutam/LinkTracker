@@ -9,6 +9,7 @@ import backend.academy.scrapper.service.LinkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
 import java.util.List;
 
 @Component
@@ -27,10 +28,10 @@ public class LinkHandlerImpl implements LinkHandler {
         Link linkInfo = linkService.addLink(tgChatId, link);
 
         return new LinkResponse(
-                linkInfo.id(),
-                linkInfo.uri(),
-                linkInfo.tags(),
-                linkInfo.filters()
+            linkInfo.id(),
+            linkInfo.uri(),
+            linkInfo.tags(),
+            linkInfo.filters()
         );
     }
 
@@ -39,10 +40,10 @@ public class LinkHandlerImpl implements LinkHandler {
         Link link = linkService.removeLink(tgChatId, removeLinkRequest.link().toString());
 
         return new LinkResponse(
-                link.id(),
-                link.uri(),
-                link.tags(),
-                link.filters()
+            link.id(),
+            link.uri(),
+            link.tags(),
+            link.filters()
         );
     }
 
@@ -51,19 +52,18 @@ public class LinkHandlerImpl implements LinkHandler {
         List<Link> links = linkService.getLinks(tgChatId);
 
         List<LinkResponse> linkResponses = links.stream()
-                .map(linkInfo ->
-                        new LinkResponse(
-                                linkInfo.id(),
-                                linkInfo.uri(),
-                                linkInfo.tags(),
-                                linkInfo.filters()
-                        ))
-                .toList();
+            .map(linkInfo ->
+                new LinkResponse(
+                    linkInfo.id(),
+                    linkInfo.uri(),
+                    linkInfo.tags(),
+                    linkInfo.filters()
+                ))
+            .toList();
 
-        //TODO: убрать хардкод с size
         return new ListLinksResponse(
-                linkResponses,
-                5
+            linkResponses,
+            linkResponses.size()
         );
     }
 }
