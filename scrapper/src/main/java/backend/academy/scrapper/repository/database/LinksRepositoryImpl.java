@@ -2,6 +2,10 @@ package backend.academy.scrapper.repository.database;
 
 import backend.academy.scrapper.models.Link;
 import backend.academy.scrapper.models.LinkMetadata;
+import backend.academy.scrapper.models.entities.InfoEntity;
+import backend.academy.scrapper.models.entities.LinksEntity;
+import backend.academy.scrapper.models.entities.RepositoryTables;
+import backend.academy.scrapper.models.entities.UserLinksEntity;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -12,66 +16,65 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public class LinksRepositoryImpl implements LinksRepository {
-    private List<Long> users = new ArrayList<>();
+    private final RepositoryTables repositoryTables;
 
-    private List<UserLinksEntity> userLinksEntities = new ArrayList<>();
+    public LinksRepositoryImpl(RepositoryTables repositoryTables) {
+        this.repositoryTables = repositoryTables;
+    }
+
     private final AtomicLong userLinksIdGenerator = new AtomicLong(1);
-
-    private List<LinksEntity> linksEntities = new ArrayList<>();
     private final AtomicLong linksEntityIdGenerator = new AtomicLong(1);
-
-    private List<InfoEntity> infoEntities = new ArrayList<>();
     private final AtomicLong infoIdGenerator = new AtomicLong(1);
 
     private URI getUriById(long linkId) {
-        return linksEntities.stream()
-            .filter(it -> it.linkId == linkId)
-            .map(it -> it.linkUri)
+        return repositoryTables.linksEntities().stream()
+            .filter(it -> it.linkId() == linkId)
+            .map(LinksEntity::linkUri)
             .findFirst()
             .orElseThrow();
     }
 
     private OffsetDateTime getLastUpdateTimeById(long linkId) {
-        return linksEntities.stream()
-            .filter(it -> it.linkId == linkId)
-            .map(it -> it.lastUpdateTime)
+        return repositoryTables.linksEntities().stream()
+            .filter(it -> it.linkId() == linkId)
+            .map(LinksEntity::lastUpdateTime)
             .findFirst()
             .orElseThrow();
     }
 
     private List<String> getTagsById(long infoId) {
-        return infoEntities.stream()
-            .filter(ie -> ie.infoId == infoId)
-            .map(ie -> ie.tags)
+        return repositoryTables.infoEntities().stream()
+            .filter(it -> it.infoId() == infoId)
+            .map(InfoEntity::tags)
             .findFirst()
             .orElseThrow();
     }
 
     private List<String> getFiltersById(long infoId) {
-        return infoEntities.stream()
-            .filter(ie -> ie.infoId == infoId)
-            .map(ie -> ie.filters)
+        return repositoryTables.infoEntities().stream()
+            .filter(ie -> ie.infoId() == infoId)
+            .map(InfoEntity::filters)
             .findFirst()
             .orElseThrow();
     }
 
     private long getLinkIdByUri(URI linkUri) {
-        return linksEntities.stream()
+        return repositoryTables.linksEntities().stream()
             .filter(it -> it.linkUri().equals(linkUri))
-            .map(it -> it.linkId)
+            .map(it -> it.linkId())
             .findFirst()
             .orElseThrow();
     }
 
     private List<URI> getAllLinks() {
-        return linksEntities.stream()
-            .map(it -> it.linkUri)
+        return repositoryTables.linksEntities().stream()
+            .map(it -> it.linkUri())
             .toList();
     }
 
     @Override
     public boolean isRegistered(long chatId) {
-        return users.contains(chatId);
+        return repositoryTables.users().contains(chatId);
     }
 
     @Override
@@ -79,7 +82,7 @@ public class LinksRepositoryImpl implements LinksRepository {
         if (isRegistered(chatId)) {
             return; // Если пользователь уже зарегистрирован, ничего не делаем
         }
-        users.add(chatId);
+        repositoryTables.users().add(chatId);
     }
 
     @Override
@@ -87,38 +90,34 @@ public class LinksRepositoryImpl implements LinksRepository {
         if (!isRegistered(chatId)) {
             return; // Если пользователь не зарегистрирован, ничего не делаем
         }
-        users.remove(chatId);
-        userLinksEntities.removeIf(userLinksEntity -> userLinksEntity.chatId == chatId);
+        repositoryTables.users().remove(chatId);
+        repositoryTables.userLinksEntities().removeIf(userLinksEntity -> userLinksEntity.chatId() == chatId);
     }
 
     @Override
     public Link saveLink(long chatId, Link link) {
 // Проверяем, зарегистрирован ли пользователь
-        if (!isRegistered(chatId)) {
-            throw new IllegalArgumentException("Пользователь не зарегистрирован");
-        }
-
         long linkId = processLinkId(link);
         long infoId = processInfoId(link);
 
         // Добавляем связь пользователя с сохраненной ссылкой
         long generalId = userLinksIdGenerator.getAndIncrement();
         UserLinksEntity userLink = new UserLinksEntity(generalId, chatId, linkId, infoId);
-        userLinksEntities.add(userLink);
+        repositoryTables.userLinksEntities().add(userLink);
 
         // Возвращаем обновленный объект Link с присвоенным ID
         return new Link(generalId, link.uri(), link.tags(), link.filters(), link.lastUpdateTime());
     }
 
     private long processLinkId(Link link) {
-        Optional<Long> maybeLinkId = linksEntities.stream()
+        Optional<Long> maybeLinkId = repositoryTables.linksEntities().stream()
             .filter(it -> it.linkUri().equals(link.uri()))
-            .map(it -> it.linkId)
+            .map(LinksEntity::linkId)
             .findFirst();
 
         if (maybeLinkId.isEmpty()) {
             long linkId = linksEntityIdGenerator.getAndIncrement();
-            linksEntities.add(new LinksEntity(linkId, link.uri(), link.lastUpdateTime()));
+            repositoryTables.linksEntities().add(new LinksEntity(linkId, link.uri(), link.lastUpdateTime()));
             return linkId;
         } else {
             return maybeLinkId.get();
@@ -126,15 +125,15 @@ public class LinksRepositoryImpl implements LinksRepository {
     }
 
     private long processInfoId(Link link) {
-        Optional<Long> maybeInfoId = infoEntities.stream()
-            .filter(it -> it.tags.stream().sorted().equals(link.tags().stream().sorted()))
-            .filter(it -> it.filters.stream().sorted().equals(link.filters().stream().sorted()))
-            .map(it -> it.infoId)
+        Optional<Long> maybeInfoId = repositoryTables.infoEntities().stream()
+            .filter(it -> it.tags().stream().sorted().equals(link.tags().stream().sorted()))
+            .filter(it -> it.filters().stream().sorted().equals(link.filters().stream().sorted()))
+            .map(InfoEntity::infoId)
             .findFirst();
 
         if (maybeInfoId.isEmpty()) {
             long infoId = infoIdGenerator.getAndIncrement();
-            infoEntities.add(new InfoEntity(infoId, link.tags(), link.filters()));
+            repositoryTables.infoEntities().add(new InfoEntity(infoId, link.tags(), link.filters()));
             return infoId;
         } else {
             return maybeInfoId.get();
@@ -143,14 +142,14 @@ public class LinksRepositoryImpl implements LinksRepository {
 
     @Override
     public Optional<Link> deleteLink(long chatId, String url) {
-        Optional<UserLinksEntity> maybeDeletedLink = userLinksEntities.stream()
-            .filter(userLinksEntity -> userLinksEntity.chatId == chatId)
-            .filter(userLinksEntity -> userLinksEntity.linkId == getLinkIdByUri(URI.create(url)))
+        Optional<UserLinksEntity> maybeDeletedLink = repositoryTables.userLinksEntities().stream()
+            .filter(userLinksEntity -> userLinksEntity.chatId() == chatId)
+            .filter(userLinksEntity -> userLinksEntity.linkId() == getLinkIdByUri(URI.create(url)))
             .findFirst();
 
-        userLinksEntities.removeIf(
+        repositoryTables.userLinksEntities().removeIf(
             userLinksEntity ->
-                userLinksEntity.chatId == chatId && userLinksEntity.linkId == getLinkIdByUri(URI.create(url))
+                userLinksEntity.chatId() == chatId && userLinksEntity.linkId() == getLinkIdByUri(URI.create(url))
         );
 
         if (maybeDeletedLink.isEmpty()) {
@@ -159,11 +158,11 @@ public class LinksRepositoryImpl implements LinksRepository {
         UserLinksEntity deletedLink = maybeDeletedLink.get();
         return Optional.of(
             new Link(
-                deletedLink.id,
-                getUriById(deletedLink.linkId),
-                getTagsById(deletedLink.infoId),
-                getFiltersById(deletedLink.infoId),
-                getLastUpdateTimeById(deletedLink.linkId)
+                deletedLink.id(),
+                getUriById(deletedLink.linkId()),
+                getTagsById(deletedLink.infoId()),
+                getFiltersById(deletedLink.infoId()),
+                getLastUpdateTimeById(deletedLink.linkId())
             )
         );
 
@@ -173,15 +172,15 @@ public class LinksRepositoryImpl implements LinksRepository {
     @Override
     public List<Link> findById(long chatId) {
         List<Link> links = new ArrayList<>();
-        userLinksEntities.stream()
-            .filter(userLinksEntity -> userLinksEntity.chatId == chatId)
+        repositoryTables.userLinksEntities().stream()
+            .filter(userLinksEntity -> userLinksEntity.chatId() == chatId)
             .forEach(userLinksEntity -> {
                 Link link = new Link(
-                    userLinksEntity.id,
-                    getUriById(userLinksEntity.linkId),
-                    getTagsById(userLinksEntity.infoId),
-                    getFiltersById(userLinksEntity.infoId),
-                    getLastUpdateTimeById(userLinksEntity.linkId)
+                    userLinksEntity.id(),
+                    getUriById(userLinksEntity.linkId()),
+                    getTagsById(userLinksEntity.infoId()),
+                    getFiltersById(userLinksEntity.infoId()),
+                    getLastUpdateTimeById(userLinksEntity.linkId())
                 );
                 links.add(link);
             });
@@ -192,9 +191,9 @@ public class LinksRepositoryImpl implements LinksRepository {
     public List<Long> getAllChatIdByLink(String uri) {
         long uriId = getLinkIdByUri(URI.create(uri));
 
-        return userLinksEntities.stream()
-            .filter(userLinksEntity -> userLinksEntity.linkId == uriId)
-            .map(userLinksEntity -> userLinksEntity.chatId)
+        return repositoryTables.userLinksEntities().stream()
+            .filter(userLinksEntity -> userLinksEntity.linkId() == uriId)
+            .map(userLinksEntity -> userLinksEntity.chatId())
             .toList();
     }
 
@@ -209,52 +208,29 @@ public class LinksRepositoryImpl implements LinksRepository {
     }
 
     private List<LinkMetadata> getLinkMetadataByHost(String host) {
-        return linksEntities.stream()
-            .filter(it -> it.linkUri.getHost().equals(host))
-            .map(it -> new LinkMetadata(it.linkId, it.linkUri, it.lastUpdateTime))
+        return repositoryTables.linksEntities().stream()
+            .filter(it -> it.linkUri().getHost().equals(host))
+            .map(it -> new LinkMetadata(it.linkId(), it.linkUri(), it.lastUpdateTime()))
             .toList();
     }
 
     @Override
     public void updateLinksLastUpdateTime(List<LinkMetadata> updatedLinks) {
         updatedLinks.forEach(linkWithNewDate -> {
-            linksEntities.stream()
-                .filter(linkWithOldDate -> linkWithOldDate.linkId == linkWithNewDate.id())
+            repositoryTables.linksEntities().stream()
+                .filter(linkWithOldDate -> linkWithOldDate.linkId() == linkWithNewDate.id())
                 .findFirst()
                 .ifPresent(linkWithOldDate -> {
                     LinksEntity linksEntity = new LinksEntity(
-                        linkWithOldDate.linkId,
-                        linkWithOldDate.linkUri,
+                        linkWithOldDate.linkId(),
+                        linkWithOldDate.linkUri(),
                         linkWithNewDate.lastUpdateTime()
                     );
-                    linksEntities.remove(linkWithOldDate);
-                    linksEntities.add(linksEntity);
+                    repositoryTables.linksEntities().remove(linkWithOldDate);
+                    repositoryTables.linksEntities().add(linksEntity);
                 });
         });
 
     }
-
-    private record LinksEntity(
-        long linkId,
-        URI linkUri,
-        OffsetDateTime lastUpdateTime
-    ) {
-    }
-
-    private record InfoEntity(
-        long infoId,
-        List<String> tags,
-        List<String> filters
-    ) {
-    }
-
-    private record UserLinksEntity(
-        long id,
-        long chatId,
-        long linkId,
-        long infoId
-    ) {
-    }
-
 
 }
