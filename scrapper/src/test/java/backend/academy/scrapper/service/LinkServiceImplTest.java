@@ -5,17 +5,20 @@ import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.exceptions.NotTrackLinkException;
 import backend.academy.scrapper.models.Link;
 import backend.academy.scrapper.repository.database.LinksRepository;
+import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import java.net.URI;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -210,7 +213,7 @@ class LinkServiceImplTest {
         OffsetDateTime time = OffsetDateTime.now();
         List<Link> expectedLinks = List.of(
             new Link(1L, URI.create("https://example.com"), List.of(), List.of(), time),
-            new Link(2L ,URI.create("https://another.com"), List.of(), List.of(), time)
+            new Link(2L, URI.create("https://another.com"), List.of(), List.of(), time)
         );
 
         when(linksRepository.isRegistered(chatId)).thenReturn(true);
