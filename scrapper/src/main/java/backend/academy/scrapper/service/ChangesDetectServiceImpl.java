@@ -21,12 +21,12 @@ public class ChangesDetectServiceImpl implements ChangesDetectService {
         List<LinkMetadata> updatedLinks = new ArrayList<>();
         // Обработка ссылок с гита
         List<LinkMetadata> gitHubLinksWithOldDate = repository.getGitHubLinks();
-        List<LinkMetadata> gitHubLinksWithNewDate = gitHubExternalDataRepository.getLinkLastUpdateDates(gitHubLinksWithOldDate);
+        List<LinkMetadata> gitHubLinksWithNewDate = gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksWithOldDate);
         updatedLinks.addAll(getUpdatedLink(gitHubLinksWithOldDate, gitHubLinksWithNewDate));
 
         // Обработка ссылок с ст
         List<LinkMetadata> stackOverflowLinks = repository.getStackOverflowLinks();
-        List<LinkMetadata> StackLastUpdateDates = stackOverflowExternalDataRepository.getLinkLastUpdateDates(stackOverflowLinks);
+        List<LinkMetadata> StackLastUpdateDates = stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinks);
         updatedLinks.addAll(getUpdatedLink(stackOverflowLinks, StackLastUpdateDates));
 
         repository.updateLinksLastUpdateTime(updatedLinks);
