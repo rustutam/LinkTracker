@@ -18,13 +18,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class LinkServiceImpl implements LinkService {
     private final LinksRepository linksRepository;
-    private final List<String> correctDomains = List.of("github.com", "stackoverflow.com");
+    private final GitHubExternalDataRepository gitHubExternalDataRepository;
+    private final StackOverflowExternalDataRepository stackOverflowExternalDataRepository;
 
     @Override
     public Link addLink(long chatId, Link link) {
-        if (!correctDomains.contains(link.uri().getHost())){
-            throw new InvalidLinkException();
-        }
+        OffsetDateTime lastUpdateTime = getLastUpdateTime(link.uri());
 
         if (!linksRepository.isRegistered(chatId)) {
             throw new NotExistTgChatException();
@@ -40,9 +39,18 @@ public class LinkServiceImpl implements LinkService {
             throw new AlreadyTrackLinkException();
         }
 
-        link.lastUpdateTime(OffsetDateTime.now());
+        link.lastUpdateTime(lastUpdateTime);
 
         return linksRepository.saveLink(chatId, link);
+    }
+
+    private OffsetDateTime getLastUpdateTime(URI uri) throws InvalidLinkException {
+        if (gitHubExternalDataRepository.isProcessingUri(uri)) {
+            return gitHubExternalDataRepository.getLastUpdateDate(uri);
+        } else if (stackOverflowExternalDataRepository.isProcessingUri(uri)) {
+            return stackOverflowExternalDataRepository.getLastUpdateDate(uri);
+        }
+        return null;
     }
 
     @Override

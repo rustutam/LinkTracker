@@ -2,9 +2,11 @@ package backend.academy.scrapper.client;
 
 import backend.academy.scrapper.configuration.TgBotConfig;
 import backend.academy.scrapper.models.api.LinkUpdate;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+@Slf4j
 @Component
 public class TgBotClient {
     private final RestClient restClient;
@@ -16,11 +18,12 @@ public class TgBotClient {
     }
 
     public void send(LinkUpdate linkUpdate){
-        restClient.post()
-            .uri("/updates")
-            .body(linkUpdate)
-            .retrieve()
-            .toBodilessEntity();
+        log.info(linkUpdate.toString());
+//        restClient.post()
+//            .uri("/updates")
+//            .body(linkUpdate)
+//            .retrieve()
+//            .toBodilessEntity();
     }
 
 }
