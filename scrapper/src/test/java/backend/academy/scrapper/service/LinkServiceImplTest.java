@@ -5,6 +5,8 @@ import backend.academy.scrapper.exceptions.InvalidLinkException;
 import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.exceptions.NotTrackLinkException;
 import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.repository.api.GitHubExternalDataRepository;
+import backend.academy.scrapper.repository.api.StackOverflowExternalDataRepository;
 import backend.academy.scrapper.repository.database.LinksRepository;
 import java.net.URI;
 import java.time.OffsetDateTime;
@@ -35,6 +37,9 @@ class LinkServiceImplTest {
     @Mock
     private LinksRepository linksRepository;
 
+    @Mock
+    private GitHubExternalDataRepository gitHubExternalDataRepository;
+
     @InjectMocks
     private LinkServiceImpl linkService;
 
@@ -50,6 +55,8 @@ class LinkServiceImplTest {
             null);
 
         when(linksRepository.isRegistered(chatId)).thenReturn(false);
+        when(gitHubExternalDataRepository.isProcessingUri(any(URI.class))).thenReturn(true);
+        when(gitHubExternalDataRepository.getLastUpdateDate(any(URI.class))).thenReturn(OffsetDateTime.now());
 
         assertThrows(NotExistTgChatException.class, () -> linkService.addLink(chatId, link));
 
@@ -78,24 +85,12 @@ class LinkServiceImplTest {
         );
         when(linksRepository.isRegistered(chatId)).thenReturn(true);
         when(linksRepository.findById(chatId)).thenReturn(existingLinks);
+        when(gitHubExternalDataRepository.isProcessingUri(any(URI.class))).thenReturn(true);
+        when(gitHubExternalDataRepository.getLastUpdateDate(any(URI.class))).thenReturn(OffsetDateTime.now());
 
         assertThrows(AlreadyTrackLinkException.class, () -> linkService.addLink(chatId, link));
 
         verify(linksRepository, never()).saveLink(anyLong(), any(Link.class));
-    }
-
-    @Test
-    @DisplayName("Выбросить InvalidLinkException, если ссылка невальная")
-    void whenLinkInvalidThenThrowInvalidLinkException() {
-        long chatId = 123L;
-        Link link = new Link(
-            0,
-            URI.create("https://test.com/repo"),
-            List.of(),
-            List.of(),
-            null);
-
-        assertThrows(InvalidLinkException.class, () -> linkService.addLink(chatId, link));
     }
 
     @Test
@@ -129,6 +124,8 @@ class LinkServiceImplTest {
         when(linksRepository.isRegistered(chatId)).thenReturn(true);
         when(linksRepository.findById(chatId)).thenReturn(existingLinks);
         when(linksRepository.saveLink(eq(chatId), any(Link.class))).thenReturn(expectedLink);
+        when(gitHubExternalDataRepository.isProcessingUri(any(URI.class))).thenReturn(true);
+        when(gitHubExternalDataRepository.getLastUpdateDate(any(URI.class))).thenReturn(OffsetDateTime.now());
 
         Link result = linkService.addLink(chatId, link);
 

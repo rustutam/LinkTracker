@@ -1,16 +1,16 @@
 package backend.academy.scrapper.handler;
 
+import backend.academy.GeneralParseLink;
+import backend.academy.scrapper.exceptions.InvalidLinkException;
 import backend.academy.scrapper.models.Link;
 import backend.academy.scrapper.models.api.request.AddLinkRequest;
 import backend.academy.scrapper.models.api.request.RemoveLinkRequest;
 import backend.academy.scrapper.models.api.response.LinkResponse;
 import backend.academy.scrapper.models.api.response.ListLinksResponse;
 import backend.academy.scrapper.service.LinkService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-
-import java.net.URI;
-import java.util.List;
 
 @Component
 @RequiredArgsConstructor
@@ -19,7 +19,10 @@ public class LinkHandlerImpl implements LinkHandler {
 
     @Override
     public LinkResponse addLink(long tgChatId, AddLinkRequest addLinkRequest) {
-        //TODO подумать какую валидацию данных сделать
+        if (new GeneralParseLink().start(addLinkRequest.link().toString()) == null) {
+            throw new InvalidLinkException();
+        }
+
         Link link = new Link();
         link.uri(addLinkRequest.link());
         link.tags(addLinkRequest.tags());

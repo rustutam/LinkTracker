@@ -49,8 +49,9 @@ public class LinkServiceImpl implements LinkService {
             return gitHubExternalDataRepository.getLastUpdateDate(uri);
         } else if (stackOverflowExternalDataRepository.isProcessingUri(uri)) {
             return stackOverflowExternalDataRepository.getLastUpdateDate(uri);
+        } else{
+            throw new InvalidLinkException();
         }
-        return null;
     }
 
     @Override

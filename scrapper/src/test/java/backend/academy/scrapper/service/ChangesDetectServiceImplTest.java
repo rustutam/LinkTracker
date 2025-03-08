@@ -78,9 +78,9 @@ class ChangesDetectServiceImplTest {
 
         when(repository.getGitHubLinks()).thenReturn(gitHubLinksBeforeUpdate);
         when(repository.getStackOverflowLinks()).thenReturn(stackOverflowLinksBeforeUpdate);
-        when(gitHubExternalDataRepository.getLinkLastUpdateDates(gitHubLinksBeforeUpdate))
+        when(gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksBeforeUpdate))
             .thenReturn(gitHubLinksAfterUpdate);
-        when(stackOverflowExternalDataRepository.getLinkLastUpdateDates(stackOverflowLinksBeforeUpdate))
+        when(stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinksBeforeUpdate))
             .thenReturn(stackOverflowLinksAfterUpdate);
 
         List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
@@ -109,7 +109,7 @@ class ChangesDetectServiceImplTest {
         );
 
         when(repository.getGitHubLinks()).thenReturn(gitHubLinksBeforeUpdate);
-        when(gitHubExternalDataRepository.getLinkLastUpdateDates(gitHubLinksBeforeUpdate))
+        when(gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksBeforeUpdate))
             .thenReturn(gitHubLinksAfterUpdate);
 
         List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
@@ -138,7 +138,7 @@ class ChangesDetectServiceImplTest {
         );
 
         when(repository.getStackOverflowLinks()).thenReturn(stackOverflowLinksBeforeUpdate);
-        when(stackOverflowExternalDataRepository.getLinkLastUpdateDates(stackOverflowLinksBeforeUpdate))
+        when(stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinksBeforeUpdate))
             .thenReturn(stackOverflowLinksAfterUpdate);
 
         List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
@@ -177,9 +177,9 @@ class ChangesDetectServiceImplTest {
 
         when(repository.getGitHubLinks()).thenReturn(gitHubLinksBeforeUpdate);
         when(repository.getStackOverflowLinks()).thenReturn(stackOverflowLinksBeforeUpdate);
-        when(gitHubExternalDataRepository.getLinkLastUpdateDates(gitHubLinksBeforeUpdate))
+        when(gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksBeforeUpdate))
             .thenReturn(gitHubLinksAfterUpdate);
-        when(stackOverflowExternalDataRepository.getLinkLastUpdateDates(stackOverflowLinksBeforeUpdate))
+        when(stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinksBeforeUpdate))
             .thenReturn(stackOverflowLinksAfterUpdate);
 
         List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
