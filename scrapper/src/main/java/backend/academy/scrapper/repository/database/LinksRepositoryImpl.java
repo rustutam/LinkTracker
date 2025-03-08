@@ -63,7 +63,7 @@ public class LinksRepositoryImpl implements LinksRepository {
             .filter(it -> it.linkUri().equals(linkUri))
             .map(it -> it.linkId())
             .findFirst()
-            .orElseThrow();
+            .orElse(-1L);
     }
 
     private List<URI> getAllLinks() {
@@ -142,14 +142,19 @@ public class LinksRepositoryImpl implements LinksRepository {
 
     @Override
     public Optional<Link> deleteLink(long chatId, String url) {
+        long linkId = getLinkIdByUri(URI.create(url));
+        if (linkId == -1L) {
+            return Optional.empty();
+        }
+
         Optional<UserLinksEntity> maybeDeletedLink = repositoryTables.userLinksEntities().stream()
             .filter(userLinksEntity -> userLinksEntity.chatId() == chatId)
-            .filter(userLinksEntity -> userLinksEntity.linkId() == getLinkIdByUri(URI.create(url)))
+            .filter(userLinksEntity -> userLinksEntity.linkId() == linkId)
             .findFirst();
 
         repositoryTables.userLinksEntities().removeIf(
             userLinksEntity ->
-                userLinksEntity.chatId() == chatId && userLinksEntity.linkId() == getLinkIdByUri(URI.create(url))
+                userLinksEntity.chatId() == chatId && userLinksEntity.linkId() == linkId
         );
 
         if (maybeDeletedLink.isEmpty()) {
