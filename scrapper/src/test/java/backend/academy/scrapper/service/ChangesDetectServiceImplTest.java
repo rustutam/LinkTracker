@@ -1,27 +1,24 @@
 package backend.academy.scrapper.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import backend.academy.scrapper.models.LinkMetadata;
 import backend.academy.scrapper.repository.api.GitHubExternalDataRepository;
 import backend.academy.scrapper.repository.api.StackOverflowExternalDataRepository;
 import backend.academy.scrapper.repository.database.LinksRepository;
-
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
-
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class ChangesDetectServiceImplTest {
@@ -59,29 +56,25 @@ class ChangesDetectServiceImplTest {
     @DisplayName("Должно вернуть пустой список, если нет обновлений на GitHub и StackOverflow")
     void detectChanges_ShouldReturnEmptyList_WhenNoUpdatesOnGitHubAndStackOverflow() {
         List<LinkMetadata> gitHubLinksBeforeUpdate = List.of(
-            new LinkMetadata(1L, URI.create("https://github.com/user/repo"), oldTime),
-            new LinkMetadata(2L, URI.create("https://github.com/user/repo"), oldTime),
-            new LinkMetadata(3L, URI.create("https://github.com/user/repo"), oldTime)
-        );
+                new LinkMetadata(1L, URI.create("https://github.com/user/repo"), oldTime),
+                new LinkMetadata(2L, URI.create("https://github.com/user/repo"), oldTime),
+                new LinkMetadata(3L, URI.create("https://github.com/user/repo"), oldTime));
 
         List<LinkMetadata> gitHubLinksAfterUpdate = List.of(
-            new LinkMetadata(1L, URI.create("https://github.com/user/repo"), oldTime),
-            new LinkMetadata(2L, URI.create("https://github.com/user/repo"), oldTime),
-            new LinkMetadata(3L, URI.create("https://github.com/user/repo"), oldTime)
-        );
-        List<LinkMetadata> stackOverflowLinksBeforeUpdate = List.of(
-            new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), oldTime)
-        );
-        List<LinkMetadata> stackOverflowLinksAfterUpdate = List.of(
-            new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), oldTime)
-        );
+                new LinkMetadata(1L, URI.create("https://github.com/user/repo"), oldTime),
+                new LinkMetadata(2L, URI.create("https://github.com/user/repo"), oldTime),
+                new LinkMetadata(3L, URI.create("https://github.com/user/repo"), oldTime));
+        List<LinkMetadata> stackOverflowLinksBeforeUpdate =
+                List.of(new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), oldTime));
+        List<LinkMetadata> stackOverflowLinksAfterUpdate =
+                List.of(new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), oldTime));
 
         when(repository.getGitHubLinks()).thenReturn(gitHubLinksBeforeUpdate);
         when(repository.getStackOverflowLinks()).thenReturn(stackOverflowLinksBeforeUpdate);
         when(gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksBeforeUpdate))
-            .thenReturn(gitHubLinksAfterUpdate);
+                .thenReturn(gitHubLinksAfterUpdate);
         when(stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinksBeforeUpdate))
-            .thenReturn(stackOverflowLinksAfterUpdate);
+                .thenReturn(stackOverflowLinksAfterUpdate);
 
         List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
 
@@ -92,54 +85,45 @@ class ChangesDetectServiceImplTest {
     @DisplayName("Должно вернуть список обновлённых ссылок с GitHub")
     void detectChanges_ShouldReturnUpdatedGitHubLinks_WhenThereAreUpdates() {
         List<LinkMetadata> gitHubLinksBeforeUpdate = List.of(
-            new LinkMetadata(1L, URI.create("https://github.com/123"), oldTime),
-            new LinkMetadata(2L, URI.create("https://github.com/345"), oldTime),
-            new LinkMetadata(3L, URI.create("https://github.com/567"), oldTime)
-        );
+                new LinkMetadata(1L, URI.create("https://github.com/123"), oldTime),
+                new LinkMetadata(2L, URI.create("https://github.com/345"), oldTime),
+                new LinkMetadata(3L, URI.create("https://github.com/567"), oldTime));
 
         List<LinkMetadata> gitHubLinksAfterUpdate = List.of(
-            new LinkMetadata(1L, URI.create("https://github.com/123"), newTime),
-            new LinkMetadata(2L, URI.create("https://github.com/345"), newTime),
-            new LinkMetadata(3L, URI.create("https://github.com/567"), oldTime)
-        );
+                new LinkMetadata(1L, URI.create("https://github.com/123"), newTime),
+                new LinkMetadata(2L, URI.create("https://github.com/345"), newTime),
+                new LinkMetadata(3L, URI.create("https://github.com/567"), oldTime));
 
         List<LinkMetadata> expectedUpdatedLinks = List.of(
-            new LinkMetadata(1L, URI.create("https://github.com/123"), newTime),
-            new LinkMetadata(2L, URI.create("https://github.com/345"), newTime)
-        );
+                new LinkMetadata(1L, URI.create("https://github.com/123"), newTime),
+                new LinkMetadata(2L, URI.create("https://github.com/345"), newTime));
 
         when(repository.getGitHubLinks()).thenReturn(gitHubLinksBeforeUpdate);
         when(gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksBeforeUpdate))
-            .thenReturn(gitHubLinksAfterUpdate);
+                .thenReturn(gitHubLinksAfterUpdate);
 
         List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
 
         assertEquals(2, updatedLinks.size());
-        assertTrue(
-            expectedUpdatedLinks.containsAll(updatedLinks)
-                && updatedLinks.containsAll(expectedUpdatedLinks)
-        );
+        assertTrue(expectedUpdatedLinks.containsAll(updatedLinks) && updatedLinks.containsAll(expectedUpdatedLinks));
     }
 
     @Test
     @DisplayName("Должно вернуть список обновлённых ссылок с StackOverflow")
     void detectChanges_ShouldReturnUpdatedStackOverflowLinks_WhenThereAreUpdates() {
         List<LinkMetadata> stackOverflowLinksBeforeUpdate = List.of(
-            new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), oldTime),
-            new LinkMetadata(5L, URI.create("https://stackoverflow.com/q/123345"), oldTime)
-        );
+                new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), oldTime),
+                new LinkMetadata(5L, URI.create("https://stackoverflow.com/q/123345"), oldTime));
         List<LinkMetadata> stackOverflowLinksAfterUpdate = List.of(
-            new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), newTime),
-            new LinkMetadata(5L, URI.create("https://stackoverflow.com/q/123345"), oldTime)
-        );
+                new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), newTime),
+                new LinkMetadata(5L, URI.create("https://stackoverflow.com/q/123345"), oldTime));
 
-        List<LinkMetadata> expectedUpdatedLinks = List.of(
-            new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), newTime)
-        );
+        List<LinkMetadata> expectedUpdatedLinks =
+                List.of(new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/12345"), newTime));
 
         when(repository.getStackOverflowLinks()).thenReturn(stackOverflowLinksBeforeUpdate);
         when(stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinksBeforeUpdate))
-            .thenReturn(stackOverflowLinksAfterUpdate);
+                .thenReturn(stackOverflowLinksAfterUpdate);
 
         List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
 
@@ -151,44 +135,35 @@ class ChangesDetectServiceImplTest {
     @DisplayName("Должно вернуть объединённый список обновлённых ссылок с GitHub и StackOverflow")
     void detectChanges_ShouldReturnCombinedList_WhenThereAreUpdatesOnBothPlatforms() {
         List<LinkMetadata> gitHubLinksBeforeUpdate = List.of(
-            new LinkMetadata(1L, URI.create("https://github.com/user/repo/1"), oldTime),
-            new LinkMetadata(2L, URI.create("https://github.com/user/repo/2"), oldTime),
-            new LinkMetadata(3L, URI.create("https://github.com/user/repo/3"), oldTime)
-        );
+                new LinkMetadata(1L, URI.create("https://github.com/user/repo/1"), oldTime),
+                new LinkMetadata(2L, URI.create("https://github.com/user/repo/2"), oldTime),
+                new LinkMetadata(3L, URI.create("https://github.com/user/repo/3"), oldTime));
         List<LinkMetadata> gitHubLinksAfterUpdate = List.of(
-            new LinkMetadata(1L, URI.create("https://github.com/user/repo/1"), newTime),
-            new LinkMetadata(2L, URI.create("https://github.com/user/repo/2"), newTime),
-            new LinkMetadata(3L, URI.create("https://github.com/user/repo/3"), newTime)
-        );
+                new LinkMetadata(1L, URI.create("https://github.com/user/repo/1"), newTime),
+                new LinkMetadata(2L, URI.create("https://github.com/user/repo/2"), newTime),
+                new LinkMetadata(3L, URI.create("https://github.com/user/repo/3"), newTime));
         List<LinkMetadata> stackOverflowLinksBeforeUpdate = List.of(
-            new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/1"), oldTime),
-            new LinkMetadata(5L, URI.create("https://stackoverflow.com/q/2"), oldTime)
-        );
+                new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/1"), oldTime),
+                new LinkMetadata(5L, URI.create("https://stackoverflow.com/q/2"), oldTime));
         List<LinkMetadata> stackOverflowLinksAfterUpdate = List.of(
-            new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/1"), newTime),
-            new LinkMetadata(5L, URI.create("https://stackoverflow.com/q/2"), oldTime)
-        );
+                new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/1"), newTime),
+                new LinkMetadata(5L, URI.create("https://stackoverflow.com/q/2"), oldTime));
         List<LinkMetadata> expectedUpdatedLinks = List.of(
-            new LinkMetadata(1L, URI.create("https://github.com/user/repo/1"), newTime),
-            new LinkMetadata(2L, URI.create("https://github.com/user/repo/2"), newTime),
-            new LinkMetadata(3L, URI.create("https://github.com/user/repo/3"), newTime),
-            new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/1"), newTime)
-        );
+                new LinkMetadata(1L, URI.create("https://github.com/user/repo/1"), newTime),
+                new LinkMetadata(2L, URI.create("https://github.com/user/repo/2"), newTime),
+                new LinkMetadata(3L, URI.create("https://github.com/user/repo/3"), newTime),
+                new LinkMetadata(4L, URI.create("https://stackoverflow.com/q/1"), newTime));
 
         when(repository.getGitHubLinks()).thenReturn(gitHubLinksBeforeUpdate);
         when(repository.getStackOverflowLinks()).thenReturn(stackOverflowLinksBeforeUpdate);
         when(gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksBeforeUpdate))
-            .thenReturn(gitHubLinksAfterUpdate);
+                .thenReturn(gitHubLinksAfterUpdate);
         when(stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinksBeforeUpdate))
-            .thenReturn(stackOverflowLinksAfterUpdate);
+                .thenReturn(stackOverflowLinksAfterUpdate);
 
         List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
 
         assertEquals(4, updatedLinks.size());
-        assertTrue(
-            expectedUpdatedLinks.containsAll(updatedLinks)
-                && updatedLinks.containsAll(expectedUpdatedLinks)
-        );
+        assertTrue(expectedUpdatedLinks.containsAll(updatedLinks) && updatedLinks.containsAll(expectedUpdatedLinks));
     }
 }
-

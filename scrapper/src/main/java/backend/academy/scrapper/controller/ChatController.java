@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class ChatController implements Controller{
+public class ChatController implements Controller {
     private final ChatHandler chatHandler;
 
     @PostMapping("/tg-chat/{id}")

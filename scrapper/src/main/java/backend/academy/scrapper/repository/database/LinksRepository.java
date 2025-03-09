@@ -1,13 +1,9 @@
 package backend.academy.scrapper.repository.database;
 
-
 import backend.academy.scrapper.models.Link;
 import backend.academy.scrapper.models.LinkMetadata;
-import java.net.URI;
-import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
-
 
 public interface LinksRepository {
     void register(long chatId);

@@ -1,10 +1,11 @@
 package backend.academy.bot.parse;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import general.RegexCheck;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DisplayName("Тестирует парсинг github и stackoverflow ссылок")
 public class LinkParseTests {

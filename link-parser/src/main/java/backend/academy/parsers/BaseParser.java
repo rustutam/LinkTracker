@@ -3,7 +3,7 @@ package backend.academy.parsers;
 import backend.academy.responses.BaseParseResponse;
 import java.util.Optional;
 
-public sealed abstract class BaseParser implements Parser permits GitHubParser, StackOverflowParser {
+public abstract sealed class BaseParser implements Parser permits GitHubParser, StackOverflowParser {
     private Parser successor;
 
     public void setSuccessor(Parser successor) {

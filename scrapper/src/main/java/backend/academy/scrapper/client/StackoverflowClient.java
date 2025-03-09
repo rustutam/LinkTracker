@@ -10,18 +10,14 @@ public class StackoverflowClient {
     private final RestClient restClient;
 
     public StackoverflowClient(StackOverflowConfig stackoverflowConfig) {
-        restClient = RestClient.builder()
-            .baseUrl(stackoverflowConfig.baseUrl())
-            .build();
+        restClient = RestClient.builder().baseUrl(stackoverflowConfig.baseUrl()).build();
     }
 
     public StackoverflowQuestionDTO questionRequest(String questionId) {
         return restClient
-            .get()
-            .uri("/questions/{questionId}/?site=stackoverflow&filter=withbody", questionId)
-            .retrieve()
-            .body(StackoverflowQuestionDTO.class);
+                .get()
+                .uri("/questions/{questionId}/?site=stackoverflow&filter=withbody", questionId)
+                .retrieve()
+                .body(StackoverflowQuestionDTO.class);
     }
-
-
 }

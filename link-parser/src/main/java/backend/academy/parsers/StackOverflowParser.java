@@ -7,7 +7,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class StackOverflowParser extends BaseParser {
-    private static final Pattern URL_TEMPLATE = Pattern.compile("^https://stackoverflow\\.com/questions/(\\d+)(?:/.*|$)");
+    private static final Pattern URL_TEMPLATE =
+            Pattern.compile("^https://stackoverflow\\.com/questions/(\\d+)(?:/.*|$)");
 
     @Override
     public BaseParseResponse parseUrl(Optional<String> url) {

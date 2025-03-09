@@ -22,15 +22,10 @@ public class StackOverflowExternalDataRepository implements ExternalDataReposito
     @Override
     public List<LinkMetadata> getLinksWithNewLastUpdateDates(List<LinkMetadata> linkList) {
         return linkList.stream()
-            .filter(linkMetadata -> isProcessingUri(linkMetadata.linkUri()))
-            .map(linkMetadata ->
-                new LinkMetadata(
-                    linkMetadata.id(),
-                    linkMetadata.linkUri(),
-                    getLastUpdateDate(linkMetadata.linkUri())
-                )
-            )
-            .toList();
+                .filter(linkMetadata -> isProcessingUri(linkMetadata.linkUri()))
+                .map(linkMetadata -> new LinkMetadata(
+                        linkMetadata.id(), linkMetadata.linkUri(), getLastUpdateDate(linkMetadata.linkUri())))
+                .toList();
     }
 
     @Override
@@ -39,10 +34,10 @@ public class StackOverflowExternalDataRepository implements ExternalDataReposito
             String questionId = getQuestionId(uri);
             StackoverflowQuestionDTO stackoverflowQuestionDTO = stackoverflowClient.questionRequest(questionId);
             Integer lastActivityDateInSeconds = stackoverflowQuestionDTO.items().stream()
-                .filter(it -> questionId.equals(it.questionId()))
-                .findFirst()
-                .map(StackoverflowQuestionDTO.ItemResponse::lastActivityDate)
-                .orElseThrow();
+                    .filter(it -> questionId.equals(it.questionId()))
+                    .findFirst()
+                    .map(StackoverflowQuestionDTO.ItemResponse::lastActivityDate)
+                    .orElseThrow();
             return getOffsetDateTime(lastActivityDateInSeconds);
         } catch (Exception e) {
             throw new InvalidLinkException();
@@ -58,10 +53,8 @@ public class StackOverflowExternalDataRepository implements ExternalDataReposito
         return parts[2];
     }
 
-
     @Override
     public boolean isProcessingUri(URI uri) {
         return uri.getHost().equals("stackoverflow.com");
     }
-
 }

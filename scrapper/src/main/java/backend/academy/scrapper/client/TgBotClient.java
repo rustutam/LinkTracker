@@ -12,17 +12,10 @@ public class TgBotClient {
     private final RestClient restClient;
 
     public TgBotClient(TgBotConfig tgBotConfig) {
-        this.restClient = RestClient.builder()
-            .baseUrl(tgBotConfig.baseUrl())
-            .build();
+        this.restClient = RestClient.builder().baseUrl(tgBotConfig.baseUrl()).build();
     }
 
     public void send(LinkUpdate linkUpdate) {
-        restClient.post()
-            .uri("/updates")
-            .body(linkUpdate)
-            .retrieve()
-            .toBodilessEntity();
+        restClient.post().uri("/updates").body(linkUpdate).retrieve().toBodilessEntity();
     }
-
 }

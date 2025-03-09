@@ -15,8 +15,7 @@ public class CommandContainer {
     @Autowired
     public CommandContainer(List<Command> commands, UnknownCommand unknownCommand) {
         this.unknownCommand = unknownCommand;
-        commandMap = commands.stream()
-            .collect(Collectors.toMap(Command::getName, Function.identity()));
+        commandMap = commands.stream().collect(Collectors.toMap(Command::getName, Function.identity()));
     }
 
     public Command retrieveCommand(String commandIdentifier) {

@@ -1,6 +1,11 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.ScrapperApplication;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.scrapper.models.LinkMetadata;
 import backend.academy.scrapper.models.LinkUpdateNotification;
 import backend.academy.scrapper.repository.database.LinksRepository;
@@ -16,12 +21,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.SpringApplication;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class SenderNotificationServiceImplTest {
@@ -44,14 +43,10 @@ class SenderNotificationServiceImplTest {
         String exampleUri = "https://example.com";
         String gitUri = "https://github.com";
         List<LinkMetadata> updatedLinks = List.of(
-            new LinkMetadata(1L, URI.create(exampleUri), time),
-            new LinkMetadata(2L, URI.create(gitUri), time)
-        );
+                new LinkMetadata(1L, URI.create(exampleUri), time), new LinkMetadata(2L, URI.create(gitUri), time));
 
-        when(linkRepository.getAllChatIdByLink(exampleUri))
-            .thenReturn(List.of(101L, 102L));
-        when(linkRepository.getAllChatIdByLink(gitUri))
-            .thenReturn(List.of(103L, 104L, 105L));
+        when(linkRepository.getAllChatIdByLink(exampleUri)).thenReturn(List.of(101L, 102L));
+        when(linkRepository.getAllChatIdByLink(gitUri)).thenReturn(List.of(103L, 104L, 105L));
 
         // Act
         senderNotificationService.notifySender(updatedLinks);
@@ -83,4 +78,3 @@ class SenderNotificationServiceImplTest {
         verify(sender, never()).send(any());
     }
 }
-

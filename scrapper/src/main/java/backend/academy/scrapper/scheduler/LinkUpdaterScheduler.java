@@ -21,8 +21,5 @@ public class LinkUpdaterScheduler {
         log.info("Updating the link on a schedule");
         List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
         senderNotificationService.notifySender(updatedLinks);
-
     }
-
-
 }

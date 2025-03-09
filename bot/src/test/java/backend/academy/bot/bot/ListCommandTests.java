@@ -1,5 +1,10 @@
 package backend.academy.bot.bot;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.bot.service.BotService;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -9,10 +14,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import static com.github.tomakehurst.wiremock.client.WireMock.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class ListCommandTests extends BaseConfigure {
@@ -26,7 +27,7 @@ public class ListCommandTests extends BaseConfigure {
     @DisplayName("Тестирование вывода всех отслеживаемых ссылок (1 ссылка без доп. полей)")
     public void test1() {
         String jsonAnswer =
-            """
+                """
                 {
                    "links" : [ {
                        "id" : 52,
@@ -38,11 +39,11 @@ public class ListCommandTests extends BaseConfigure {
                 }""";
 
         wireMockServer.stubFor(get(urlEqualTo("/links"))
-            .withHeader("Tg-Chat-Id", matching("123"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody(jsonAnswer)));
+                .withHeader("Tg-Chat-Id", matching("123"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(jsonAnswer)));
 
         when(message.text()).thenReturn("/list");
 
@@ -56,7 +57,7 @@ public class ListCommandTests extends BaseConfigure {
         assertEquals(123L, sentMessage.getParameters().get("chat_id"));
 
         String returnAnswer =
-            """
+                """
                 Кол-во отслеживаемых ссылок: 1
 
                 Отслеживаемые ссылки:
@@ -64,14 +65,14 @@ public class ListCommandTests extends BaseConfigure {
                 1) Ссылка: https://github.com/lirik1254/abTestRepo""";
 
         assertEquals(
-            returnAnswer, sentMessage.getParameters().get("text").toString().replaceAll("\r\n", "\n"));
+                returnAnswer, sentMessage.getParameters().get("text").toString().replaceAll("\r\n", "\n"));
     }
 
     @Test
     @DisplayName("Тестирование вывода более чем 1 отслеживаемой ссылки с разным контентов (теги, фильтры)")
     public void test2() {
         String jsonAnswer =
-            """
+                """
                 {
                    "links" : [ {
                        "id" : 52,
@@ -90,11 +91,11 @@ public class ListCommandTests extends BaseConfigure {
                 }""";
 
         wireMockServer.stubFor(get(urlEqualTo("/links"))
-            .withHeader("Tg-Chat-Id", matching("123"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody(jsonAnswer)));
+                .withHeader("Tg-Chat-Id", matching("123"))
+                .willReturn(aResponse()
+                        .withStatus(200)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(jsonAnswer)));
 
         when(message.text()).thenReturn("/list");
 
@@ -108,7 +109,7 @@ public class ListCommandTests extends BaseConfigure {
         assertEquals(123L, sentMessage.getParameters().get("chat_id"));
 
         String returnAnswer =
-            """
+                """
                 Кол-во отслеживаемых ссылок: 2
 
                 Отслеживаемые ссылки:
@@ -121,14 +122,14 @@ public class ListCommandTests extends BaseConfigure {
                 Фильтры: test:test, test2:test2""";
 
         assertEquals(
-            returnAnswer, sentMessage.getParameters().get("text").toString().replaceAll("\r\n", "\n"));
+                returnAnswer, sentMessage.getParameters().get("text").toString().replaceAll("\r\n", "\n"));
     }
 
     @Test
     @DisplayName("Тестирование обработки ошибки 400 от сервера")
     public void test3() {
         String jsonAnswer =
-            """
+                """
                 {
                     "description" : "Некорректные параметры52",
                     "code" : "400",
@@ -138,11 +139,11 @@ public class ListCommandTests extends BaseConfigure {
                 }""";
 
         wireMockServer.stubFor(get(urlEqualTo("/links"))
-            .withHeader("Tg-Chat-Id", matching("123"))
-            .willReturn(aResponse()
-                .withStatus(400)
-                .withHeader("Content-Type", "application/json")
-                .withBody(jsonAnswer)));
+                .withHeader("Tg-Chat-Id", matching("123"))
+                .willReturn(aResponse()
+                        .withStatus(400)
+                        .withHeader("Content-Type", "application/json")
+                        .withBody(jsonAnswer)));
 
         when(message.text()).thenReturn("/list");
 

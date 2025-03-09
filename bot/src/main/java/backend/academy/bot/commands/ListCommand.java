@@ -1,12 +1,13 @@
 package backend.academy.bot.commands;
 
+import static general.LogMessages.CHAT_ID;
+
 import backend.academy.bot.client.TrackClient;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.request.SendMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-import static general.LogMessages.CHAT_ID;
 
 @RequiredArgsConstructor
 @Component
@@ -18,9 +19,9 @@ public class ListCommand implements Command {
     @Override
     public void execute(Long chatId, String message) {
         log.atInfo()
-            .addKeyValue(CHAT_ID, chatId)
-            .setMessage("Выполняется команда /list")
-            .log();
+                .addKeyValue(CHAT_ID, chatId)
+                .setMessage("Выполняется команда /list")
+                .log();
         bot.execute(new SendMessage(chatId, trackClient.getTrackLinks(chatId)));
     }
 

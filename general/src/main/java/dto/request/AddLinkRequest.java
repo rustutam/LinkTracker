@@ -1,17 +1,7 @@
 package dto.request;
 
 import jakarta.validation.constraints.NotNull;
-import java.net.URI;
 import java.util.List;
 
-/**
- * AddLinkRequest
- */
-public record AddLinkRequest(
-    @NotNull String link,
-    @NotNull List<String> tags,
-    @NotNull List<String> filters
-) {
-
-}
-
+/** AddLinkRequest */
+public record AddLinkRequest(@NotNull String link, @NotNull List<String> tags, @NotNull List<String> filters) {}

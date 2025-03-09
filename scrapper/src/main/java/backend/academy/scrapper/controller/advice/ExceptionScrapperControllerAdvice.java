@@ -1,6 +1,5 @@
 package backend.academy.scrapper.controller.advice;
 
-
 import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
 import backend.academy.scrapper.exceptions.InvalidLinkException;
@@ -42,152 +41,155 @@ public class ExceptionScrapperControllerAdvice {
 
     @ExceptionHandler(DoubleRegistrationException.class)
     public ResponseEntity<ApiErrorResponse> exceptionDoubleRegistration(DoubleRegistrationException e) {
-        return ResponseEntity
-            .status(HttpStatus.NOT_ACCEPTABLE)
-            .body(ApiErrorResponse.builder()
-                .description(CHAT_ALREADY_REGISTER_DESCRIPTION)
-                .code(NOT_ACCEPTABLE_HTTP_CODE)
-                .exceptionName(DoubleRegistrationException.class.getName())
-                .exceptionMessage(CHAT_ALREADY_REGISTER_DESCRIPTION)
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build()
-            );
+        return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE)
+                .body(ApiErrorResponse.builder()
+                        .description(CHAT_ALREADY_REGISTER_DESCRIPTION)
+                        .code(NOT_ACCEPTABLE_HTTP_CODE)
+                        .exceptionName(DoubleRegistrationException.class.getName())
+                        .exceptionMessage(CHAT_ALREADY_REGISTER_DESCRIPTION)
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(NotExistTgChatException.class)
     public ResponseEntity<ApiErrorResponse> exceptionNotExistChat(NotExistTgChatException e) {
-        return ResponseEntity
-            .status(HttpStatus.UNAUTHORIZED)
-            .body(ApiErrorResponse.builder()
-                .description(CHAT_NOT_REGISTER_DESCRIPTION)
-
-                .code(UNAUTHORIZED_HTTP_CODE)
-                .exceptionName(NotExistTgChatException.class.getName())
-                .exceptionMessage(CHAT_NOT_REGISTER_DESCRIPTION)
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ApiErrorResponse.builder()
+                        .description(CHAT_NOT_REGISTER_DESCRIPTION)
+                        .code(UNAUTHORIZED_HTTP_CODE)
+                        .exceptionName(NotExistTgChatException.class.getName())
+                        .exceptionMessage(CHAT_NOT_REGISTER_DESCRIPTION)
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(AlreadyTrackLinkException.class)
     public ResponseEntity<ApiErrorResponse> exceptionAlreadyTrackLink(AlreadyTrackLinkException e) {
-        return ResponseEntity
-            .status(HttpStatus.PRECONDITION_FAILED)
-            .body(ApiErrorResponse.builder()
-                .description(LINK_ALREADY_TRACKED_DESCRIPTION)
-                .code(PRECONDITION_FAILED_HTTP_CODE)
-                .exceptionName(AlreadyTrackLinkException.class.getName())
-                .exceptionMessage(LINK_ALREADY_TRACKED_DESCRIPTION)
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build());
+        return ResponseEntity.status(HttpStatus.PRECONDITION_FAILED)
+                .body(ApiErrorResponse.builder()
+                        .description(LINK_ALREADY_TRACKED_DESCRIPTION)
+                        .code(PRECONDITION_FAILED_HTTP_CODE)
+                        .exceptionName(AlreadyTrackLinkException.class.getName())
+                        .exceptionMessage(LINK_ALREADY_TRACKED_DESCRIPTION)
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(NotTrackLinkException.class)
     public ResponseEntity<ApiErrorResponse> exceptionNotTrackLinkException(NotTrackLinkException e) {
-        return ResponseEntity
-            .status(HttpStatus.FORBIDDEN)
-            .body(ApiErrorResponse.builder()
-                .description(LINK_IS_NOT_TRACK_DESCRIPTION)
-                .code(FORBIDDEN_HTTP_CODE)
-                .exceptionName(NotExistLinkException.class.getName())
-                .exceptionMessage(LINK_IS_NOT_TRACK_DESCRIPTION)
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ApiErrorResponse.builder()
+                        .description(LINK_IS_NOT_TRACK_DESCRIPTION)
+                        .code(FORBIDDEN_HTTP_CODE)
+                        .exceptionName(NotExistLinkException.class.getName())
+                        .exceptionMessage(LINK_IS_NOT_TRACK_DESCRIPTION)
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(NotExistLinkException.class)
     public ResponseEntity<ApiErrorResponse> notExistLinkException(NotExistLinkException e) {
-        return ResponseEntity
-            .status(HttpStatus.NOT_FOUND)
-            .body(ApiErrorResponse.builder()
-                .description(LINK_NOT_FOUND_DESCRIPTION)
-                .code(NOT_FOUND_HTTP_CODE)
-                .exceptionName(NotExistLinkException.class.getName())
-                .exceptionMessage(LINK_NOT_FOUND_DESCRIPTION)
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(ApiErrorResponse.builder()
+                        .description(LINK_NOT_FOUND_DESCRIPTION)
+                        .code(NOT_FOUND_HTTP_CODE)
+                        .exceptionName(NotExistLinkException.class.getName())
+                        .exceptionMessage(LINK_NOT_FOUND_DESCRIPTION)
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(InvalidLinkException.class)
     public ResponseEntity<ApiErrorResponse> invalidLinkException(InvalidLinkException e) {
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiErrorResponse.builder()
-                .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
-                .code(BAD_REQUEST_HTTP_CODE)
-                .exceptionName(e.getClass().getName())
-                .exceptionMessage(e.getMessage())
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build()
-            );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.builder()
+                        .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
+                        .code(BAD_REQUEST_HTTP_CODE)
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
     public ResponseEntity<ApiErrorResponse> notSupportedContentType(HttpMediaTypeNotSupportedException e) {
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiErrorResponse.builder()
-                .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
-                .code(BAD_REQUEST_HTTP_CODE)
-                .exceptionName(e.getClass().getName())
-                .exceptionMessage(e.getMessage())
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build()
-            );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.builder()
+                        .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
+                        .code(BAD_REQUEST_HTTP_CODE)
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ApiErrorResponse> badRequest(MethodArgumentNotValidException e) {
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiErrorResponse.builder()
-                .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
-                .code(BAD_REQUEST_HTTP_CODE)
-                .exceptionName(e.getClass().getName())
-                .exceptionMessage(e.getMessage())
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build()
-            );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.builder()
+                        .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
+                        .code(BAD_REQUEST_HTTP_CODE)
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(HttpMessageConversionException.class)
     public ResponseEntity<ApiErrorResponse> badRequest2(HttpMessageConversionException e) {
-        return ResponseEntity
-            .status(HttpStatus.BAD_REQUEST)
-            .body(ApiErrorResponse.builder()
-                .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
-                .code(BAD_REQUEST_HTTP_CODE)
-                .exceptionName(e.getClass().getName())
-                .exceptionMessage(e.getMessage())
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build()
-            );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ApiErrorResponse.builder()
+                        .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
+                        .code(BAD_REQUEST_HTTP_CODE)
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiErrorResponse> notSupportedRequestException(NoResourceFoundException e) {
-        return ResponseEntity
-            .status(HttpStatus.BAD_GATEWAY)
-            .body(ApiErrorResponse.builder()
-                .description(UNSUPPORTED_REQUEST_DESCRIPTION)
-                .code(BAD_GATEWAY_HTTP_CODE)
-                .exceptionName(e.getClass().getName())
-                .exceptionMessage(e.getMessage())
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build()
-            );
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .body(ApiErrorResponse.builder()
+                        .description(UNSUPPORTED_REQUEST_DESCRIPTION)
+                        .code(BAD_GATEWAY_HTTP_CODE)
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiErrorResponse> otherExceptions(Exception e) {
-        return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body(ApiErrorResponse.builder()
-                .description(SERVER_ERROR_DESCRIPTION)
-                .code(INTERNAL_SERVER_ERROR_HTTP_CODE)
-                .exceptionName(e.getClass().getName())
-                .exceptionMessage(e.getMessage())
-                .stacktrace(Arrays.stream(e.getStackTrace()).map(StackTraceElement::toString).toList())
-                .build()
-            );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(ApiErrorResponse.builder()
+                        .description(SERVER_ERROR_DESCRIPTION)
+                        .code(INTERNAL_SERVER_ERROR_HTTP_CODE)
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 }

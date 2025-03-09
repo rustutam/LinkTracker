@@ -1,12 +1,13 @@
 package backend.academy.bot.client;
 
+import static general.LogMessages.CHAT_ID;
+import static general.LogMessages.STATUS;
+
 import backend.academy.bot.configuration.BotConfig;
 import dto.response.ApiErrorResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
-import static general.LogMessages.CHAT_ID;
-import static general.LogMessages.STATUS;
 
 @Component
 @Slf4j

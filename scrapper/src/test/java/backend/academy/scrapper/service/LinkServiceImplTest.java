@@ -1,23 +1,5 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
-import backend.academy.scrapper.exceptions.InvalidLinkException;
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
-import backend.academy.scrapper.exceptions.NotTrackLinkException;
-import backend.academy.scrapper.models.Link;
-import backend.academy.scrapper.repository.api.GitHubExternalDataRepository;
-import backend.academy.scrapper.repository.api.StackOverflowExternalDataRepository;
-import backend.academy.scrapper.repository.database.LinksRepository;
-import java.net.URI;
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -30,6 +12,23 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
+import backend.academy.scrapper.exceptions.NotExistTgChatException;
+import backend.academy.scrapper.exceptions.NotTrackLinkException;
+import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.repository.api.GitHubExternalDataRepository;
+import backend.academy.scrapper.repository.database.LinksRepository;
+import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
 class LinkServiceImplTest {
@@ -47,12 +46,7 @@ class LinkServiceImplTest {
     @DisplayName("Выбросить NotExistTgChatException, если чат не зарегистрирован")
     void addLink_ShouldThrowNotExistTgChatException_WhenChatNotRegistered() {
         long chatId = 123L;
-        Link link = new Link(
-            0,
-            URI.create("https://github.com/repo"),
-            List.of(),
-            List.of(),
-            null);
+        Link link = new Link(0, URI.create("https://github.com/repo"), List.of(), List.of(), null);
 
         when(linksRepository.isRegistered(chatId)).thenReturn(false);
         when(gitHubExternalDataRepository.isProcessingUri(any(URI.class))).thenReturn(true);
@@ -67,22 +61,10 @@ class LinkServiceImplTest {
     @DisplayName("Выбросить AlreadyTrackLinkException, если ссылка уже отслеживается")
     void addLink_ShouldThrowAlreadyTrackLinkException_WhenLinkAlreadyTracked() {
         long chatId = 123L;
-        Link link = new Link(
-            0,
-            URI.create("https://github.com/repo"),
-            List.of(),
-            List.of(),
-            null);
+        Link link = new Link(0, URI.create("https://github.com/repo"), List.of(), List.of(), null);
 
-        List<Link> existingLinks = List.of(
-            new Link(
-                0,
-                URI.create("https://github.com/repo"),
-                List.of(),
-                List.of(),
-                null
-            )
-        );
+        List<Link> existingLinks =
+                List.of(new Link(0, URI.create("https://github.com/repo"), List.of(), List.of(), null));
         when(linksRepository.isRegistered(chatId)).thenReturn(true);
         when(linksRepository.findById(chatId)).thenReturn(existingLinks);
         when(gitHubExternalDataRepository.isProcessingUri(any(URI.class))).thenReturn(true);
@@ -97,29 +79,13 @@ class LinkServiceImplTest {
     @DisplayName("Сохранить ссылку, если её нет в списке отслеживаемых")
     void addLink_ShouldSaveLink_WhenNotAlreadyTracked() {
         long chatId = 123L;
-        Link link = new Link(
-            0,
-            URI.create("https://stackoverflow.com/repo"),
-            List.of(),
-            List.of(),
-            null);
+        Link link = new Link(0, URI.create("https://stackoverflow.com/repo"), List.of(), List.of(), null);
 
-        List<Link> existingLinks = List.of(
-            new Link(
-                0,
-                URI.create("https://github.com/repo"),
-                List.of(),
-                List.of(),
-                null
-            )
-        );
+        List<Link> existingLinks =
+                List.of(new Link(0, URI.create("https://github.com/repo"), List.of(), List.of(), null));
 
-        Link expectedLink = new Link(
-            0,
-            URI.create("https://stackoverflow.com/repo"),
-            List.of(),
-            List.of(),
-            OffsetDateTime.now());
+        Link expectedLink =
+                new Link(0, URI.create("https://stackoverflow.com/repo"), List.of(), List.of(), OffsetDateTime.now());
 
         when(linksRepository.isRegistered(chatId)).thenReturn(true);
         when(linksRepository.findById(chatId)).thenReturn(existingLinks);
@@ -170,13 +136,7 @@ class LinkServiceImplTest {
         long chatId = 123L;
         String uri = "https://example.com";
         OffsetDateTime time = OffsetDateTime.now();
-        Link deletedLink = new Link(
-            0,
-            URI.create(uri),
-            List.of(),
-            List.of(),
-            time
-        );
+        Link deletedLink = new Link(0, URI.create(uri), List.of(), List.of(), time);
 
         when(linksRepository.isRegistered(chatId)).thenReturn(true);
         when(linksRepository.deleteLink(chatId, uri)).thenReturn(Optional.of(deletedLink));
@@ -224,9 +184,8 @@ class LinkServiceImplTest {
         long chatId = 123L;
         OffsetDateTime time = OffsetDateTime.now();
         List<Link> expectedLinks = List.of(
-            new Link(1L, URI.create("https://example.com"), List.of(), List.of(), time),
-            new Link(2L, URI.create("https://another.com"), List.of(), List.of(), time)
-        );
+                new Link(1L, URI.create("https://example.com"), List.of(), List.of(), time),
+                new Link(2L, URI.create("https://another.com"), List.of(), List.of(), time));
 
         when(linksRepository.isRegistered(chatId)).thenReturn(true);
         when(linksRepository.findById(chatId)).thenReturn(expectedLinks);
@@ -240,4 +199,3 @@ class LinkServiceImplTest {
         verify(linksRepository).findById(chatId);
     }
 }
-

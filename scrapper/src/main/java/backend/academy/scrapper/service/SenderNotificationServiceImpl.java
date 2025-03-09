@@ -14,6 +14,7 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
     private final LinksRepository linkRepository;
     private final Sender sender;
 
+    @Override
     public void notifySender(List<LinkMetadata> updatedLinks) {
         if (updatedLinks.isEmpty()) {
             return;
@@ -24,14 +25,10 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
 
     private List<LinkUpdateNotification> linkUpdateNotificationMapper(List<LinkMetadata> updatedLinks) {
         return updatedLinks.stream()
-            .map(linkMetadata ->
-                new LinkUpdateNotification(
-                    linkMetadata.id(),
-                    linkMetadata.linkUri(),
-                    linkRepository.getAllChatIdByLink(linkMetadata.linkUri().toString())
-                )
-            )
-            .toList();
+                .map(linkMetadata -> new LinkUpdateNotification(
+                        linkMetadata.id(),
+                        linkMetadata.linkUri(),
+                        linkRepository.getAllChatIdByLink(linkMetadata.linkUri().toString())))
+                .toList();
     }
-
 }

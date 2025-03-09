@@ -28,48 +28,42 @@ public class LinksRepositoryImpl implements LinksRepository {
 
     private URI getUriById(long linkId) {
         return repositoryTables.linksEntities().stream()
-            .filter(it -> it.linkId() == linkId)
-            .map(LinksEntity::linkUri)
-            .findFirst()
-            .orElseThrow();
+                .filter(it -> it.linkId() == linkId)
+                .map(LinksEntity::linkUri)
+                .findFirst()
+                .orElseThrow();
     }
 
     private OffsetDateTime getLastUpdateTimeById(long linkId) {
         return repositoryTables.linksEntities().stream()
-            .filter(it -> it.linkId() == linkId)
-            .map(LinksEntity::lastUpdateTime)
-            .findFirst()
-            .orElseThrow();
+                .filter(it -> it.linkId() == linkId)
+                .map(LinksEntity::lastUpdateTime)
+                .findFirst()
+                .orElseThrow();
     }
 
     private List<String> getTagsById(long infoId) {
         return repositoryTables.infoEntities().stream()
-            .filter(it -> it.infoId() == infoId)
-            .map(InfoEntity::tags)
-            .findFirst()
-            .orElseThrow();
+                .filter(it -> it.infoId() == infoId)
+                .map(InfoEntity::tags)
+                .findFirst()
+                .orElseThrow();
     }
 
     private List<String> getFiltersById(long infoId) {
         return repositoryTables.infoEntities().stream()
-            .filter(ie -> ie.infoId() == infoId)
-            .map(InfoEntity::filters)
-            .findFirst()
-            .orElseThrow();
+                .filter(ie -> ie.infoId() == infoId)
+                .map(InfoEntity::filters)
+                .findFirst()
+                .orElseThrow();
     }
 
     private long getLinkIdByUri(URI linkUri) {
         return repositoryTables.linksEntities().stream()
-            .filter(it -> it.linkUri().equals(linkUri))
-            .map(it -> it.linkId())
-            .findFirst()
-            .orElse(-1L);
-    }
-
-    private List<URI> getAllLinks() {
-        return repositoryTables.linksEntities().stream()
-            .map(it -> it.linkUri())
-            .toList();
+                .filter(it -> it.linkUri().equals(linkUri))
+                .map(it -> it.linkId())
+                .findFirst()
+                .orElse(-1L);
     }
 
     @Override
@@ -96,7 +90,7 @@ public class LinksRepositoryImpl implements LinksRepository {
 
     @Override
     public Link saveLink(long chatId, Link link) {
-// Проверяем, зарегистрирован ли пользователь
+        // Проверяем, зарегистрирован ли пользователь
         long linkId = processLinkId(link);
         long infoId = processInfoId(link);
 
@@ -111,32 +105,35 @@ public class LinksRepositoryImpl implements LinksRepository {
 
     private long processLinkId(Link link) {
         Optional<Long> maybeLinkId = repositoryTables.linksEntities().stream()
-            .filter(it -> it.linkUri().equals(link.uri()))
-            .map(LinksEntity::linkId)
-            .findFirst();
+                .filter(it -> it.linkUri().equals(link.uri()))
+                .map(LinksEntity::linkId)
+                .findFirst();
 
         if (maybeLinkId.isEmpty()) {
             long linkId = linksEntityIdGenerator.getAndIncrement();
             repositoryTables.linksEntities().add(new LinksEntity(linkId, link.uri(), link.lastUpdateTime()));
             return linkId;
         } else {
-            return maybeLinkId.get();
+            return maybeLinkId.orElseThrow();
         }
     }
 
     private long processInfoId(Link link) {
         Optional<Long> maybeInfoId = repositoryTables.infoEntities().stream()
-            .filter(it -> it.tags().stream().sorted().equals(link.tags().stream().sorted()))
-            .filter(it -> it.filters().stream().sorted().equals(link.filters().stream().sorted()))
-            .map(InfoEntity::infoId)
-            .findFirst();
+                .filter(it ->
+                        it.tags().stream().sorted().equals(link.tags().stream().sorted()))
+                .filter(it -> it.filters().stream()
+                        .sorted()
+                        .equals(link.filters().stream().sorted()))
+                .map(InfoEntity::infoId)
+                .findFirst();
 
         if (maybeInfoId.isEmpty()) {
             long infoId = infoIdGenerator.getAndIncrement();
             repositoryTables.infoEntities().add(new InfoEntity(infoId, link.tags(), link.filters()));
             return infoId;
         } else {
-            return maybeInfoId.get();
+            return maybeInfoId.orElseThrow();
         }
     }
 
@@ -148,47 +145,40 @@ public class LinksRepositoryImpl implements LinksRepository {
         }
 
         Optional<UserLinksEntity> maybeDeletedLink = repositoryTables.userLinksEntities().stream()
-            .filter(userLinksEntity -> userLinksEntity.chatId() == chatId)
-            .filter(userLinksEntity -> userLinksEntity.linkId() == linkId)
-            .findFirst();
+                .filter(userLinksEntity -> userLinksEntity.chatId() == chatId)
+                .filter(userLinksEntity -> userLinksEntity.linkId() == linkId)
+                .findFirst();
 
-        repositoryTables.userLinksEntities().removeIf(
-            userLinksEntity ->
-                userLinksEntity.chatId() == chatId && userLinksEntity.linkId() == linkId
-        );
+        repositoryTables
+                .userLinksEntities()
+                .removeIf(userLinksEntity -> userLinksEntity.chatId() == chatId && userLinksEntity.linkId() == linkId);
 
         if (maybeDeletedLink.isEmpty()) {
             return Optional.empty();
         }
-        UserLinksEntity deletedLink = maybeDeletedLink.get();
-        return Optional.of(
-            new Link(
+        UserLinksEntity deletedLink = maybeDeletedLink.orElseThrow();
+        return Optional.of(new Link(
                 deletedLink.id(),
                 getUriById(deletedLink.linkId()),
                 getTagsById(deletedLink.infoId()),
                 getFiltersById(deletedLink.infoId()),
-                getLastUpdateTimeById(deletedLink.linkId())
-            )
-        );
-
+                getLastUpdateTimeById(deletedLink.linkId())));
     }
-
 
     @Override
     public List<Link> findById(long chatId) {
         List<Link> links = new ArrayList<>();
         repositoryTables.userLinksEntities().stream()
-            .filter(userLinksEntity -> userLinksEntity.chatId() == chatId)
-            .forEach(userLinksEntity -> {
-                Link link = new Link(
-                    userLinksEntity.id(),
-                    getUriById(userLinksEntity.linkId()),
-                    getTagsById(userLinksEntity.infoId()),
-                    getFiltersById(userLinksEntity.infoId()),
-                    getLastUpdateTimeById(userLinksEntity.linkId())
-                );
-                links.add(link);
-            });
+                .filter(userLinksEntity -> userLinksEntity.chatId() == chatId)
+                .forEach(userLinksEntity -> {
+                    Link link = new Link(
+                            userLinksEntity.id(),
+                            getUriById(userLinksEntity.linkId()),
+                            getTagsById(userLinksEntity.infoId()),
+                            getFiltersById(userLinksEntity.infoId()),
+                            getLastUpdateTimeById(userLinksEntity.linkId()));
+                    links.add(link);
+                });
         return links;
     }
 
@@ -197,9 +187,9 @@ public class LinksRepositoryImpl implements LinksRepository {
         long uriId = getLinkIdByUri(URI.create(uri));
 
         return repositoryTables.userLinksEntities().stream()
-            .filter(userLinksEntity -> userLinksEntity.linkId() == uriId)
-            .map(userLinksEntity -> userLinksEntity.chatId())
-            .toList();
+                .filter(userLinksEntity -> userLinksEntity.linkId() == uriId)
+                .map(userLinksEntity -> userLinksEntity.chatId())
+                .toList();
     }
 
     @Override
@@ -214,28 +204,23 @@ public class LinksRepositoryImpl implements LinksRepository {
 
     private List<LinkMetadata> getLinkMetadataByHost(String host) {
         return repositoryTables.linksEntities().stream()
-            .filter(it -> it.linkUri().getHost().equals(host))
-            .map(it -> new LinkMetadata(it.linkId(), it.linkUri(), it.lastUpdateTime()))
-            .toList();
+                .filter(it -> it.linkUri().getHost().equals(host))
+                .map(it -> new LinkMetadata(it.linkId(), it.linkUri(), it.lastUpdateTime()))
+                .toList();
     }
 
     @Override
     public void updateLinksLastUpdateTime(List<LinkMetadata> updatedLinks) {
         updatedLinks.forEach(linkWithNewDate -> {
             repositoryTables.linksEntities().stream()
-                .filter(linkWithOldDate -> linkWithOldDate.linkId() == linkWithNewDate.id())
-                .findFirst()
-                .ifPresent(linkWithOldDate -> {
-                    LinksEntity linksEntity = new LinksEntity(
-                        linkWithOldDate.linkId(),
-                        linkWithOldDate.linkUri(),
-                        linkWithNewDate.lastUpdateTime()
-                    );
-                    repositoryTables.linksEntities().remove(linkWithOldDate);
-                    repositoryTables.linksEntities().add(linksEntity);
-                });
+                    .filter(linkWithOldDate -> linkWithOldDate.linkId() == linkWithNewDate.id())
+                    .findFirst()
+                    .ifPresent(linkWithOldDate -> {
+                        LinksEntity linksEntity = new LinksEntity(
+                                linkWithOldDate.linkId(), linkWithOldDate.linkUri(), linkWithNewDate.lastUpdateTime());
+                        repositoryTables.linksEntities().remove(linkWithOldDate);
+                        repositoryTables.linksEntities().add(linksEntity);
+                    });
         });
-
     }
-
 }

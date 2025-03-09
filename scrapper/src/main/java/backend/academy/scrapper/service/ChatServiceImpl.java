@@ -5,7 +5,6 @@ import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.repository.database.LinksRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -15,7 +14,7 @@ public class ChatServiceImpl implements ChatService {
     @Override
     public void register(long chatId) {
 
-        if (linksRepository.isRegistered(chatId)){
+        if (linksRepository.isRegistered(chatId)) {
             throw new DoubleRegistrationException();
         }
 
@@ -24,7 +23,7 @@ public class ChatServiceImpl implements ChatService {
 
     @Override
     public void unRegister(long chatId) {
-        if (!linksRepository.isRegistered(chatId)){
+        if (!linksRepository.isRegistered(chatId)) {
             throw new NotExistTgChatException();
         }
         linksRepository.unRegister(chatId);

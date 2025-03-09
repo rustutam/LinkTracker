@@ -1,5 +1,7 @@
 package backend.academy.bot.bot;
 
+import static org.mockito.Mockito.when;
+
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
@@ -9,7 +11,6 @@ import com.pengrad.telegrambot.model.Update;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.when;
 
 public abstract class BaseConfigure {
     protected static WireMockServer wireMockServer;

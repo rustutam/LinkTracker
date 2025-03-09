@@ -1,6 +1,5 @@
 package backend.academy.parsers;
 
-
 import backend.academy.responses.BaseParseResponse;
 import backend.academy.responses.GitHubParseResponse;
 import java.util.Optional;

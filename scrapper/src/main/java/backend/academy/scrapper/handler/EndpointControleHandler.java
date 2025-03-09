@@ -1,4 +1,3 @@
 package backend.academy.scrapper.handler;
 
-public interface EndpointControleHandler {
-}
+public interface EndpointControleHandler {}

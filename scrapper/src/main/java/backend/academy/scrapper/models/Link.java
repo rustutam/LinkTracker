@@ -21,5 +21,3 @@ public class Link {
     private List<String> filters;
     private OffsetDateTime lastUpdateTime;
 }
-
-

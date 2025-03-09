@@ -1,5 +1,9 @@
 package backend.academy.bot.bot;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import backend.academy.bot.service.BotService;
 import backend.academy.bot.utils.BotMessages;
 import com.pengrad.telegrambot.TelegramBot;
@@ -10,9 +14,6 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 public class UnknownCommandTest extends BaseConfigure {

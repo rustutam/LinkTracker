@@ -16,17 +16,19 @@ public class ChangesDetectServiceImpl implements ChangesDetectService {
     private final GitHubExternalDataRepository gitHubExternalDataRepository;
     private final StackOverflowExternalDataRepository stackOverflowExternalDataRepository;
 
-
+    @Override
     public List<LinkMetadata> detectChanges() {
         List<LinkMetadata> updatedLinks = new ArrayList<>();
         // Обработка ссылок с гита
         List<LinkMetadata> gitHubLinksWithOldDate = repository.getGitHubLinks();
-        List<LinkMetadata> gitHubLinksWithNewDate = gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksWithOldDate);
+        List<LinkMetadata> gitHubLinksWithNewDate =
+                gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksWithOldDate);
         updatedLinks.addAll(getUpdatedLink(gitHubLinksWithOldDate, gitHubLinksWithNewDate));
 
         // Обработка ссылок с ст
         List<LinkMetadata> stackOverflowLinks = repository.getStackOverflowLinks();
-        List<LinkMetadata> StackLastUpdateDates = stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinks);
+        List<LinkMetadata> StackLastUpdateDates =
+                stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinks);
         updatedLinks.addAll(getUpdatedLink(stackOverflowLinks, StackLastUpdateDates));
 
         repository.updateLinksLastUpdateTime(updatedLinks);
@@ -34,15 +36,12 @@ public class ChangesDetectServiceImpl implements ChangesDetectService {
         return updatedLinks;
     }
 
-
-    private List<LinkMetadata> getUpdatedLink(List<LinkMetadata> linksWithOldDate, List<LinkMetadata> linksWithNewDate) {
+    private List<LinkMetadata> getUpdatedLink(
+            List<LinkMetadata> linksWithOldDate, List<LinkMetadata> linksWithNewDate) {
         return linksWithNewDate.stream()
-            .filter(newLink -> linksWithOldDate.stream()
-                .anyMatch(oldLink ->
-                    oldLink.linkUri().equals(newLink.linkUri())
-                        && newLink.lastUpdateTime().isAfter(oldLink.lastUpdateTime())
-                )
-            )
-            .toList();
+                .filter(newLink -> linksWithOldDate.stream()
+                        .anyMatch(oldLink -> oldLink.linkUri().equals(newLink.linkUri())
+                                && newLink.lastUpdateTime().isAfter(oldLink.lastUpdateTime())))
+                .toList();
     }
 }

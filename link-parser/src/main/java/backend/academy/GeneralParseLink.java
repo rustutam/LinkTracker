@@ -1,6 +1,5 @@
 package backend.academy;
 
-
 import backend.academy.parsers.ParseChain;
 import backend.academy.parsers.Parser;
 import backend.academy.responses.BaseParseResponse;

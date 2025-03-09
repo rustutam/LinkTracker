@@ -20,15 +20,10 @@ public class GitHubExternalDataRepository implements ExternalDataRepository {
     @Override
     public List<LinkMetadata> getLinksWithNewLastUpdateDates(List<LinkMetadata> linkList) {
         return linkList.stream()
-            .filter(linkMetadata -> isProcessingUri(linkMetadata.linkUri()))
-            .map(linkMetadata ->
-                new LinkMetadata(
-                    linkMetadata.id(),
-                    linkMetadata.linkUri(),
-                    getLastUpdateDate(linkMetadata.linkUri())
-                )
-            )
-            .toList();
+                .filter(linkMetadata -> isProcessingUri(linkMetadata.linkUri()))
+                .map(linkMetadata -> new LinkMetadata(
+                        linkMetadata.id(), linkMetadata.linkUri(), getLastUpdateDate(linkMetadata.linkUri())))
+                .toList();
     }
 
     @Override
@@ -52,7 +47,5 @@ public class GitHubExternalDataRepository implements ExternalDataRepository {
         return new RepoInfo(parts[1], parts[2]);
     }
 
-    private record RepoInfo(String owner, String repo) {
-    }
-
+    private record RepoInfo(String owner, String repo) {}
 }

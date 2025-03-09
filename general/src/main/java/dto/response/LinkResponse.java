@@ -1,18 +1,10 @@
 package dto.response;
 
-import java.net.URI;
 import java.util.List;
 
-/**
- * LinkResponse
- */
-public record LinkResponse(
-    Long id,
-    String url,
-    List<String> tags,
-    List<String> filters
+/** LinkResponse */
+public record LinkResponse(Long id, String url, List<String> tags, List<String> filters) {
 
-) {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -29,4 +21,3 @@ public record LinkResponse(
         return sb.toString().trim();
     }
 }
-

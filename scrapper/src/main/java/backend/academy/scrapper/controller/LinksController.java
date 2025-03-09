@@ -19,36 +19,26 @@ public class LinksController implements Controller {
 
     @GetMapping("/links")
     public ResponseEntity<ListLinksResponse> getLinks(
-            @RequestHeader(value = "Tg-Chat-Id", required = true) Long tgChatId
-    ) {
+            @RequestHeader(value = "Tg-Chat-Id", required = true) Long tgChatId) {
         ListLinksResponse listLinksResponse = linkHandler.getLinks(tgChatId);
 
-        return ResponseEntity
-                .ok()
-                .body(listLinksResponse);
+        return ResponseEntity.ok().body(listLinksResponse);
     }
 
     @PostMapping("/links")
     public ResponseEntity<LinkResponse> addLinks(
             @RequestHeader(value = "Tg-Chat-Id", required = true) Long tgChatId,
-            @Valid @RequestBody AddLinkRequest addLinkRequest
-    ) {
-        log.info("Добавление ссылки{}",addLinkRequest.link());
+            @Valid @RequestBody AddLinkRequest addLinkRequest) {
+        log.info("Добавление ссылки{}", addLinkRequest.link());
         LinkResponse linkResponse = linkHandler.addLink(tgChatId, addLinkRequest);
-        return ResponseEntity
-                .ok()
-                .body(linkResponse);
+        return ResponseEntity.ok().body(linkResponse);
     }
 
     @DeleteMapping("/links")
     public ResponseEntity<LinkResponse> deleteLinks(
             @RequestHeader(value = "Tg-Chat-Id", required = true) Long tgChatId,
-            @Valid @RequestBody RemoveLinkRequest removeLinkRequest
-    ) {
+            @Valid @RequestBody RemoveLinkRequest removeLinkRequest) {
         LinkResponse linkResponse = linkHandler.removeLink(tgChatId, removeLinkRequest);
-        return ResponseEntity
-                .ok()
-                .body(linkResponse);
-
+        return ResponseEntity.ok().body(linkResponse);
     }
 }

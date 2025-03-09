@@ -29,11 +29,10 @@ public class LinkServiceImpl implements LinkService {
             throw new NotExistTgChatException();
         }
 
-        List<String> links = linksRepository.findById(chatId)
-            .stream()
-            .map(Link::uri)
-            .map(URI::toString)
-            .toList();
+        List<String> links = linksRepository.findById(chatId).stream()
+                .map(Link::uri)
+                .map(URI::toString)
+                .toList();
 
         if (links.contains(link.uri().toString())) {
             throw new AlreadyTrackLinkException();
@@ -49,7 +48,7 @@ public class LinkServiceImpl implements LinkService {
             return gitHubExternalDataRepository.getLastUpdateDate(uri);
         } else if (stackOverflowExternalDataRepository.isProcessingUri(uri)) {
             return stackOverflowExternalDataRepository.getLastUpdateDate(uri);
-        } else{
+        } else {
             throw new InvalidLinkException();
         }
     }
@@ -60,8 +59,7 @@ public class LinkServiceImpl implements LinkService {
             throw new NotExistTgChatException();
         }
 
-        return linksRepository.deleteLink(chatId, uri)
-            .orElseThrow(NotTrackLinkException::new);
+        return linksRepository.deleteLink(chatId, uri).orElseThrow(NotTrackLinkException::new);
     }
 
     @Override
@@ -71,5 +69,4 @@ public class LinkServiceImpl implements LinkService {
         }
         return linksRepository.findById(chatId);
     }
-
 }
