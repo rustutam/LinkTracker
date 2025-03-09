@@ -3,12 +3,13 @@ package backend.academy.scrapper.handler;
 import backend.academy.GeneralParseLink;
 import backend.academy.scrapper.exceptions.InvalidLinkException;
 import backend.academy.scrapper.models.Link;
-import backend.academy.scrapper.models.api.request.AddLinkRequest;
-import backend.academy.scrapper.models.api.request.RemoveLinkRequest;
-import backend.academy.scrapper.models.api.response.LinkResponse;
-import backend.academy.scrapper.models.api.response.ListLinksResponse;
 import backend.academy.scrapper.service.LinkService;
+import java.net.URI;
 import java.util.List;
+import dto.request.AddLinkRequest;
+import dto.request.RemoveLinkRequest;
+import dto.response.LinkResponse;
+import dto.response.ListLinksResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -19,12 +20,12 @@ public class LinkHandlerImpl implements LinkHandler {
 
     @Override
     public LinkResponse addLink(long tgChatId, AddLinkRequest addLinkRequest) {
-        if (new GeneralParseLink().start(addLinkRequest.link().toString()) == null) {
+        if (new GeneralParseLink().start(addLinkRequest.link()) == null) {
             throw new InvalidLinkException();
         }
 
         Link link = new Link();
-        link.uri(addLinkRequest.link());
+        link.uri(URI.create(addLinkRequest.link()));
         link.tags(addLinkRequest.tags());
         link.filters(addLinkRequest.filters());
 
@@ -32,7 +33,7 @@ public class LinkHandlerImpl implements LinkHandler {
 
         return new LinkResponse(
             linkInfo.id(),
-            linkInfo.uri(),
+            linkInfo.uri().toString(),
             linkInfo.tags(),
             linkInfo.filters()
         );
@@ -40,11 +41,11 @@ public class LinkHandlerImpl implements LinkHandler {
 
     @Override
     public LinkResponse removeLink(long tgChatId, RemoveLinkRequest removeLinkRequest) {
-        Link link = linkService.removeLink(tgChatId, removeLinkRequest.link().toString());
+        Link link = linkService.removeLink(tgChatId, removeLinkRequest.link());
 
         return new LinkResponse(
             link.id(),
-            link.uri(),
+            link.uri().toString(),
             link.tags(),
             link.filters()
         );
@@ -58,7 +59,7 @@ public class LinkHandlerImpl implements LinkHandler {
             .map(linkInfo ->
                 new LinkResponse(
                     linkInfo.id(),
-                    linkInfo.uri(),
+                    linkInfo.uri().toString(),
                     linkInfo.tags(),
                     linkInfo.filters()
                 ))

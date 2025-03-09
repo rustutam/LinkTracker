@@ -2,10 +2,10 @@ package backend.academy.scrapper.sender;
 
 import backend.academy.scrapper.client.TgBotClient;
 import backend.academy.scrapper.models.LinkUpdateNotification;
-import backend.academy.scrapper.models.api.LinkUpdate;
-import backend.academy.scrapper.models.api.response.ApiErrorResponse;
 import java.util.List;
 import java.util.Random;
+import dto.LinkUpdate;
+import dto.response.ApiErrorResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -38,8 +38,8 @@ public class BotSenderImpl implements Sender {
     private LinkUpdate toLinkUpdateMapper(LinkUpdateNotification linkUpdateNotification) {
         return new LinkUpdate(
             new Random().nextLong(),
-            linkUpdateNotification.uri(),
-            "",
+            linkUpdateNotification.uri().toString(),
+            "Обновление!",
             linkUpdateNotification.chatIds()
         );
     }

@@ -10,6 +10,5 @@ import org.springframework.context.annotation.Configuration;
 @Setter
 @Configuration("tgBot")
 public class TgBotConfig {
-    @Value("${baseUrl:http://localhost:8080}")
     private String baseUrl;
 }

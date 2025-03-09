@@ -19,6 +19,8 @@
         <module>bot</module>
         <module>report</module>
         <module>scrapper</module>
+        <module>link-parser</module>
+        <module>general</module>
     </modules>
 
     <properties>

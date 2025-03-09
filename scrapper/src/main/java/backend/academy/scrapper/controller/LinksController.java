@@ -1,10 +1,10 @@
 package backend.academy.scrapper.controller;
 
 import backend.academy.scrapper.handler.LinkHandler;
-import backend.academy.scrapper.models.api.request.AddLinkRequest;
-import backend.academy.scrapper.models.api.request.RemoveLinkRequest;
-import backend.academy.scrapper.models.api.response.LinkResponse;
-import backend.academy.scrapper.models.api.response.ListLinksResponse;
+import dto.request.AddLinkRequest;
+import dto.request.RemoveLinkRequest;
+import dto.response.LinkResponse;
+import dto.response.ListLinksResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

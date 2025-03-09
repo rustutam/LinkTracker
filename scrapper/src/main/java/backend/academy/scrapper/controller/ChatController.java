@@ -1,6 +1,5 @@
 package backend.academy.scrapper.controller;
 
-import backend.academy.scrapper.configuration.GitHubConfig;
 import backend.academy.scrapper.handler.ChatHandler;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

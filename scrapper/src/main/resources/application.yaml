@@ -7,6 +7,7 @@ app:
     key: ${SO_TOKEN_KEY}
     access-token: ${SO_ACCESS_TOKEN}
   stackoverflow-uri: https://api.stackexchange.com/2.3
+  base-uri: http://localhost:8080
 
 spring:
   application:

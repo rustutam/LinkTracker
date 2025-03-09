@@ -143,8 +143,12 @@
         <dependency>
             <groupId>backend.academy</groupId>
             <artifactId>link-parser</artifactId>
-            <version>1.0</version>
-            <scope>compile</scope>
+            <version>${revision}</version>
+        </dependency>
+        <dependency>
+            <groupId>backend.academy</groupId>
+            <artifactId>general</artifactId>
+            <version>${revision}</version>
         </dependency>
 
     </dependencies>
