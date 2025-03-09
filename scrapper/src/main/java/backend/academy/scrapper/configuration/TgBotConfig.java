@@ -13,5 +13,4 @@ public class TgBotConfig {
     public TgBotConfig(ScrapperConfig scrapperConfig) {
         baseUrl = scrapperConfig.baseUri();
     }
-
 }

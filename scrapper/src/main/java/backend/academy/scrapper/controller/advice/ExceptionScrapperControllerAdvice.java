@@ -127,15 +127,15 @@ public class ExceptionScrapperControllerAdvice {
     @ExceptionHandler(MethodArgumentTypeMismatchException.class)
     public ResponseEntity<ApiErrorResponse> invalidArgumentTypeException(MethodArgumentTypeMismatchException e) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(ApiErrorResponse.builder()
-                .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
-                .code(BAD_REQUEST_HTTP_CODE)
-                .exceptionName(e.getClass().getName())
-                .exceptionMessage(e.getMessage())
-                .stacktrace(Arrays.stream(e.getStackTrace())
-                    .map(StackTraceElement::toString)
-                    .toList())
-                .build());
+                .body(ApiErrorResponse.builder()
+                        .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
+                        .code(BAD_REQUEST_HTTP_CODE)
+                        .exceptionName(e.getClass().getName())
+                        .exceptionMessage(e.getMessage())
+                        .stacktrace(Arrays.stream(e.getStackTrace())
+                                .map(StackTraceElement::toString)
+                                .toList())
+                        .build());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
