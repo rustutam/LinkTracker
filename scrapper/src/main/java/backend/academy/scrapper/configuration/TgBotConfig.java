@@ -9,4 +9,9 @@ import org.springframework.context.annotation.Configuration;
 @Configuration("tgBot")
 public class TgBotConfig {
     private String baseUrl;
+
+    public TgBotConfig(ScrapperConfig scrapperConfig) {
+        baseUrl = scrapperConfig.baseUri();
+    }
+
 }

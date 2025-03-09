@@ -16,6 +16,7 @@ import org.springframework.web.HttpMediaTypeNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.reactive.resource.NoResourceFoundException;
 
 @RestControllerAdvice
@@ -121,6 +122,20 @@ public class ExceptionScrapperControllerAdvice {
                                 .map(StackTraceElement::toString)
                                 .toList())
                         .build());
+    }
+
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<ApiErrorResponse> invalidArgumentTypeException(MethodArgumentTypeMismatchException e) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ApiErrorResponse.builder()
+                .description(UNCORRECT_REQUEST_PARAM_DESCRIPTION)
+                .code(BAD_REQUEST_HTTP_CODE)
+                .exceptionName(e.getClass().getName())
+                .exceptionMessage(e.getMessage())
+                .stacktrace(Arrays.stream(e.getStackTrace())
+                    .map(StackTraceElement::toString)
+                    .toList())
+                .build());
     }
 
     @ExceptionHandler(HttpMediaTypeNotSupportedException.class)
