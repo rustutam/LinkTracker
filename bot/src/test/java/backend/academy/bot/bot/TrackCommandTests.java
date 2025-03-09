@@ -93,7 +93,7 @@ public class TrackCommandTests extends BaseConfigure {
     @Test
     @DisplayName("Если введешь корректное url, попросят ввести теги")
     public void test4() {
-        when(message.text()).thenReturn("https://github.com/lirik1254/abTestRepo");
+        when(message.text()).thenReturn("https://github.com/TestOwner/TestRepo");
         ReflectionTestUtils.setField(trackCommand, "userStates", new HashMap<>(Map.of(123L, State.WAITING_FOR_URL)));
 
         botService.handleMessage(update);
@@ -134,7 +134,7 @@ public class TrackCommandTests extends BaseConfigure {
         when(message.text()).thenReturn("Работа учёба дом");
         ReflectionTestUtils.setField(trackCommand, "userStates", new HashMap<>(Map.of(123L, State.WAITING_FOR_TAGS)));
         ReflectionTestUtils.setField(
-                trackCommand, "userUrl", new HashMap<>(Map.of(123L, "https://github.com/lirik1254/abTestRepo")));
+                trackCommand, "userUrl", new HashMap<>(Map.of(123L, "https://github.com/TestOwner/TestRepo")));
 
         botService.handleMessage(update);
 
@@ -177,7 +177,7 @@ public class TrackCommandTests extends BaseConfigure {
                 """
             {
               "id": 123,
-              "url": "https://github.com/lirik1254/abTestRepo",
+              "url": "https://github.com/TestOwner/TestRepo",
               "tags": [],
               "filters": ["filter:filter"]
             }""";
@@ -194,7 +194,7 @@ public class TrackCommandTests extends BaseConfigure {
         ReflectionTestUtils.setField(
                 trackCommand, "userStates", new HashMap<>(Map.of(123L, State.WAITING_FOR_FILTERS)));
         ReflectionTestUtils.setField(
-                trackCommand, "userUrl", new HashMap<>(Map.of(123L, "https://github.com/lirik1254/abTestRepo")));
+                trackCommand, "userUrl", new HashMap<>(Map.of(123L, "https://github.com/TestOwner/TestRepo")));
 
         botService.handleMessage(update);
 
@@ -217,7 +217,7 @@ public class TrackCommandTests extends BaseConfigure {
                 """
             {
               "id": 123,
-              "url": "https://github.com/lirik1254/abTestRepo",
+              "url": "https://github.com/TestOwner/TestRepo",
               "tags": [],
               "filters": ["filter:filter"]
             }""";
@@ -234,7 +234,7 @@ public class TrackCommandTests extends BaseConfigure {
         ReflectionTestUtils.setField(
                 trackCommand, "userStates", new HashMap<>(Map.of(123L, State.WAITING_FOR_FILTERS)));
         ReflectionTestUtils.setField(
-                trackCommand, "userUrl", new HashMap<>(Map.of(123L, "https://github.com/lirik1254/abTestRepo")));
+                trackCommand, "userUrl", new HashMap<>(Map.of(123L, "https://github.com/TestOwner/TestRepo")));
 
         botService.handleMessage(update);
 
