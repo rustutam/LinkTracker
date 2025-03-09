@@ -1,24 +1,25 @@
 package backend.academy.scrapper.repository.database;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.when;
-
 import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.entities.InfoEntity;
+import backend.academy.scrapper.models.entities.LinksEntity;
 import backend.academy.scrapper.models.entities.RepositoryTables;
 import backend.academy.scrapper.models.entities.UserLinksEntity;
 import java.net.URI;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import org.junit.jupiter.api.BeforeEach;
+import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class LinksRepositoryImplTest {
@@ -28,15 +29,11 @@ class LinksRepositoryImplTest {
     @InjectMocks
     private LinksRepositoryImpl linksRepository;
 
-    private final long chatId = 1L;
-    private final long chatId2 = 2L;
-    private final URI testUri = URI.create("https://github.com/test");
-    private Link testLink;
-    private Link testLink2;
-    private final OffsetDateTime time = OffsetDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
 
-    @BeforeEach
-    void setUp() {}
+    private final List<LinksEntity> linksEntities = new ArrayList<>();
+    private final List<UserLinksEntity> userLinksEntities = new ArrayList<>();
+    private final List<InfoEntity> infoEntities = new ArrayList<>();
+
 
     @Test
     @DisplayName("when chat is registered then isRegistered true")
@@ -91,57 +88,42 @@ class LinksRepositoryImplTest {
         assertFalse(userLinksEntities.stream().anyMatch(entity -> entity.chatId() == 1L));
     }
 
-    //
-    //    @Test
-    //    @DisplayName("Должен сохранять ссылку и присваивать ID")
-    //    void shouldSaveLinkAndAssignId() {
-    //
-    //
-    //        Link savedLink = linksRepository.saveLink(chatId, testLink);
-    //
-    //        assertTrue(linksRepository.findById(chatId).contains(savedLink));
-    //        assertTrue(savedLink.id() > 0);
-    //    }
-    //
-    //    @Test
-    //    @DisplayName("Должен удалять ссылку")
-    //    void shouldDeleteLink() {
-    //        linksRepository.saveLink(chatId, testLink);
-    //        Optional<Link> deletedLink = linksRepository.deleteLink(chatId, testUri.toString());
-    //        assertTrue(deletedLink.isPresent());
-    //        assertTrue(linksRepository.findById(chatId).isEmpty());
-    //    }
 
-    //    @Test
-    //    @DisplayName("Должен находить ссылки по chatId")
-    //    void shouldFindLinksByChatId() {
-    //        linksRepository.saveLink(chatId, testLink);
-    //
-    //        List<Link> links = linksRepository.findById(chatId);
-    //        assertThat(links).hasSize(1);
-    //        assertThat(links.get(0).uri()).isEqualTo(testUri);
-    //    }
-    //
-    //    @Test
-    //    @DisplayName("Должен возвращать список чатов по ссылке")
-    //    void shouldReturnChatIdsByLink() {
-    //        linksRepository.saveLink(chatId, testLink);
-    //        List<Long> chatIds = linksRepository.getAllChatIdByLink(testUri.toString());
-    //        assertThat(chatIds).contains(chatId);
-    //    }
-    //
-    //    @Test
-    //    @DisplayName("Должен обновлять время последнего обновления")
-    //    void shouldUpdateLastUpdateTime() {
-    //        Link savedLink = linksRepository.saveLink(chatId, testLink);
-    //        linksRepository.saveLink(chatId2, testLink2);
-    //
-    //        OffsetDateTime newTime = time.plusDays(1);
-    //        linksRepository.updateLinksLastUpdateTime(savedLink.id(), newTime);
-    //        Link savedLinkAfterUpdate = linksRepository.findById(chatId).get(0);
-    //        Link savedLinkAfterUpdate2 = linksRepository.findById(chatId2).get(0);
-    //
-    //        assertEquals(savedLinkAfterUpdate.lastUpdateTime(), newTime);
-    //        assertEquals(savedLinkAfterUpdate2.lastUpdateTime(), newTime);
-    //    }
+    @Test
+    void testSaveLink() {
+        long chatId = 1L;
+        URI testUri = URI.create("https://example.com");
+        OffsetDateTime now = OffsetDateTime.now();
+        Link testLink = new Link(0, testUri, List.of("tag1"), List.of("filter1"), now);
+
+        when(repositoryTables.linksEntities()).thenReturn(linksEntities);
+        when(repositoryTables.userLinksEntities()).thenReturn(userLinksEntities);
+        when(repositoryTables.infoEntities()).thenReturn(infoEntities);
+
+        linksRepository.register(chatId);
+        Link savedLink = linksRepository.saveLink(chatId, testLink);
+
+        assertEquals(savedLink.uri(), testUri);
+        assertEquals(1, linksEntities.size());
+        assertEquals(1, userLinksEntities.size());
+    }
+
+    @Test
+    void testDeleteLink() {
+        long chatId = 1L;
+        URI testUri = URI.create("https://example.com");
+        OffsetDateTime now = OffsetDateTime.now();
+        linksEntities.add(new LinksEntity(1L, testUri, now));
+        userLinksEntities.add(new UserLinksEntity(1L, chatId, 1L, 1L));
+        infoEntities.add(new InfoEntity(1L, List.of("title"), List.of("description")));
+
+        when(repositoryTables.linksEntities()).thenReturn(linksEntities);
+        when(repositoryTables.userLinksEntities()).thenReturn(userLinksEntities);
+        when(repositoryTables.infoEntities()).thenReturn(infoEntities);
+
+        Optional<Link> deletedLink = linksRepository.deleteLink(chatId, testUri.toString());
+
+        assertTrue(deletedLink.isPresent());
+        assertTrue(userLinksEntities.isEmpty());
+    }
 }

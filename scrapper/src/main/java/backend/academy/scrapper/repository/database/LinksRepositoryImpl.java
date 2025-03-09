@@ -90,7 +90,6 @@ public class LinksRepositoryImpl implements LinksRepository {
 
     @Override
     public Link saveLink(long chatId, Link link) {
-        // Проверяем, зарегистрирован ли пользователь
         long linkId = processLinkId(link);
         long infoId = processInfoId(link);
 

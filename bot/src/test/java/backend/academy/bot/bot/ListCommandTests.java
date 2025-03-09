@@ -31,7 +31,7 @@ public class ListCommandTests extends BaseConfigure {
                 {
                    "links" : [ {
                        "id" : 52,
-                       "url" : "https://github.com/lirik1254/abTestRepo",
+                       "url" : "https://github.com/TestOwner/TestRepo",
                        "tags" : [ ],
                        "filters" : [ ]
                      } ],
@@ -62,7 +62,7 @@ public class ListCommandTests extends BaseConfigure {
 
                 Отслеживаемые ссылки:
 
-                1) Ссылка: https://github.com/lirik1254/abTestRepo""";
+                1) Ссылка: https://github.com/TestOwner/TestRepo""";
 
         assertEquals(
                 returnAnswer, sentMessage.getParameters().get("text").toString().replaceAll("\r\n", "\n"));
@@ -76,7 +76,7 @@ public class ListCommandTests extends BaseConfigure {
                 {
                    "links" : [ {
                        "id" : 52,
-                       "url" : "https://github.com/lirik1254/abTestRepo",
+                       "url" : "https://github.com/TestOwner/TestRepo",
                        "tags" : [ "aboba" ],
                        "filters" : [ ]
                      },
@@ -114,7 +114,7 @@ public class ListCommandTests extends BaseConfigure {
 
                 Отслеживаемые ссылки:
 
-                1) Ссылка: https://github.com/lirik1254/abTestRepo
+                1) Ссылка: https://github.com/TestOwner/TestRepo
                 Теги: aboba
 
                 2) Ссылка: https://stackoverflow.com/questions/5252525

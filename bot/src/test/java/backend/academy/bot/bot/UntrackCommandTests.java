@@ -80,20 +80,20 @@ public class UntrackCommandTests extends BaseConfigure {
                 """
             {
                "id" : 123,
-               "url" : "https://github.com/lirik1254/abTestRepo",
+               "url" : "https://github.com/TestOwner/TestRepo",
                "tags" : [ "haamoooodahamibihamood" ],
                "filters" : [ "ya:ustal" ]
             }""";
 
         wireMockServer.stubFor(delete(urlEqualTo("/links"))
                 .withHeader("Tg-Chat-Id", matching("123"))
-                .withRequestBody(matchingJsonPath("$.link", equalTo("https://github.com/lirik1254/abTestRepo")))
+                .withRequestBody(matchingJsonPath("$.link", equalTo("https://github.com/TestOwner/TestRepo")))
                 .willReturn(aResponse()
                         .withStatus(200)
                         .withHeader("Content-Type", "application/json")
                         .withBody(jsonAnswer)));
 
-        when(message.text()).thenReturn("https://github.com/lirik1254/abTestRepo");
+        when(message.text()).thenReturn("https://github.com/TestOwner/TestRepo");
         ReflectionTestUtils.setField(untrackCommand, "userStates", new HashMap<>(Map.of(123L, State.WAITING_FOR_URL)));
         botService.handleMessage(update);
 
@@ -158,13 +158,13 @@ public class UntrackCommandTests extends BaseConfigure {
 
         wireMockServer.stubFor(delete(urlEqualTo("/links"))
                 .withHeader("Tg-Chat-Id", matching("123"))
-                .withRequestBody(matchingJsonPath("$.link", equalTo("https://github.com/lirik1254/abTestRepo")))
+                .withRequestBody(matchingJsonPath("$.link", equalTo("https://github.com/TestOwner/TestRepo")))
                 .willReturn(aResponse()
                         .withStatus(400)
                         .withHeader("Content-Type", "application/json")
                         .withBody(jsonAnswer)));
 
-        when(message.text()).thenReturn("https://github.com/lirik1254/abTestRepo");
+        when(message.text()).thenReturn("https://github.com/TestOwner/TestRepo");
         ReflectionTestUtils.setField(untrackCommand, "userStates", new HashMap<>(Map.of(123L, State.WAITING_FOR_URL)));
         botService.handleMessage(update);
 
@@ -193,13 +193,13 @@ public class UntrackCommandTests extends BaseConfigure {
 
         wireMockServer.stubFor(delete(urlEqualTo("/links"))
                 .withHeader("Tg-Chat-Id", matching("123"))
-                .withRequestBody(matchingJsonPath("$.link", equalTo("https://github.com/lirik1254/abTestRepo")))
+                .withRequestBody(matchingJsonPath("$.link", equalTo("https://github.com/TestOwner/TestRepo")))
                 .willReturn(aResponse()
                         .withStatus(404)
                         .withHeader("Content-Type", "application/json")
                         .withBody(jsonAnswer)));
 
-        when(message.text()).thenReturn("https://github.com/lirik1254/abTestRepo");
+        when(message.text()).thenReturn("https://github.com/TestOwner/TestRepo");
         ReflectionTestUtils.setField(untrackCommand, "userStates", new HashMap<>(Map.of(123L, State.WAITING_FOR_URL)));
         botService.handleMessage(update);
 

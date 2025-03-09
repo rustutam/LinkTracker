@@ -14,18 +14,18 @@ public class LinkParseTests {
     @Test
     @DisplayName("Тестирует парсинг github ссылок")
     public void parseGithubLink() {
-        String noHttpsGithubLink = "http://github.com/lirik1254/abTestRepo";
-        String noGithubLink = "https://nogithub.com/lirik1254/abTestRepo";
+        String noHttpsGithubLink = "http://github.com/TestOwner/TestRepo";
+        String noGithubLink = "https://nogithub.com/TestOwner/TestRepo";
         String moreThan39CharactersNickName =
                 "https://github.com/lirik1252525252525252525252lkj25l2j5225252jl5j2l5/abTestRepo";
         String moreThan39CharactersRepoName =
-                "https://github.com/lirik1254/PISYATDVAPISYATDVAPISYATDVAPISYATDVA5252525252525252";
-        String someBadLettersBefore = "asljkdfj https://github.com/lirik1254/abTestRepo";
-        String someBadLettersAfter = "https://github.com/lirik1254/abTestRepo klasdjf";
-        String moreThanOneSlash = "https://github.com//lirik1254/abTestRepo";
+                "https://github.com/TestOwner/PISYATDVAPISYATDVAPISYATDVAPISYATDVA5252525252525252";
+        String someBadLettersBefore = "asljkdfj https://github.com/TestOwner/TestRepo";
+        String someBadLettersAfter = "https://github.com/TestOwner/TestRepo klasdjf";
+        String moreThanOneSlash = "https://github.com//TestOwner/TestRepo";
 
-        String correctGithubRepo = "https://github.com/lirik1254/abTestRepo";
-        String correctGithubRepoWithDash = "https://github.com/lirik1254/ab-Test-REPO";
+        String correctGithubRepo = "https://github.com/TestOwner/TestRepo";
+        String correctGithubRepoWithDash = "https://github.com/TestOwner/ab-Test-REPO";
 
         assertFalse(regexCheck.checkApi(noHttpsGithubLink));
         assertFalse(regexCheck.checkApi(noGithubLink));
