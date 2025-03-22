@@ -1,8 +1,9 @@
-package backend.academy.scrapper.service;
+package backend.academy.scrapper.service.simple;
 
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
 import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.repository.database.LinksRepository;
+import backend.academy.scrapper.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

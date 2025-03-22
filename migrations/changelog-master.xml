@@ -11,6 +11,6 @@
     <include file="sql/create_filters_table.sql" relativeToChangelogFile="true"/>
     <include file="sql/create_users_table.sql" relativeToChangelogFile="true"/>
     <include file="sql/create_links_table.sql" relativeToChangelogFile="true"/>
-    <include file="sql/create_subscripions_table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/create_subscriptions_table.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

@@ -1,4 +1,4 @@
-package backend.academy.scrapper.service;
+package backend.academy.scrapper.service.simple;
 
 import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
 import backend.academy.scrapper.exceptions.InvalidLinkException;
@@ -11,6 +11,8 @@ import backend.academy.scrapper.repository.database.LinksRepository;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
+
+import backend.academy.scrapper.service.LinkService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

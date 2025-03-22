@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
 import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.repository.database.LinksRepository;
+import backend.academy.scrapper.service.simple.ChatServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
