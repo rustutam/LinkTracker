@@ -7,10 +7,10 @@
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.14.xsd
         http://www.liquibase.org/xml/ns/dbchangelog-ext https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-    <include file="sql/create_links_table.sql" relativeToChangelogFile="true"/>
-    <include file="sql/create_users_table.sql" relativeToChangelogFile="true"/>
     <include file="sql/create_tags_table.sql" relativeToChangelogFile="true"/>
     <include file="sql/create_filters_table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/create_users_table.sql" relativeToChangelogFile="true"/>
+    <include file="sql/create_links_table.sql" relativeToChangelogFile="true"/>
     <include file="sql/create_subscripions_table.sql" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
