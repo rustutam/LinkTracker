@@ -1,33 +1,33 @@
-package backend.academy.scrapper.service.simple;
+package backend.academy.scrapper.service.jdbc;
 
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
 import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.repository.database.ChatRepository;
-import backend.academy.scrapper.repository.database.LinksRepository;
 import backend.academy.scrapper.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class ChatServiceImpl implements ChatService {
-    private final LinksRepository linksRepository;
+public class JdbcChatService implements ChatService {
+    private final ChatRepository chatRepository;
 
     @Override
     public void register(ChatId chatId) {
-        if (linksRepository.isRegistered(chatId.id())) {
+        try {
+            chatRepository.save(chatId);
+        } catch (DoubleRegistrationException e){
             throw new DoubleRegistrationException();
         }
-
-        linksRepository.register(chatId.id());
     }
 
     @Override
     public void unRegister(ChatId chatId) {
-        if (!linksRepository.isRegistered(chatId.id())) {
+        try {
+            chatRepository.deleteByChatId(chatId);
+        } catch (NotExistTgChatException e){
             throw new NotExistTgChatException();
         }
-        linksRepository.unRegister(chatId.id());
     }
 }

@@ -1,7 +1,9 @@
 package backend.academy.scrapper.service;
 
-public interface ChatService extends EndpointControleService {
-    void register(long chatId);
+import backend.academy.scrapper.models.domain.ids.ChatId;
 
-    void unRegister(long chatId);
+public interface ChatService extends EndpointControleService {
+    void register(ChatId chatId);
+
+    void unRegister(ChatId chatId);
 }
