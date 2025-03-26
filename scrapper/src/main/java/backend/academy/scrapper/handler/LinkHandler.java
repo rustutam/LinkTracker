@@ -7,9 +7,9 @@ import dto.response.ListLinksResponse;
 
 public interface LinkHandler extends EndpointControleHandler {
 
-    LinkResponse addLink(long tgChatId, AddLinkRequest addLinkRequest);
+    LinkResponse addLink(long chatId, AddLinkRequest addLinkRequest);
 
-    LinkResponse removeLink(long tgChatId, RemoveLinkRequest addLinkRequest);
+    LinkResponse removeLink(long chatId, RemoveLinkRequest addLinkRequest);
 
-    ListLinksResponse getLinks(long tgChatId);
+    ListLinksResponse getLinks(long chatId);
 }
