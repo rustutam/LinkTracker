@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
@@ -23,13 +24,13 @@ public class JdbcChatRepository implements ChatRepository {
      * @return User
      */
     @Override
-    public User findById(UserId userId) {
+    public Optional<User> findById(UserId userId){
         var resultChats = jdbcTemplate.query(
             "SELECT * FROM users WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToUserEntity,
             userId
         );
-        return resultChats.stream().map(UserMapper::toDomain).findFirst().orElseThrow(NotExistTgChatException::new);
+        return resultChats.stream().map(UserMapper::toDomain).findFirst();
     }
 
     /**
@@ -37,21 +38,21 @@ public class JdbcChatRepository implements ChatRepository {
      * @return User
      */
     @Override
-    public User findByChatId(ChatId chatId) throws NotExistTgChatException {
+    public Optional<User> findByChatId(ChatId chatId){
         var userEntities = jdbcTemplate.query(
             "SELECT * FROM users WHERE chat_id = (?)",
             JdbcRowMapperUtil::mapRowToUserEntity,
             chatId
         );
 
-        return userEntities.stream().map(UserMapper::toDomain).findFirst().orElseThrow(NotExistTgChatException::new);
+        return userEntities.stream().map(UserMapper::toDomain).findFirst();
     }
 
     /**
      * @param chatId
      */
     @Override
-    public void save(ChatId chatId) {
+    public void save(ChatId chatId) throws DoubleRegistrationException {
         //TODO проверить выбрасывается ли ошибка
         try {
             jdbcTemplate.update(
@@ -67,7 +68,7 @@ public class JdbcChatRepository implements ChatRepository {
      * @param chatId
      */
     @Override
-    public void deleteByChatId(ChatId chatId) {
+    public void deleteByChatId(ChatId chatId) throws NotExistTgChatException {
         int updatedRows = jdbcTemplate.update(
             "DELETE FROM users WHERE chat_id = (?)",
             chatId.id()
