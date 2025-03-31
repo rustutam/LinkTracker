@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 public record TagEntity(
     Long id,
-    String tag,
+    String value,
     OffsetDateTime createdAt
 ) {
 }

@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 public record FilterEntity(
     Long id,
-    String filter,
+    String value,
     OffsetDateTime createdAt
 ) {
 }

@@ -5,6 +5,7 @@ import backend.academy.scrapper.exceptions.InvalidLinkException;
 import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.exceptions.NotTrackLinkException;
 import backend.academy.scrapper.models.Link;
+import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.repository.api.GitHubExternalDataRepository;
 import backend.academy.scrapper.repository.api.StackOverflowExternalDataRepository;
 import backend.academy.scrapper.repository.database.LinksRepository;
@@ -56,7 +57,7 @@ public class LinkServiceImpl implements LinkService {
     }
 
     @Override
-    public Link removeLink(long chatId, String uri) {
+    public Link removeLink(ChatId chatId, String uri) {
         if (!linksRepository.isRegistered(chatId)) {
             throw new NotExistTgChatException();
         }

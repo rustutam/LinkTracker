@@ -5,15 +5,19 @@ import backend.academy.scrapper.models.domain.ids.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 
 @Builder
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 public class User {
-    @Builder.Default
-    private UserId userId = new UserId(0L);
+    private UserId userId;
     private ChatId chatId;
+
+    public static User of(ChatId chatId) {
+        return builder()
+            .userId(new UserId(0L))
+            .chatId(chatId)
+            .build();
+    }
 }

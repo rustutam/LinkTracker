@@ -10,6 +10,9 @@ import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
 import backend.academy.scrapper.repository.database.utilities.mapper.LinkMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DuplicateKeyException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -67,6 +70,7 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public Link save(URI uri) {
+        //TODO не делать доп запрос на получение Link, а сразу возвращать из таблицы
         try {
             jdbcTemplate.update(
                 "INSERT INTO links (uri) VALUES (?)",
@@ -77,5 +81,24 @@ public class JdbcLinkRepository implements LinkRepository {
         }
 
         return findByUri(uri).orElseThrow(NotExistLinkException::new);
+    }
+
+    @Override
+    public Page<Link> findAll(Pageable pageable) {
+        // 1. Вычисляем общее количество записей в таблице
+        String countSql = "SELECT COUNT(*) FROM links";
+        int total = jdbcTemplate.queryForObject(countSql, Integer.class);
+
+        // 2. Формируем запрос с пагинацией (LIMIT и OFFSET)
+        List<LinkEntity> linkEntities = jdbcTemplate.query(
+            "SELECT * FROM links ORDER BY id LIMIT (?) OFFSET (?)",
+            JdbcRowMapperUtil::mapRowToLink,
+            pageable.getPageSize(),
+            pageable.getOffset()
+        );
+
+        List<Link> links = linkEntities.stream().map(LinkMapper::toDomain).toList();
+
+        return new PageImpl<>(links, pageable, total);
     }
 }

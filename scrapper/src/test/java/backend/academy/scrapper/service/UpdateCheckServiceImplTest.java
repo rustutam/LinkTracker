@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 @ExtendWith(MockitoExtension.class)
-class ChangesDetectServiceImplTest {
+class UpdateCheckServiceImplTest {
 
     @Mock
     private LinksRepository repository;
@@ -33,7 +33,7 @@ class ChangesDetectServiceImplTest {
     private StackOverflowExternalDataRepository stackOverflowExternalDataRepository;
 
     @InjectMocks
-    private ChangesDetectServiceImpl changesDetectService;
+    private UpdateCheckServiceImpl changesDetectService;
 
     private final OffsetDateTime newTime = OffsetDateTime.of(2020, 1, 1, 0, 0, 0, 0, ZoneOffset.UTC);
     private final OffsetDateTime oldTime = newTime.minusDays(1);

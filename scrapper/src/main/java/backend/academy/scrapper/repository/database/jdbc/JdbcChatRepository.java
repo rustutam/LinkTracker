@@ -28,7 +28,7 @@ public class JdbcChatRepository implements ChatRepository {
         var resultChats = jdbcTemplate.query(
             "SELECT * FROM users WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToUserEntity,
-            userId
+            userId.id()
         );
         return resultChats.stream().map(UserMapper::toDomain).findFirst();
     }

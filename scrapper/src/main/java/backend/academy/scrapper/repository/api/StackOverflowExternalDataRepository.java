@@ -3,6 +3,8 @@ package backend.academy.scrapper.repository.api;
 import backend.academy.scrapper.client.StackoverflowClient;
 import backend.academy.scrapper.exceptions.InvalidLinkException;
 import backend.academy.scrapper.models.LinkMetadata;
+import backend.academy.scrapper.models.domain.Link;
+import backend.academy.scrapper.models.domain.LinkChangeStatus;
 import backend.academy.scrapper.models.external.stackoverflow.StackoverflowQuestionDTO;
 import java.net.URI;
 import java.time.Instant;
@@ -16,33 +18,44 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-public class StackOverflowExternalDataRepository implements ExternalDataRepository {
+public class StackOverflowExternalDataRepository extends ExternalDataRepository {
     private final StackoverflowClient stackoverflowClient;
 
     @Override
-    public List<LinkMetadata> getLinksWithNewLastUpdateDates(List<LinkMetadata> linkList) {
-        return linkList.stream()
-                .filter(linkMetadata -> isProcessingUri(linkMetadata.linkUri()))
-                .map(linkMetadata -> new LinkMetadata(
-                        linkMetadata.id(), linkMetadata.linkUri(), getLastUpdateDate(linkMetadata.linkUri())))
-                .toList();
+    public LinkChangeStatus getLinkChangeStatus(Link link) {
+        //TODO реализовать получение инфы про ссылку, что с ним произошло
+
+        return LinkChangeStatus.builder()
+            .link(link)
+            .hasChanges(false)
+            .changeDescription("Сюда вписать инфу")
+            .build();
     }
 
-    @Override
-    public OffsetDateTime getLastUpdateDate(URI uri) {
-        try {
-            String questionId = getQuestionId(uri);
-            StackoverflowQuestionDTO stackoverflowQuestionDTO = stackoverflowClient.questionRequest(questionId);
-            Integer lastActivityDateInSeconds = stackoverflowQuestionDTO.items().stream()
-                    .filter(it -> questionId.equals(it.questionId()))
-                    .findFirst()
-                    .map(StackoverflowQuestionDTO.ItemResponse::lastActivityDate)
-                    .orElseThrow();
-            return getOffsetDateTime(lastActivityDateInSeconds);
-        } catch (Exception e) {
-            throw new InvalidLinkException();
-        }
-    }
+//    @Override
+//    public List<LinkMetadata> getLinksWithNewLastUpdateDates(List<LinkMetadata> linkList) {
+//        return linkList.stream()
+//                .filter(linkMetadata -> isProcessingUri(linkMetadata.linkUri()))
+//                .map(linkMetadata -> new LinkMetadata(
+//                        linkMetadata.id(), linkMetadata.linkUri(), getLastUpdateDate(linkMetadata.linkUri())))
+//                .toList();
+//    }
+//
+//    @Override
+//    public OffsetDateTime getLastUpdateDate(URI uri) {
+//        try {
+//            String questionId = getQuestionId(uri);
+//            StackoverflowQuestionDTO stackoverflowQuestionDTO = stackoverflowClient.questionRequest(questionId);
+//            Integer lastActivityDateInSeconds = stackoverflowQuestionDTO.items().stream()
+//                    .filter(it -> questionId.equals(it.questionId()))
+//                    .findFirst()
+//                    .map(StackoverflowQuestionDTO.ItemResponse::lastActivityDate)
+//                    .orElseThrow();
+//            return getOffsetDateTime(lastActivityDateInSeconds);
+//        } catch (Exception e) {
+//            throw new InvalidLinkException();
+//        }
+//    }
 
     private OffsetDateTime getOffsetDateTime(Integer lastActivityDateInSeconds) {
         return OffsetDateTime.ofInstant(Instant.ofEpochSecond(lastActivityDateInSeconds), ZoneOffset.UTC);
@@ -54,7 +67,7 @@ public class StackOverflowExternalDataRepository implements ExternalDataReposito
     }
 
     @Override
-    public boolean isProcessingUri(URI uri) {
+    protected boolean isProcessingUri(URI uri) {
         return uri.getHost().equals("stackoverflow.com");
     }
 }
