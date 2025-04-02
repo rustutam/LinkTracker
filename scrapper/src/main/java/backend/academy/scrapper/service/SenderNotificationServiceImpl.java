@@ -17,18 +17,18 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
 
     @Override
     public void notifySender(LinkChangeStatus linkChangeStatus) {
-        sender.send(linkUpdateNotificationMapper(linkChangeStatus));
+
+        linkChangeStatus.changeInfoList().forEach(changeInfo -> {
+            LinkId linkId = linkChangeStatus.link().linkId();
+            LinkUpdateNotification linkUpdateNotification = new LinkUpdateNotification(
+                linkId,
+                linkChangeStatus.link().uri(),
+                changeInfo.toString(),
+                chatRepository.findAllUsersByLinkId(linkId).stream().map(User::chatId).toList()
+            );
+            sender.send(linkUpdateNotification);
+        });
     }
 
-    private LinkUpdateNotification linkUpdateNotificationMapper(LinkChangeStatus linkChangeStatus) {
-        LinkId linkId = linkChangeStatus.link().linkId();
-        return new LinkUpdateNotification(
-            linkId,
-            linkChangeStatus.link().uri(),
-            linkChangeStatus.description(),
-            chatRepository.findAllUsersByLinkId(linkId).stream().map(User::chatId).toList()
-        );
-
-
-    }
 }
+
