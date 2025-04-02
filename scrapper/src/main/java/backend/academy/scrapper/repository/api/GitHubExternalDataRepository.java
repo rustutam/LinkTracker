@@ -1,16 +1,19 @@
 package backend.academy.scrapper.repository.api;
 
 import backend.academy.scrapper.client.GithubClient;
-import backend.academy.scrapper.exceptions.InvalidLinkException;
-import backend.academy.scrapper.models.LinkMetadata;
+import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
-import backend.academy.scrapper.models.external.github.RepositoryDto;
 import java.net.URI;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
@@ -18,37 +21,43 @@ import org.springframework.stereotype.Repository;
 @RequiredArgsConstructor
 public class GitHubExternalDataRepository extends ExternalDataRepository {
     private final GithubClient githubClient;
+    private final ObjectMapper objectMapper;
 
     @Override
-    public LinkChangeStatus getLinkChangeStatus(Link link) {
-        //TODO реализовать получение инфы про ссылку, что с ним произошло
+    public List<ChangeInfo> getChangeInfoByLink(Link link) {
+        //TODO написано на скорую руку, переделать
+        List<ChangeInfo> allContent = new ArrayList<>();
+        RepoInfo repoInfo = getRepoInfo(link.uri());
+        String responce = githubClient.issuesRequest(repoInfo.owner, repoInfo.repo);
 
-        return LinkChangeStatus.builder()
-            .link(link)
-            .hasChanges(false)
-            .description("Сюда вписать инфу")
-            .build();
+        try {
+            JsonNode jsonResponse = objectMapper.readTree(responce);
+
+            jsonResponse.forEach(content -> {
+                    ChangeInfo changeInfo = ChangeInfo.builder()
+                        .title(content.get("title").asText())
+                        .username(content.get("user").get("login").asText())
+                        .creationTime(OffsetDateTime.parse(content.get("created_at").asText()))
+                        .preview(content.get("body").asText())
+                        .build();
+
+                    allContent.add(changeInfo);
+                }
+            );
+            return allContent;
+        } catch (HttpMessageNotReadableException | JsonProcessingException e) {
+            log.atError()
+                .addKeyValue("link", link.uri().toString())
+                .setMessage("Ошибка при получении github контента")
+                .log();
+            throw new HttpMessageNotReadableException("Не удаётся прочитать поле 'updated_at'");
+        }
     }
-
-//    @Override
-//    public List<LinkMetadata> getLinksWithNewLastUpdateDates(List<LinkMetadata> linkList) {
-//        return linkList.stream()
-//                .filter(linkMetadata -> isProcessingUri(linkMetadata.linkUri()))
-//                .map(linkMetadata -> new LinkMetadata(
-//                        linkMetadata.id(), linkMetadata.linkUri(), getLastUpdateDate(linkMetadata.linkUri())))
-//                .toList();
-//    }
-//
-//    @Override
-//    public OffsetDateTime getLastUpdateDate(URI uri) {
-//        try {
-//            RepoInfo repoInfo = getRepoInfo(uri);
-//            RepositoryDto repositoryDto = githubClient.repoRequest(repoInfo.owner, repoInfo.repo);
-//            return repositoryDto.updatedAt();
-//        } catch (Exception e) {
-//            throw new InvalidLinkException();
-//        }
-//    }
+//    Для GitHub новый PR или Issue, сообщение включает:
+//    название PR или Issue
+//    имя пользователя
+//    время создания
+//    превью описания (первые 200 символов)
 
     @Override
     protected boolean isProcessingUri(URI uri) {
@@ -60,5 +69,6 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
         return new RepoInfo(parts[1], parts[2]);
     }
 
-    private record RepoInfo(String owner, String repo) {}
+    private record RepoInfo(String owner, String repo) {
+    }
 }

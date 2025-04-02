@@ -3,6 +3,7 @@ package backend.academy.scrapper.models.domain;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import java.util.List;
 
 @Builder
 @Getter
@@ -10,5 +11,5 @@ import lombok.Getter;
 public class LinkChangeStatus {
     private Link link;
     private boolean hasChanges;
-    private String description;
+    private List<ChangeInfo> changeInfoList;
 }
