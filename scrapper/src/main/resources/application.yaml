@@ -8,6 +8,8 @@ app:
     access-token: ${SO_ACCESS_TOKEN}
   stackoverflow-uri: https://api.stackexchange.com/2.3
   base-uri: http://localhost:8080
+  access-type: SQL
+  batch-size: 1000
 
 spring:
   application:

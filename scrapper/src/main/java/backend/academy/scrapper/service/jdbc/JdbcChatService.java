@@ -6,10 +6,12 @@ import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.repository.database.ChatRepository;
 import backend.academy.scrapper.service.ChatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcChatService implements ChatService {
     private final ChatRepository chatRepository;
 

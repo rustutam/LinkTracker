@@ -1,53 +1,45 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.models.LinkMetadata;
+import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
 import backend.academy.scrapper.repository.api.ExternalDataRepository;
-import backend.academy.scrapper.repository.api.GitHubExternalDataRepository;
-import backend.academy.scrapper.repository.api.StackOverflowExternalDataRepository;
-import backend.academy.scrapper.repository.database.LinksRepository;
-import java.util.ArrayList;
-import java.util.List;
+import backend.academy.scrapper.repository.api.ExternalDataRepositoryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class UpdateCheckServiceImpl implements UpdateCheckService {
-    private final LinksRepository repository;
-    private final GitHubExternalDataRepository gitHubExternalDataRepository;
-    private final StackOverflowExternalDataRepository stackOverflowExternalDataRepository;
+    //    private final LinksRepository repository;
+    private final ExternalDataRepositoryFactory repositoryFactory;
+
 
     @Override
     public LinkChangeStatus detectChanges(Link link) {
-        gitHubExternalDataRepository.getLinkChangeStatus(link);
-        
-//        //Приходит Link,отправляем линк в опр репо.
-//        List<LinkMetadata> updatedLinks = new ArrayList<>();
-//        // Обработка ссылок с гита
-//        List<LinkMetadata> gitHubLinksWithOldDate = repository.getGitHubLinks();
-//        List<LinkMetadata> gitHubLinksWithNewDate =
-//                gitHubExternalDataRepository.getLinksWithNewLastUpdateDates(gitHubLinksWithOldDate);
-//        updatedLinks.addAll(getUpdatedLink(gitHubLinksWithOldDate, gitHubLinksWithNewDate));
-//
-//        // Обработка ссылок с ст
-//        List<LinkMetadata> stackOverflowLinks = repository.getStackOverflowLinks();
-//        List<LinkMetadata> StackLastUpdateDates =
-//                stackOverflowExternalDataRepository.getLinksWithNewLastUpdateDates(stackOverflowLinks);
-//        updatedLinks.addAll(getUpdatedLink(stackOverflowLinks, StackLastUpdateDates));
-//
-//        repository.updateLinksLastUpdateTime(updatedLinks);
-//
-//        return updatedLinks;
+        ExternalDataRepository repository = repositoryFactory.getExternalDataRepository(link);
+
+        List<ChangeInfo> contentList = repository.getChangeInfoByLink(link);
+
+        List<ChangeInfo> newContentList = getUpdatedContent(contentList, link);
+
+        if (newContentList.isEmpty()) {
+            return LinkChangeStatus.builder()
+                .link(link)
+                .hasChanges(false)
+                .changeInfoList(List.of())
+                .build();
+        }
+
+        return LinkChangeStatus.builder()
+            .link(link)
+            .hasChanges(true)
+            .changeInfoList(newContentList)
+            .build();
     }
 
-    private List<LinkMetadata> getUpdatedLink(
-            List<LinkMetadata> linksWithOldDate, List<LinkMetadata> linksWithNewDate) {
-        return linksWithNewDate.stream()
-                .filter(newLink -> linksWithOldDate.stream()
-                        .anyMatch(oldLink -> oldLink.linkUri().equals(newLink.linkUri())
-                                && newLink.lastUpdateTime().isAfter(oldLink.lastUpdateTime())))
-                .toList();
+    private List<ChangeInfo> getUpdatedContent(List<ChangeInfo> allContent, Link link) {
+        return allContent.stream().filter(changeInfo -> changeInfo.creationTime().isAfter(link.lastUpdateTime())).toList();
     }
 }

@@ -1,9 +1,7 @@
 package backend.academy.scrapper.sender;
 
 import backend.academy.scrapper.client.TgBotClient;
-import backend.academy.scrapper.models.LinkUpdateNotification;
-import backend.academy.scrapper.models.domain.ids.ChatId;
-import dto.LinkUpdate;
+import backend.academy.scrapper.models.domain.LinkUpdateNotification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;

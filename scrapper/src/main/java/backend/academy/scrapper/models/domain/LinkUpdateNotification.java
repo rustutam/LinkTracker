@@ -1,4 +1,4 @@
-package backend.academy.scrapper.models;
+package backend.academy.scrapper.models.domain;
 
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.LinkId;

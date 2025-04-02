@@ -12,15 +12,11 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LinkUpdaterScheduler {
-    private final UpdateCheckService updateCheckService;
-    private final SenderNotificationService senderNotificationService;
     private final LinkProcessingService linkProcessingService;
 
     @Scheduled(fixedDelayString = "#{@schedulerIntervalMs}")
     public void update() {
         log.info("Updating the link on a schedule");
         linkProcessingService.processLinks();
-//        List<LinkMetadata> updatedLinks = changesDetectService.detectChanges();
-//        senderNotificationService.notifySender(updatedLinks);
     }
 }

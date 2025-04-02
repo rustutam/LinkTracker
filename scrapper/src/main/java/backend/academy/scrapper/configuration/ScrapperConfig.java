@@ -1,6 +1,7 @@
 package backend.academy.scrapper.configuration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import general.RegexCheck;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
@@ -29,4 +30,7 @@ public record ScrapperConfig(
     public ObjectMapper createObjectMapper() {
         return new ObjectMapper();
     }
+
+    @Bean
+    public RegexCheck createRegexCheck() { return new RegexCheck(); }
 }

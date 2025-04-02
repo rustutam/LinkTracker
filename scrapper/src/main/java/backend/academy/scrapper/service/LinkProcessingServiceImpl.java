@@ -1,5 +1,6 @@
 package backend.academy.scrapper.service;
 
+import backend.academy.scrapper.configuration.ScrapperConfig;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
 import backend.academy.scrapper.repository.database.LinkRepository;
@@ -17,9 +18,7 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
     private final LinkRepository linkRepository;
     private final SenderNotificationService senderNotificationService;
     private final UpdateCheckService updateCheckService;
-
-    //TODO подтягивать из конфига
-    private final int pageSize = 500;
+    private final ScrapperConfig scrapperConfig;
 
     /**
      * Метод обрабатывает ссылки из базы данных пакетами (страницами) и проверяет наличие обновлений.
@@ -29,7 +28,7 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
     public void processLinks() {
         int pageNumber = 0;
         while (true) {
-            Pageable pageable = PageRequest.of(pageNumber, pageSize);
+            Pageable pageable = PageRequest.of(pageNumber, scrapperConfig.batchSize());
             Page<Link> page = linkRepository.findAll(pageable);
 
             if (!page.hasNext()) {
@@ -43,19 +42,6 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
             page.getContent().forEach(this::processLink);
             pageNumber++;
         }
-
-//        // Цикл, выполняющий пагинацию до тех пор, пока есть следующие страницы
-//        do {
-//            // Создаём объект Pageable для запроса страницы с нужным размером
-//            Pageable pageable = PageRequest.of(pageNumber, pageSize);
-//            page = linkRepository.findAll(pageable);
-//            log.info("Обработка страницы {}. Количество ссылок: {}", pageNumber, page.getNumberOfElements());
-//
-//            // Обрабатываем каждую ссылку на текущей странице
-//            page.getContent().forEach(link -> processLink(link));
-//
-//            pageNumber++;
-//        } while (page.hasNext());
     }
 
     /**
@@ -70,11 +56,17 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
 
             // Если получена информация об обновлении, уведомляем пользователя
             if (linkChangeStatus.hasChanges()) {
-                log.info("Найдено обновление для ссылки {}. Отправка уведомления...", link.uri().toString());
                 senderNotificationService.notifySender(linkChangeStatus);
+                log.atInfo()
+                    .addKeyValue("Найдено обновление для ссылки", link.uri().toString())
+                    .setMessage("Отправка уведомления")
+                    .log();
             }
         } catch (Exception ex) {
-            log.error("Ошибка при обработке ссылки {}: {}", link.uri().toString(), ex.getMessage());
+            log.atError()
+                .addKeyValue("Ошибка при обработке ссылки", link.uri().toString())
+                .setMessage(ex.getMessage())
+                .log();
         }
     }
 }

@@ -1,6 +1,6 @@
 package backend.academy.scrapper.sender;
 
-import backend.academy.scrapper.models.LinkUpdateNotification;
+import backend.academy.scrapper.models.domain.LinkUpdateNotification;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import dto.LinkUpdate;
 

@@ -2,6 +2,7 @@ package general;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -34,5 +35,10 @@ public class RegexCheck {
     public boolean isGithub(String url) {
         Matcher githubMatcher = githubPattern.matcher(url);
         return githubMatcher.find();
+    }
+
+    public boolean isStackOverflow(String url) {
+        Matcher stackOverflowMatcher = stackOverflowPattern.matcher(url);
+        return stackOverflowMatcher.find();
     }
 }

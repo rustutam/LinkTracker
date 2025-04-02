@@ -8,12 +8,14 @@ import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.repository.database.*;
 import backend.academy.scrapper.service.LinkService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 
 import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcLinkService implements LinkService {
     private final ChatRepository chatRepository;
     private final LinkRepository linkRepository;

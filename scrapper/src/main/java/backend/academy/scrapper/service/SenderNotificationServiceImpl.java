@@ -1,6 +1,6 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.models.LinkUpdateNotification;
+import backend.academy.scrapper.models.domain.LinkUpdateNotification;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.LinkId;
