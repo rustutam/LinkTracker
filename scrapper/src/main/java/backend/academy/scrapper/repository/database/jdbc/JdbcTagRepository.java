@@ -2,6 +2,7 @@ package backend.academy.scrapper.repository.database.jdbc;
 
 import backend.academy.scrapper.exceptions.NotExistTagException;
 import backend.academy.scrapper.models.domain.Tag;
+import backend.academy.scrapper.models.domain.ids.SubscriptionId;
 import backend.academy.scrapper.models.domain.ids.TagId;
 import backend.academy.scrapper.models.entities.TagEntity;
 import backend.academy.scrapper.repository.database.TagRepository;
@@ -38,6 +39,23 @@ public class JdbcTagRepository implements TagRepository {
         );
 
         return tagEntities.stream().findFirst().map(TagMapper::toDomain);
+    }
+
+    @Override
+    public List<Tag> findBySubscriptionId(SubscriptionId subscriptionId) {
+        String sql = """
+                SELECT t.id, t.tag, t.created_at
+                FROM subscription_tags st
+                LEFT JOIN tags t ON st.tag_id = t.id
+                WHERE st.subscription_id = (?)
+                """;
+        List<TagEntity> tagEntities = jdbcTemplate.query(
+            sql,
+            JdbcRowMapperUtil::mapRowToTag,
+            subscriptionId.id()
+        );
+
+        return tagEntities.stream().map(TagMapper::toDomain).toList();
     }
 
     @Override

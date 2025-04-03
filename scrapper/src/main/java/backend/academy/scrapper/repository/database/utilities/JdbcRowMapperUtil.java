@@ -2,12 +2,14 @@ package backend.academy.scrapper.repository.database.utilities;
 
 import backend.academy.scrapper.models.entities.FilterEntity;
 import backend.academy.scrapper.models.entities.LinkEntity;
+import backend.academy.scrapper.models.entities.LinkMetadataEntity;
 import backend.academy.scrapper.models.entities.TagEntity;
 import backend.academy.scrapper.models.entities.UserEntity;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import java.sql.ResultSet;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @SuppressWarnings("MultipleStringLiterals")
 @NoArgsConstructor
@@ -29,10 +31,14 @@ public final class JdbcRowMapperUtil {
     private static final String TG_CHAT_TABLE_COLUMN_CHAT_ID = "chat_id";
     private static final String TG_CHAT_TABLE_COLUMN_CREATED_AT = "created_at";
 
-    private static final String RELATION_TABLE_COLUMN_CHAT_ID = "chat_id";
-    private static final String RELATION_TABLE_COLUMN_LINK_ID = "link_id";
-    private static final String RELATION_TABLE_COLUMN_CREATED_AT = "created_at";
-    private static final String RELATION_TABLE_COLUMN_CREATED_BY = "created_by";
+    private static final String LINK_METADATA_TABLE_COLUMN_LINK_ID = "link_id";
+    private static final String LINK_METADATA_TABLE_COLUMN_SUBSCRIPTION_ID = "subscription_id";
+    private static final String LINK_METADATA_TABLE_COLUMN_TAG_IDS = "tag_ids";
+    private static final String LINK_METADATA_TABLE_COLUMN_TAG_NAMES = "tag_names";
+    private static final String LINK_METADATA_TABLE_COLUMN_FILTER_IDS = "filter_ids";
+    private static final String LINK_METADATA_TABLE_COLUMN_FILTER_NAMES = "filter_names";
+
+
 
 
     /**
@@ -112,6 +118,21 @@ public final class JdbcRowMapperUtil {
             row.getLong(TG_CHAT_TABLE_COLUMN_ID),
             row.getLong(TG_CHAT_TABLE_COLUMN_CHAT_ID),
             row.getObject(TG_CHAT_TABLE_COLUMN_CREATED_AT, OffsetDateTime.class)
+        );
+    }
+
+    @SneakyThrows
+    public static LinkMetadataEntity mapRowToLinkMetadataEntity(ResultSet row, int rowNum) {
+        //TODO добавить
+        return new LinkMetadataEntity(
+            row.getLong(LINK_METADATA_TABLE_COLUMN_SUBSCRIPTION_ID),
+            row.getLong(LINK_METADATA_TABLE_COLUMN_LINK_ID),
+            row.getString(LINK_TABLE_COLUMN_URI),
+            row.getObject(LINK_TABLE_COLUMN_LAST_MODIFYING_DATE, OffsetDateTime.class),
+            List.of(),
+            List.of(),
+            List.of(),
+            List.of()
         );
     }
 }
