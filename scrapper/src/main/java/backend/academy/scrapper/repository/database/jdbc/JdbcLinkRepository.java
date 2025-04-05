@@ -3,6 +3,7 @@ package backend.academy.scrapper.repository.database.jdbc;
 import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
 import backend.academy.scrapper.exceptions.NotExistLinkException;
 import backend.academy.scrapper.models.domain.Link;
+import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.LinkId;
 import backend.academy.scrapper.models.entities.LinkEntity;
 import backend.academy.scrapper.repository.database.LinkRepository;
@@ -78,6 +79,7 @@ public class JdbcLinkRepository implements LinkRepository {
 
         return findByUri(uri).orElseThrow(NotExistLinkException::new);
     }
+
 
     @Override
     public Page<Link> findAll(Pageable pageable) {

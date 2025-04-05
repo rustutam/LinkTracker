@@ -16,16 +16,4 @@ public class BotSenderImpl extends Sender {
     public void send(LinkUpdateNotification linkUpdateNotification) {
         tgBotClient.send(toLinkUpdateMapper(linkUpdateNotification));
     }
-//TODO убрать комменты
-    //    private void handleResponse(ResponseEntity<ApiErrorResponse> response) {
-    //        int statusCode = response.getStatusCode().value();
-    //        ApiErrorResponse body = response.getBody();
-    //
-    //        switch (statusCode) {
-    //            case 200 -> log.info("Успешный ответ от бота");
-    //            case 400 -> log.info("Ошибка: " + body.exceptionMessage());
-    //            default -> log.info("Неожиданный статус: " + statusCode);
-    //        }
-    //    }
-
 }
