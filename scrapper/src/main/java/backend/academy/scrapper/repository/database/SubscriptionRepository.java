@@ -6,13 +6,16 @@ import backend.academy.scrapper.models.domain.Subscription;
 import backend.academy.scrapper.models.domain.Tag;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
+import backend.academy.scrapper.models.domain.ids.FilterId;
 import backend.academy.scrapper.models.domain.ids.LinkId;
 import backend.academy.scrapper.models.domain.ids.SubscriptionId;
+import backend.academy.scrapper.models.domain.ids.TagId;
+import backend.academy.scrapper.models.domain.ids.UserId;
 import java.util.List;
 import java.util.Optional;
 
 public interface SubscriptionRepository {
-    Subscription save(User user, Link link);
+    SubscriptionId save(UserId userId, LinkId linkId);
 
     Subscription remove(User user, Link link);
 
@@ -22,12 +25,14 @@ public interface SubscriptionRepository {
 
     Optional<Subscription> findById(SubscriptionId subscriptionId);
 
-    // Методы для управления связями many-to-many:
-    void addFilterToSubscription(Long subscriptionId, Long filterId);
-    void removeFilterFromSubscription(Long subscriptionId, Long filterId);
-    List<Filter> findFiltersBySubscriptionId(Long subscriptionId);
+    Optional<Subscription> findByLinkIdAndUserId(LinkId linkId, UserId userId);
 
-    void addTagToSubscription(Long subscriptionId, Long tagId);
-    void removeTagFromSubscription(Long subscriptionId, Long tagId);
-    List<Tag> findTagsBySubscriptionId(Long subscriptionId);
+    // Методы для управления связями many-to-many:
+    void addFilterToSubscription(SubscriptionId subscriptionId, FilterId filterId);
+    void removeFilterFromSubscription(SubscriptionId subscriptionId, FilterId filterId);
+    List<Filter> findFiltersBySubscriptionId(SubscriptionId subscriptionId);
+
+    void addTagToSubscription(SubscriptionId subscriptionId, TagId tagId);
+    void removeTagFromSubscription(SubscriptionId subscriptionId, TagId tagId);
+    List<Tag> findTagsBySubscriptionId(SubscriptionId subscriptionId);
 }

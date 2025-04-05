@@ -13,7 +13,7 @@ public interface FilterRepository {
 
     List<Filter> findBySubscriptionId(SubscriptionId subscriptionId);
 
-    void save(String filter);
+    Filter save(String filter);
 
     void deleteById(FilterId filterId);
 }

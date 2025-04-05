@@ -29,8 +29,8 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public List<Link> findAll() {
         List<LinkEntity> linkEntities = jdbcTemplate.query(
-                "SELECT * FROM links",
-                JdbcRowMapperUtil::mapRowToLink
+            "SELECT * FROM links",
+            JdbcRowMapperUtil::mapRowToLink
         );
 
         return linkEntities.stream().map(LinkMapper::toDomain).toList();
@@ -39,9 +39,9 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public Optional<Link> findById(LinkId linkId) {
         List<LinkEntity> linkEntities = jdbcTemplate.query(
-                "SELECT * FROM links WHERE id = (?)",
-                JdbcRowMapperUtil::mapRowToLink,
-                linkId.id()
+            "SELECT * FROM links WHERE id = (?)",
+            JdbcRowMapperUtil::mapRowToLink,
+            linkId.id()
         );
 
         return linkEntities.stream().map(LinkMapper::toDomain).findFirst();
@@ -50,9 +50,9 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public Optional<Link> findByUri(URI uri) {
         List<LinkEntity> linkEntities = jdbcTemplate.query(
-                "SELECT * FROM links WHERE uri = (?)",
-                JdbcRowMapperUtil::mapRowToLink,
-                uri.toString()
+            "SELECT * FROM links WHERE uri = (?)",
+            JdbcRowMapperUtil::mapRowToLink,
+            uri.toString()
         );
 
         return linkEntities.stream().map(LinkMapper::toDomain).findFirst();
@@ -61,9 +61,9 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public Link updateLastModifying(LinkId linkId, OffsetDateTime newLastModifyingTime) {
         jdbcTemplate.update(
-                "UPDATE links SET last_modified_date = (?) WHERE id = (?)",
-                newLastModifyingTime,
-                linkId.id()
+            "UPDATE links SET last_modified_date = (?) WHERE id = (?)",
+            newLastModifyingTime,
+            linkId.id()
         );
         return findById(linkId).orElseThrow(NotExistLinkException::new);
     }
@@ -71,14 +71,10 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public Link save(URI uri) {
         //TODO не делать доп запрос на получение Link, а сразу возвращать из таблицы
-        try {
-            jdbcTemplate.update(
-                "INSERT INTO links (uri) VALUES (?)",
-                uri
-            );
-        } catch (DuplicateKeyException e) {
-            throw new AlreadyTrackLinkException();
-        }
+        jdbcTemplate.update(
+            "INSERT INTO links (uri) VALUES (?)",
+            uri
+        );
 
         return findByUri(uri).orElseThrow(NotExistLinkException::new);
     }

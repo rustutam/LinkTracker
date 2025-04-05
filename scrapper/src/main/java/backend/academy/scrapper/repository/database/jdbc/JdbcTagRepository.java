@@ -1,6 +1,5 @@
 package backend.academy.scrapper.repository.database.jdbc;
 
-import backend.academy.scrapper.exceptions.NotExistTagException;
 import backend.academy.scrapper.models.domain.Tag;
 import backend.academy.scrapper.models.domain.ids.SubscriptionId;
 import backend.academy.scrapper.models.domain.ids.TagId;
@@ -44,11 +43,11 @@ public class JdbcTagRepository implements TagRepository {
     @Override
     public List<Tag> findBySubscriptionId(SubscriptionId subscriptionId) {
         String sql = """
-                SELECT t.id, t.tag, t.created_at
-                FROM subscription_tags st
-                LEFT JOIN tags t ON st.tag_id = t.id
-                WHERE st.subscription_id = (?)
-                """;
+            SELECT t.id, t.tag, t.created_at
+            FROM subscription_tags st
+            LEFT JOIN tags t ON st.tag_id = t.id
+            WHERE st.subscription_id = (?)
+            """;
         List<TagEntity> tagEntities = jdbcTemplate.query(
             sql,
             JdbcRowMapperUtil::mapRowToTag,
@@ -59,11 +58,17 @@ public class JdbcTagRepository implements TagRepository {
     }
 
     @Override
-    public void save(String tag) {
-        jdbcTemplate.update(
-            "INSERT INTO tags (tag) VALUES (?)",
+    public Tag save(String tag) {
+
+        TagEntity tagEntity = jdbcTemplate.queryForObject(
+            "INSERT INTO tags (tag) VALUES (?) RETURNING id, tag, created_at",
+            JdbcRowMapperUtil::mapRowToTag,
             tag
         );
+
+        return TagMapper.toDomain(tagEntity);
+
+
     }
 
     @Override

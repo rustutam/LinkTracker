@@ -3,6 +3,7 @@ package backend.academy.scrapper.repository.database.utilities;
 import backend.academy.scrapper.models.entities.FilterEntity;
 import backend.academy.scrapper.models.entities.LinkEntity;
 import backend.academy.scrapper.models.entities.LinkMetadataEntity;
+import backend.academy.scrapper.models.entities.SubscriptionEntity;
 import backend.academy.scrapper.models.entities.TagEntity;
 import backend.academy.scrapper.models.entities.UserEntity;
 import lombok.NoArgsConstructor;
@@ -14,22 +15,16 @@ import java.util.List;
 @SuppressWarnings("MultipleStringLiterals")
 @NoArgsConstructor
 public final class JdbcRowMapperUtil {
-    private static final String LINK_TABLE_COLUMN_ID = "id";
+    private static final String COLUMN_ID = "id";
     private static final String LINK_TABLE_COLUMN_URI = "uri";
     private static final String LINK_TABLE_COLUMN_LAST_MODIFYING_DATE = "last_modified_date";
-    private static final String LINK_TABLE_COLUMN_CREATE_AT = "created_at";
+    private static final String COLUMN_CREATE_AT = "created_at";
 
-    private static final String TAG_TABLE_COLUMN_ID = "id";
     private static final String TAG_TABLE_COLUMN_TAG = "tag";
-    private static final String TAG_TABLE_COLUMN_CREATE_AT = "created_at";
 
-    private static final String FILTER_TABLE_COLUMN_ID = "id";
     private static final String FILTER_TABLE_COLUMN_TAG = "filter";
-    private static final String FILTER_TABLE_COLUMN_CREATE_AT = "created_at";
 
-    private static final String TG_CHAT_TABLE_COLUMN_ID = "id";
     private static final String TG_CHAT_TABLE_COLUMN_CHAT_ID = "chat_id";
-    private static final String TG_CHAT_TABLE_COLUMN_CREATED_AT = "created_at";
 
     private static final String LINK_METADATA_TABLE_COLUMN_LINK_ID = "link_id";
     private static final String LINK_METADATA_TABLE_COLUMN_SUBSCRIPTION_ID = "subscription_id";
@@ -51,28 +46,28 @@ public final class JdbcRowMapperUtil {
     @SneakyThrows
     public static LinkEntity mapRowToLink(ResultSet row, int rowNum) {
         return new LinkEntity(
-            row.getLong(LINK_TABLE_COLUMN_ID),
+            row.getLong(COLUMN_ID),
             row.getString(LINK_TABLE_COLUMN_URI),
             row.getObject(LINK_TABLE_COLUMN_LAST_MODIFYING_DATE, OffsetDateTime.class),
-            row.getObject(LINK_TABLE_COLUMN_CREATE_AT, OffsetDateTime.class)
+            row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
         );
     }
 
     @SneakyThrows
     public static TagEntity mapRowToTag(ResultSet row, int rowNum) {
         return new TagEntity(
-            row.getLong(TAG_TABLE_COLUMN_ID),
+            row.getLong(COLUMN_ID),
             row.getString(TAG_TABLE_COLUMN_TAG),
-            row.getObject(TAG_TABLE_COLUMN_CREATE_AT, OffsetDateTime.class)
+            row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
         );
     }
 
     @SneakyThrows
     public static FilterEntity mapRowToFilter(ResultSet row, int rowNum) {
         return new FilterEntity(
-            row.getLong(FILTER_TABLE_COLUMN_ID),
+            row.getLong(COLUMN_ID),
             row.getString(FILTER_TABLE_COLUMN_TAG),
-            row.getObject(FILTER_TABLE_COLUMN_CREATE_AT, OffsetDateTime.class)
+            row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
         );
     }
 //
@@ -102,7 +97,7 @@ public final class JdbcRowMapperUtil {
      */
     @SneakyThrows
     public static Long mapRowToChatId(ResultSet row, int rowNum) {
-        return row.getLong(TG_CHAT_TABLE_COLUMN_ID);
+        return row.getLong(COLUMN_ID);
     }
 
     /**
@@ -115,9 +110,19 @@ public final class JdbcRowMapperUtil {
     @SneakyThrows
     public static UserEntity mapRowToUserEntity(ResultSet row, int rowNum) {
         return new UserEntity(
-            row.getLong(TG_CHAT_TABLE_COLUMN_ID),
+            row.getLong(COLUMN_ID),
             row.getLong(TG_CHAT_TABLE_COLUMN_CHAT_ID),
-            row.getObject(TG_CHAT_TABLE_COLUMN_CREATED_AT, OffsetDateTime.class)
+            row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
+        );
+    }
+
+    @SneakyThrows
+    public static SubscriptionEntity mapRowToSubscriptionEntity(ResultSet row, int rowNum) {
+        return new SubscriptionEntity(
+            row.getLong(COLUMN_ID),
+            row.getLong(TG_CHAT_TABLE_COLUMN_CHAT_ID),
+            row.getLong(LINK_METADATA_TABLE_COLUMN_LINK_ID),
+            row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
         );
     }
 

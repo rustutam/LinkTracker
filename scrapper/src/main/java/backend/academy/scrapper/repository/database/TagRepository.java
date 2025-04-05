@@ -13,7 +13,7 @@ public interface TagRepository {
 
     List<Tag> findBySubscriptionId(SubscriptionId subscriptionId);
 
-    void save(String tag);
+    Tag save(String tag);
 
     void deleteById(TagId tagId);
 }
