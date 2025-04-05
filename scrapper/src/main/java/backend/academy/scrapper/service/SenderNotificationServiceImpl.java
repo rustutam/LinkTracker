@@ -8,6 +8,7 @@ import backend.academy.scrapper.repository.database.ChatRepository;
 import backend.academy.scrapper.sender.Sender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -17,17 +18,20 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
 
     @Override
     public void notifySender(LinkChangeStatus linkChangeStatus) {
+        String description = linkChangeStatus.changeInfoList().stream()
+            .map(Object::toString)
+            .collect(Collectors.joining("\n"));
 
-        linkChangeStatus.changeInfoList().forEach(changeInfo -> {
-            LinkId linkId = linkChangeStatus.link().linkId();
-            LinkUpdateNotification linkUpdateNotification = new LinkUpdateNotification(
-                linkId,
-                linkChangeStatus.link().uri(),
-                changeInfo.toString(),
-                chatRepository.findAllUsersByLinkId(linkId).stream().map(User::chatId).toList()
-            );
-            sender.send(linkUpdateNotification);
-        });
+        LinkId linkId = linkChangeStatus.link().linkId();
+
+        LinkUpdateNotification linkUpdateNotification = new LinkUpdateNotification(
+            linkId,
+            linkChangeStatus.link().uri(),
+            description,
+            chatRepository.findAllUsersByLinkId(linkId).stream().map(User::chatId).toList()
+        );
+
+        sender.send(linkUpdateNotification);
     }
 
 }
