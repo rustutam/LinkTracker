@@ -14,7 +14,7 @@ CREATE TABLE scrapper.links
     id                 BIGSERIAL PRIMARY KEY,
     uri                TEXT NOT NULL UNIQUE,
     last_modified_date TIMESTAMP DEFAULT now(),
-    created_at         TIMESTAMP DEFAULT now(),
+    created_at         TIMESTAMP DEFAULT now()
 );
 
 -- Подписки. Таблица для связывания пользователей и ссылок
@@ -25,8 +25,8 @@ CREATE TABLE scrapper.subscriptions
     link_id    BIGINT NOT NULL,
     created_at TIMESTAMP DEFAULT now(),
 
-    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
-    FOREIGN KEY (link_id) REFERENCES links (id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES scrapper.users (id) ON DELETE CASCADE,
+    FOREIGN KEY (link_id) REFERENCES scrapper.links (id) ON DELETE CASCADE,
 
     CONSTRAINT unique_user_link UNIQUE (user_id, link_id)
 );
@@ -54,8 +54,8 @@ CREATE TABLE scrapper.subscription_tags
     tag_id          BIGINT NOT NULL,
     created_at      TIMESTAMP DEFAULT now(),
     PRIMARY KEY (subscription_id, tag_id),
-    FOREIGN KEY (subscription_id) REFERENCES subscriptions (id) ON DELETE CASCADE,
-    FOREIGN KEY (tag_id) REFERENCES tags (id) ON DELETE CASCADE
+    FOREIGN KEY (subscription_id) REFERENCES scrapper.subscriptions (id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES scrapper.tags (id) ON DELETE CASCADE
 );
 
 --Таблица связи подписок и фильтров
@@ -65,8 +65,8 @@ CREATE TABLE scrapper.subscription_filters
     filter_id       BIGINT NOT NULL,
     created_at      TIMESTAMP DEFAULT now(),
     PRIMARY KEY (subscription_id, filter_id),
-    FOREIGN KEY (subscription_id) REFERENCES subscriptions (id) ON DELETE CASCADE,
-    FOREIGN KEY (filter_id) REFERENCES filters (id) ON DELETE CASCADE
+    FOREIGN KEY (subscription_id) REFERENCES scrapper.subscriptions (id) ON DELETE CASCADE,
+    FOREIGN KEY (filter_id) REFERENCES scrapper.filters (id) ON DELETE CASCADE
 );
 
 -- TODO добавить индексы на поля
