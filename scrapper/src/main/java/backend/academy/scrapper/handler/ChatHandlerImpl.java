@@ -12,13 +12,11 @@ public class ChatHandlerImpl implements ChatHandler {
 
     @Override
     public void register(long id) {
-        ChatId chatId = new ChatId(id);
-        chatService.register(chatId);
+        chatService.register(new ChatId(id));
     }
 
     @Override
     public void unregister(long id) {
-        ChatId chatId = new ChatId(id);
-        chatService.unRegister(chatId);
+        chatService.unRegister(new ChatId(id));
     }
 }

@@ -23,6 +23,7 @@ import backend.academy.scrapper.repository.database.utilities.mapper.FilterMappe
 import backend.academy.scrapper.repository.database.utilities.mapper.SubscriptionMapper;
 import backend.academy.scrapper.repository.database.utilities.mapper.TagMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -31,10 +32,9 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcSubscriptionRepository implements SubscriptionRepository {
     private final JdbcTemplate jdbcTemplate;
-    private final LinkRepository linkRepository;
-    private final ChatRepository chatRepository;
 
     @Override
     public SubscriptionId save(UserId userId, LinkId linkId) {
@@ -62,8 +62,8 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
 
         return Subscription.builder()
             .subscriptionId(subscriptionId)
-            .user(user)
-            .link(link)
+            .userId(user.userId())
+            .linkId(link.linkId())
             .build();
 
     }
@@ -75,7 +75,17 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
 
     @Override
     public List<ChatId> findAllChatIdsByLinkId(LinkId linkId) {
-        return List.of();
+        String sql = """
+        SELECT u.chat_id
+        FROM subscriptions s
+        JOIN users u ON s.user_id = u.id
+        WHERE s.link_id = (?)
+        """;
+        return jdbcTemplate.query(
+            sql,
+            (rs, rowNum) -> new ChatId(rs.getLong("chat_id")),
+            linkId.id()
+        );
     }
 
     @Override
@@ -106,9 +116,6 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
         return subscriptions.stream().map(SubscriptionMapper::toDomain).findFirst();
     }
 
-    private User getUser(User user) {
-        return chatRepository.findByChatId(user.chatId()).orElseThrow(NotExistTgChatException::new);
-    }
 
     @Override
     public void addFilterToSubscription(SubscriptionId subscriptionId, FilterId filterId) {

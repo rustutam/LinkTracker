@@ -9,13 +9,17 @@ import backend.academy.scrapper.repository.database.ChatRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
 import backend.academy.scrapper.repository.database.utilities.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcChatRepository implements ChatRepository {
     private final JdbcTemplate jdbcTemplate;
 
@@ -60,6 +64,11 @@ public class JdbcChatRepository implements ChatRepository {
                 chatId.id()
             );
         } catch (DataIntegrityViolationException e) {
+            log.atError()
+                .addKeyValue("chatId", chatId)
+                .setMessage("Ошибка сохранения в базу данных пользователя")
+                .setMessage("Такой пользователь уже существует")
+                .log();
             throw new DoubleRegistrationException();
         }
     }

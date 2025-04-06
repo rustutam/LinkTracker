@@ -19,5 +19,4 @@ public interface ChatRepository {
 
     void deleteByChatId(ChatId chatId) throws NotExistTgChatException;
 
-    List<User> findAllUsersByLinkId(LinkId linkId);
 }

@@ -2,9 +2,11 @@ package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.models.domain.LinkUpdateNotification;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
+import backend.academy.scrapper.models.domain.Subscription;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.LinkId;
 import backend.academy.scrapper.repository.database.ChatRepository;
+import backend.academy.scrapper.repository.database.SubscriptionRepository;
 import backend.academy.scrapper.sender.Sender;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +15,7 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class SenderNotificationServiceImpl implements SenderNotificationService {
-    private final ChatRepository chatRepository;
+    private final SubscriptionRepository subscriptionRepository;
     private final Sender sender;
 
     @Override
@@ -28,7 +30,7 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
             linkId,
             linkChangeStatus.link().uri(),
             description,
-            chatRepository.findAllUsersByLinkId(linkId).stream().map(User::chatId).toList()
+            subscriptionRepository.findAllChatIdsByLinkId(linkId)
         );
 
         sender.send(linkUpdateNotification);

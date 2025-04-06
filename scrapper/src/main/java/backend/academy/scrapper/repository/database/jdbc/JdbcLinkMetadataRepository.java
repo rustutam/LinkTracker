@@ -8,9 +8,11 @@ import backend.academy.scrapper.models.domain.ids.SubscriptionId;
 import backend.academy.scrapper.models.entities.LinkMetadataEntity;
 import backend.academy.scrapper.repository.database.FilterRepository;
 import backend.academy.scrapper.repository.database.LinkMetadataRepository;
+import backend.academy.scrapper.repository.database.SubscriptionRepository;
 import backend.academy.scrapper.repository.database.TagRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import java.net.URI;
@@ -18,10 +20,10 @@ import java.util.List;
 
 @Repository
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcLinkMetadataRepository implements LinkMetadataRepository {
     private final JdbcTemplate jdbcTemplate;
-    private final TagRepository tagRepository;
-    private final FilterRepository filterRepository;
+    private final SubscriptionRepository subscriptionRepository;
 
     @Override
     public List<LinkMetadata> findAllLinkMetadataByChatId(ChatId chatId) {
@@ -54,8 +56,8 @@ public class JdbcLinkMetadataRepository implements LinkMetadataRepository {
 
                     return LinkMetadata.builder()
                         .link(link)
-                        .tags(tagRepository.findBySubscriptionId(subscriptionId))
-                        .filters(filterRepository.findBySubscriptionId(subscriptionId))
+                        .tags(subscriptionRepository.findTagsBySubscriptionId(subscriptionId))
+                        .filters(subscriptionRepository.findFiltersBySubscriptionId(subscriptionId))
                         .build();
 
                 }

@@ -25,7 +25,5 @@ public interface LinkRepository {
 
     Link save(URI uri);
 
-//    List<Link> findAllLinksByChatId(ChatId chatId);
-
     Page<Link> findAll(Pageable pageable);
 }

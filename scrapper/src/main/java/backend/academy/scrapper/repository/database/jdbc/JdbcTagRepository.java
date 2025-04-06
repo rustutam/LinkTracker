@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.Optional;
 import backend.academy.scrapper.repository.database.utilities.mapper.TagMapper;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcTagRepository implements TagRepository {
     private final JdbcTemplate jdbcTemplate;
 
@@ -41,23 +43,6 @@ public class JdbcTagRepository implements TagRepository {
     }
 
     @Override
-    public List<Tag> findBySubscriptionId(SubscriptionId subscriptionId) {
-        String sql = """
-            SELECT t.id, t.tag, t.created_at
-            FROM subscription_tags st
-            LEFT JOIN tags t ON st.tag_id = t.id
-            WHERE st.subscription_id = (?)
-            """;
-        List<TagEntity> tagEntities = jdbcTemplate.query(
-            sql,
-            JdbcRowMapperUtil::mapRowToTag,
-            subscriptionId.id()
-        );
-
-        return tagEntities.stream().map(TagMapper::toDomain).toList();
-    }
-
-    @Override
     public Tag save(String tag) {
 
         TagEntity tagEntity = jdbcTemplate.queryForObject(
@@ -67,8 +52,6 @@ public class JdbcTagRepository implements TagRepository {
         );
 
         return TagMapper.toDomain(tagEntity);
-
-
     }
 
     @Override

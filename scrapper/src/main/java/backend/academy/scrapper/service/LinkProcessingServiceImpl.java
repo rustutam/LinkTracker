@@ -57,6 +57,7 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
             // Если получена информация об обновлении, уведомляем пользователя
             if (linkChangeStatus.hasChanges()) {
                 senderNotificationService.notifySender(linkChangeStatus);
+                linkRepository.updateLastModifying(linkChangeStatus.link().linkId(), linkChangeStatus.link().lastUpdateTime());
                 log.atInfo()
                     .addKeyValue("Найдено обновление для ссылки", link.uri().toString())
                     .setMessage("Отправка уведомления")

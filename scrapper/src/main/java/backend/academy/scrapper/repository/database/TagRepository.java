@@ -11,8 +11,6 @@ public interface TagRepository {
 
     Optional<Tag> findByTag(String tag);
 
-    List<Tag> findBySubscriptionId(SubscriptionId subscriptionId);
-
     Tag save(String tag);
 
     void deleteById(TagId tagId);

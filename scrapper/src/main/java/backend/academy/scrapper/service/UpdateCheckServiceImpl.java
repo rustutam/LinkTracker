@@ -12,34 +12,20 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class UpdateCheckServiceImpl implements UpdateCheckService {
-    //    private final LinksRepository repository;
     private final ExternalDataRepositoryFactory repositoryFactory;
-
 
     @Override
     public LinkChangeStatus detectChanges(Link link) {
-        ExternalDataRepository repository = repositoryFactory.getExternalDataRepository(link);
-
-        List<ChangeInfo> contentList = repository.getChangeInfoByLink(link);
-
-        List<ChangeInfo> newContentList = getUpdatedContent(contentList, link);
-
-        if (newContentList.isEmpty()) {
-            return LinkChangeStatus.builder()
-                .link(link)
-                .hasChanges(false)
-                .changeInfoList(List.of())
-                .build();
-        }
+        ExternalDataRepository externalDataRepository = repositoryFactory.getExternalDataRepository(link);
+        List<ChangeInfo> newContentList = externalDataRepository.getChangeInfoByLink(link)
+            .stream()
+            .filter(changeInfo -> changeInfo.creationTime().isAfter(link.lastUpdateTime()))
+            .toList();
 
         return LinkChangeStatus.builder()
             .link(link)
-            .hasChanges(true)
+            .hasChanges(!newContentList.isEmpty())
             .changeInfoList(newContentList)
             .build();
-    }
-
-    private List<ChangeInfo> getUpdatedContent(List<ChangeInfo> allContent, Link link) {
-        return allContent.stream().filter(changeInfo -> changeInfo.creationTime().isAfter(link.lastUpdateTime())).toList();
     }
 }

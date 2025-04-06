@@ -29,10 +29,14 @@ public interface SubscriptionRepository {
 
     // Методы для управления связями many-to-many:
     void addFilterToSubscription(SubscriptionId subscriptionId, FilterId filterId);
+
     void removeFilterFromSubscription(SubscriptionId subscriptionId, FilterId filterId);
+
     List<Filter> findFiltersBySubscriptionId(SubscriptionId subscriptionId);
 
     void addTagToSubscription(SubscriptionId subscriptionId, TagId tagId);
+
     void removeTagFromSubscription(SubscriptionId subscriptionId, TagId tagId);
+
     List<Tag> findTagsBySubscriptionId(SubscriptionId subscriptionId);
 }

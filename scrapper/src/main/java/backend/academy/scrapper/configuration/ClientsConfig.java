@@ -14,16 +14,16 @@ public class ClientsConfig {
     private final GitHubConfig gitHubConfig;
     private final StackOverflowConfig stackOverflowConfig;
     private final TgBotConfig tgBotConfig;
-//
-//    @Bean("gitHubClient")
-//    public GithubClient gitHubRestClient() {
-//        return new GithubClient(gitHubConfig);
-//    }
 
-//    @Bean("stackOverflowClient")
-//    public StackoverflowClient stackOverflowRestClient() {
-//        return new StackoverflowClient(stackOverflowConfig);
-//    }
+    @Bean("gitHubClient")
+    public GithubClient gitHubRestClient() {
+        return new GithubClient(gitHubConfig);
+    }
+
+    @Bean("stackOverflowClient")
+    public StackoverflowClient stackOverflowRestClient() {
+        return new StackoverflowClient(stackOverflowConfig);
+    }
 
     @Bean("tgBotClient")
     public TgBotClient tgBotRestClient() {

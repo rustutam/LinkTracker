@@ -21,11 +21,11 @@ public class GithubClient {
     private final RestClient restClient;
     private final GitHubConfig gitHubConfig;
 
-    public GithubClient(GitHubConfig gitHubConfig, ObjectMapper objectMapper, GitHubConfig gitHubConfig1) {
+    public GithubClient(GitHubConfig gitHubConfig) {
         restClient = RestClient.builder()
             .baseUrl(gitHubConfig.baseUrl())
             .build();
-        this.gitHubConfig = gitHubConfig1;
+        this.gitHubConfig = gitHubConfig;
     }
 
     public String issuesRequest(String owner, String repository) {

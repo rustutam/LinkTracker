@@ -16,8 +16,8 @@ public class StackoverflowClient {
     private final String filter = "withbody";
     private static final String REQUEST_ERROR = "Ошибка при запросе";
 
-    public StackoverflowClient(StackOverflowConfig stackoverflowConfig, StackOverflowConfig stackOverflowConfig) {
-        restClient = RestClient.builder().baseUrl(stackoverflowConfig.baseUrl()).build();
+    public StackoverflowClient(StackOverflowConfig stackOverflowConfig) {
+        restClient = RestClient.builder().baseUrl(stackOverflowConfig.baseUrl()).build();
         this.stackOverflowConfig = stackOverflowConfig;
     }
 

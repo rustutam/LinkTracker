@@ -11,8 +11,6 @@ public interface FilterRepository {
 
     Optional<Filter> findByFilter(String filter);
 
-    List<Filter> findBySubscriptionId(SubscriptionId subscriptionId);
-
     Filter save(String filter);
 
     void deleteById(FilterId filterId);

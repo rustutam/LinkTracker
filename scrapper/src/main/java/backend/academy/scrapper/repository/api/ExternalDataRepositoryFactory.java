@@ -16,21 +16,20 @@ public class ExternalDataRepositoryFactory {
 
 
     public ExternalDataRepository getExternalDataRepository(Link link) {
-        //TODO переписать красиво
         String uri = link.uri().toString();
 
-        if (regexCheck.isGithub(uri)){
-            return gitHubRepository;
-        }
-        else if (regexCheck.isStackOverflow(uri)){
-            return stackOverflowRepository;
-        }
-        else {
-            log.atError()
-                .addKeyValue("link", uri)
-                .setMessage("Неподдерживаемая ссылка")
-                .log();
-            throw new IllegalArgumentException("Неподдерживаемая ссылка");
-        }
+        ExternalDataRepository repository = switch (uri) {
+            case String u when regexCheck.isGithub(u) -> gitHubRepository;
+            case String u when regexCheck.isStackOverflow(u) -> stackOverflowRepository;
+            default -> {
+                log.atError()
+                    .addKeyValue("link", uri)
+                    .setMessage("Неподдерживаемая ссылка")
+                    .log();
+                throw new IllegalArgumentException("Неподдерживаемая ссылка");
+            }
+        };
+
+        return repository;
     }
 }
