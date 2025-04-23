@@ -24,7 +24,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
-@Testcontainers
 class JdbcLinkMetadataRepositoryTest extends IntegrationEnvironment {
 
     @Autowired

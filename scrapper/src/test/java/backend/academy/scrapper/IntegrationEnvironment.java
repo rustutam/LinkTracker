@@ -21,11 +21,15 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
-@Testcontainers
 @AutoConfigureMockMvc
 public abstract class IntegrationEnvironment {
-    @Container
-    protected static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>("postgres:17");
+
+    public static PostgreSQLContainer<?> postgres;
+    static {
+        postgres = new PostgreSQLContainer<>("postgres:17");
+        postgres.start();
+    }
+
 
     @Autowired
     protected MockMvc mockMvc;
