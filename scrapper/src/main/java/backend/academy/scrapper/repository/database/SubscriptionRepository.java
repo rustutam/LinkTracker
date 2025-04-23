@@ -17,7 +17,7 @@ import java.util.Optional;
 public interface SubscriptionRepository {
     SubscriptionId save(UserId userId, LinkId linkId);
 
-    Subscription remove(User user, Link link);
+    Subscription remove(UserId userId, LinkId linkId);
 
     List<Link> findAllLinksByChatId(ChatId chatId);
 

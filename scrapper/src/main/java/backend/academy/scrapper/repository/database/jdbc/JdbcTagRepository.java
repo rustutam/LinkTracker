@@ -23,7 +23,7 @@ public class JdbcTagRepository implements TagRepository {
     @Override
     public Optional<Tag> findById(TagId tagId) {
         List<TagEntity> tagEntities = jdbcTemplate.query(
-            "SELECT * FROM tags WHERE id = (?)",
+            "SELECT * FROM scrapper.tags WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToTag,
             tagId.id()
         );
@@ -34,7 +34,7 @@ public class JdbcTagRepository implements TagRepository {
     @Override
     public Optional<Tag> findByTag(String tag) {
         List<TagEntity> tagEntities = jdbcTemplate.query(
-            "SELECT * FROM tags WHERE tag = (?)",
+            "SELECT * FROM scrapper.tags WHERE tag = (?)",
             JdbcRowMapperUtil::mapRowToTag,
             tag
         );
@@ -46,7 +46,7 @@ public class JdbcTagRepository implements TagRepository {
     public Tag save(String tag) {
 
         TagEntity tagEntity = jdbcTemplate.queryForObject(
-            "INSERT INTO tags (tag) VALUES (?) RETURNING id, tag, created_at",
+            "INSERT INTO scrapper.tags (tag) VALUES (?) RETURNING id, tag, created_at",
             JdbcRowMapperUtil::mapRowToTag,
             tag
         );
@@ -57,7 +57,7 @@ public class JdbcTagRepository implements TagRepository {
     @Override
     public void deleteById(TagId tagId) {
         jdbcTemplate.update(
-            "DELETE FROM tags WHERE id = (?)",
+            "DELETE FROM scrapper.tags WHERE id = (?)",
             tagId.id()
         );
     }

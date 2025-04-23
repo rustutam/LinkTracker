@@ -25,6 +25,7 @@ public final class JdbcRowMapperUtil {
     private static final String FILTER_TABLE_COLUMN_TAG = "filter";
 
     private static final String TG_CHAT_TABLE_COLUMN_CHAT_ID = "chat_id";
+    private static final String TG_CHAT_TABLE_COLUMN_USER_ID = "user_id";
 
     private static final String LINK_METADATA_TABLE_COLUMN_LINK_ID = "link_id";
     private static final String LINK_METADATA_TABLE_COLUMN_SUBSCRIPTION_ID = "subscription_id";
@@ -120,7 +121,7 @@ public final class JdbcRowMapperUtil {
     public static SubscriptionEntity mapRowToSubscriptionEntity(ResultSet row, int rowNum) {
         return new SubscriptionEntity(
             row.getLong(COLUMN_ID),
-            row.getLong(TG_CHAT_TABLE_COLUMN_CHAT_ID),
+            row.getLong(TG_CHAT_TABLE_COLUMN_USER_ID),
             row.getLong(LINK_METADATA_TABLE_COLUMN_LINK_ID),
             row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
         );

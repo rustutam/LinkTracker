@@ -32,7 +32,7 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public List<Link> findAll() {
         List<LinkEntity> linkEntities = jdbcTemplate.query(
-            "SELECT * FROM links",
+            "SELECT * FROM scrapper.links",
             JdbcRowMapperUtil::mapRowToLink
         );
 
@@ -42,7 +42,7 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public Optional<Link> findById(LinkId linkId) {
         List<LinkEntity> linkEntities = jdbcTemplate.query(
-            "SELECT * FROM links WHERE id = (?)",
+            "SELECT * FROM scrapper.links WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToLink,
             linkId.id()
         );
@@ -53,7 +53,7 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public Optional<Link> findByUri(URI uri) {
         List<LinkEntity> linkEntities = jdbcTemplate.query(
-            "SELECT * FROM links WHERE uri = (?)",
+            "SELECT * FROM scrapper.links WHERE uri = (?)",
             JdbcRowMapperUtil::mapRowToLink,
             uri.toString()
         );
@@ -64,7 +64,7 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public Link updateLastModifying(LinkId linkId, OffsetDateTime newLastModifyingTime) {
         jdbcTemplate.update(
-            "UPDATE links SET last_modified_date = (?) WHERE id = (?)",
+            "UPDATE scrapper.links SET last_modified_date = (?) WHERE id = (?)",
             newLastModifyingTime,
             linkId.id()
         );
@@ -73,25 +73,25 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public Link save(URI uri) {
-        //TODO не делать доп запрос на получение Link, а сразу возвращать из таблицы
-        jdbcTemplate.update(
-            "INSERT INTO links (uri) VALUES (?)",
-            uri
+        LinkEntity linkEntity = jdbcTemplate.queryForObject(
+            "INSERT INTO scrapper.links (uri) VALUES (?) RETURNING id, uri, last_modified_date, created_at",
+            JdbcRowMapperUtil::mapRowToLink,
+            uri.toString()
         );
 
-        return findByUri(uri).orElseThrow(NotExistLinkException::new);
+        return LinkMapper.toDomain(linkEntity);
     }
 
 
     @Override
     public Page<Link> findAll(Pageable pageable) {
         // 1. Вычисляем общее количество записей в таблице
-        String countSql = "SELECT COUNT(*) FROM links";
+        String countSql = "SELECT COUNT(*) FROM scrapper.links";
         int total = jdbcTemplate.queryForObject(countSql, Integer.class);
 
         // 2. Формируем запрос с пагинацией (LIMIT и OFFSET)
         List<LinkEntity> linkEntities = jdbcTemplate.query(
-            "SELECT * FROM links ORDER BY id LIMIT (?) OFFSET (?)",
+            "SELECT * FROM scrapper.links ORDER BY id LIMIT (?) OFFSET (?)",
             JdbcRowMapperUtil::mapRowToLink,
             pageable.getPageSize(),
             pageable.getOffset()

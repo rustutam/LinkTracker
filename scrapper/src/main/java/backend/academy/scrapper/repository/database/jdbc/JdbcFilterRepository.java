@@ -23,7 +23,7 @@ public class JdbcFilterRepository implements FilterRepository {
     @Override
     public Optional<Filter> findById(FilterId filterId) {
         List<FilterEntity> filterEntities = jdbcTemplate.query(
-            "SELECT * FROM filters WHERE id = (?)",
+            "SELECT * FROM scrapper.filters WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToFilter,
             filterId.id()
         );
@@ -34,7 +34,7 @@ public class JdbcFilterRepository implements FilterRepository {
     @Override
     public Optional<Filter> findByFilter(String filter) {
         List<FilterEntity> filterEntities = jdbcTemplate.query(
-            "SELECT * FROM filters WHERE filter = (?)",
+            "SELECT * FROM scrapper.filters WHERE filter = (?)",
             JdbcRowMapperUtil::mapRowToFilter,
             filter
         );
@@ -45,7 +45,7 @@ public class JdbcFilterRepository implements FilterRepository {
     @Override
     public Filter save(String filter) {
         FilterEntity filterEntity = jdbcTemplate.queryForObject(
-            "INSERT INTO filters (filter) VALUES (?) RETURNING id, filter, created_at",
+            "INSERT INTO scrapper.filters (filter) VALUES (?) RETURNING id, filter, created_at",
             JdbcRowMapperUtil::mapRowToFilter,
             filter
         );
@@ -57,7 +57,7 @@ public class JdbcFilterRepository implements FilterRepository {
     @Override
     public void deleteById(FilterId filterId) {
         jdbcTemplate.update(
-            "DELETE FROM filters WHERE id = (?)",
+            "DELETE FROM scrapper.filters WHERE id = (?)",
             filterId.id()
         );
     }

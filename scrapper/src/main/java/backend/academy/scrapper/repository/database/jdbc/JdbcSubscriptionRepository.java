@@ -13,6 +13,7 @@ import backend.academy.scrapper.models.domain.ids.SubscriptionId;
 import backend.academy.scrapper.models.domain.ids.TagId;
 import backend.academy.scrapper.models.domain.ids.UserId;
 import backend.academy.scrapper.models.entities.FilterEntity;
+import backend.academy.scrapper.models.entities.LinkEntity;
 import backend.academy.scrapper.models.entities.SubscriptionEntity;
 import backend.academy.scrapper.models.entities.TagEntity;
 import backend.academy.scrapper.repository.database.LinkRepository;
@@ -20,6 +21,7 @@ import backend.academy.scrapper.repository.database.SubscriptionRepository;
 import backend.academy.scrapper.repository.database.ChatRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
 import backend.academy.scrapper.repository.database.utilities.mapper.FilterMapper;
+import backend.academy.scrapper.repository.database.utilities.mapper.LinkMapper;
 import backend.academy.scrapper.repository.database.utilities.mapper.SubscriptionMapper;
 import backend.academy.scrapper.repository.database.utilities.mapper.TagMapper;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +42,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     public SubscriptionId save(UserId userId, LinkId linkId) {
         SubscriptionId subscriptionId = new SubscriptionId(
             jdbcTemplate.queryForObject(
-                "INSERT INTO subscriptions (user_id, link_id) VALUES (?, ?) RETURNING id",
+                "INSERT INTO scrapper.subscriptions (user_id, link_id) VALUES (?, ?) RETURNING id",
                 Long.class,
                 userId.id(),
                 linkId.id()
@@ -50,35 +52,51 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     }
 
     @Override
-    public Subscription remove(User user, Link link) {
+    public Subscription remove(UserId userId, LinkId linkId) {
         SubscriptionId subscriptionId = new SubscriptionId(
             jdbcTemplate.queryForObject(
-                "DELETE FROM subscriptions WHERE user_id =? AND link_id =? RETURNING id",
+                "DELETE FROM scrapper.subscriptions WHERE user_id =? AND link_id =? RETURNING id",
                 Long.class,
-                user.userId().id(),
-                link.linkId().id()
+                userId.id(),
+                linkId.id()
             )
         );
 
         return Subscription.builder()
             .subscriptionId(subscriptionId)
-            .userId(user.userId())
-            .linkId(link.linkId())
+            .userId(userId)
+            .linkId(linkId)
             .build();
 
     }
 
     @Override
     public List<Link> findAllLinksByChatId(ChatId chatId) {
-        return List.of();
+        String sql = """
+        SELECT l.id, l.uri, l.last_modified_date, l.created_at
+        FROM scrapper.links l
+        JOIN scrapper.subscriptions s ON l.id = s.link_id
+        JOIN scrapper.users u ON s.user_id = u.id
+        WHERE u.chat_id = ?
+        """;
+
+        List<LinkEntity> linkEntities = jdbcTemplate.query(
+            sql,
+            JdbcRowMapperUtil::mapRowToLink,
+            chatId.id()
+        );
+
+        return linkEntities.stream()
+            .map(LinkMapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<ChatId> findAllChatIdsByLinkId(LinkId linkId) {
         String sql = """
         SELECT u.chat_id
-        FROM subscriptions s
-        JOIN users u ON s.user_id = u.id
+        FROM scrapper.subscriptions s
+        JOIN scrapper.users u ON s.user_id = u.id
         WHERE s.link_id = (?)
         """;
         return jdbcTemplate.query(
@@ -91,7 +109,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     @Override
     public Optional<Subscription> findById(SubscriptionId subscriptionId) {
         var userEntities = jdbcTemplate.query(
-            "SELECT * FROM subscriptions WHERE chat_id = (?)",
+            "SELECT * FROM scrapper.subscriptions WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToSubscriptionEntity,
             subscriptionId.id()
         );
@@ -103,7 +121,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     public Optional<Subscription> findByLinkIdAndUserId(LinkId linkId, UserId userId) {
         String sql = """
             SELECT *
-            FROM subscriptions s
+            FROM scrapper.subscriptions s
             WHERE s.link_id = (?) AND s.user_id = (?)
             """;
         List<SubscriptionEntity> subscriptions = jdbcTemplate.query(
@@ -120,7 +138,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     @Override
     public void addFilterToSubscription(SubscriptionId subscriptionId, FilterId filterId) {
         jdbcTemplate.update(
-            "INSERT INTO subscription_filters (subscription_id, filter_id) VALUES (?, ?)",
+            "INSERT INTO scrapper.subscription_filters (subscription_id, filter_id) VALUES (?, ?)",
             subscriptionId.id(),
             filterId.id()
         );
@@ -129,7 +147,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     @Override
     public void removeFilterFromSubscription(SubscriptionId subscriptionId, FilterId filterId) {
         jdbcTemplate.update(
-            "DELETE FROM subscription_filters WHERE subscription_id =? AND filter_id =?",
+            "DELETE FROM scrapper.subscription_filters WHERE subscription_id =? AND filter_id =?",
             subscriptionId.id(),
             filterId.id()
         );
@@ -140,8 +158,8 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     public List<Filter> findFiltersBySubscriptionId(SubscriptionId subscriptionId) {
         String sql = """
             SELECT f.id, f.filter, f.created_at
-            FROM subscription_tags st
-            LEFT JOIN filters f ON st.tag_id = f.id
+            FROM scrapper.subscription_tags st
+            LEFT JOIN scrapper.filters f ON st.tag_id = f.id
             WHERE st.subscription_id = (?)
             """;
         List<FilterEntity> filterEntities = jdbcTemplate.query(
@@ -157,7 +175,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     @Override
     public void addTagToSubscription(SubscriptionId subscriptionId, TagId tagId) {
         jdbcTemplate.update(
-            "INSERT INTO subscription_tags (subscription_id, tag_id) VALUES (?, ?)",
+            "INSERT INTO scrapper.subscription_tags (subscription_id, tag_id) VALUES (?, ?)",
             subscriptionId.id(),
             tagId.id()
         );
@@ -166,7 +184,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     @Override
     public void removeTagFromSubscription(SubscriptionId subscriptionId, TagId tagId) {
         jdbcTemplate.update(
-            "DELETE FROM subscription_tags WHERE subscription_id =? AND tag_id =?",
+            "DELETE FROM scrapper.subscription_tags WHERE subscription_id =? AND tag_id =?",
             subscriptionId.id(),
             tagId.id()
         );
@@ -176,8 +194,8 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     public List<Tag> findTagsBySubscriptionId(SubscriptionId subscriptionId) {
         String sql = """
             SELECT t.id, t.tag, t.created_at
-            FROM subscription_tags st
-            LEFT JOIN tags t ON st.tag_id = t.id
+            FROM scrapper.subscription_tags st
+            LEFT JOIN scrapper.tags t ON st.tag_id = t.id
             WHERE st.subscription_id = (?)
             """;
         List<TagEntity> tagEntities = jdbcTemplate.query(

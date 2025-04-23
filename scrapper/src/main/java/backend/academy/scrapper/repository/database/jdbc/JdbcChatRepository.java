@@ -30,7 +30,7 @@ public class JdbcChatRepository implements ChatRepository {
     @Override
     public Optional<User> findById(UserId userId){
         var resultChats = jdbcTemplate.query(
-            "SELECT * FROM users WHERE id = (?)",
+            "SELECT * FROM scrapper.users WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToUserEntity,
             userId.id()
         );
@@ -44,9 +44,9 @@ public class JdbcChatRepository implements ChatRepository {
     @Override
     public Optional<User> findByChatId(ChatId chatId){
         var userEntities = jdbcTemplate.query(
-            "SELECT * FROM users WHERE chat_id = (?)",
+            "SELECT * FROM scrapper.users WHERE chat_id = (?)",
             JdbcRowMapperUtil::mapRowToUserEntity,
-            chatId
+            chatId.id()
         );
 
         return userEntities.stream().map(UserMapper::toDomain).findFirst();
@@ -57,10 +57,9 @@ public class JdbcChatRepository implements ChatRepository {
      */
     @Override
     public void save(ChatId chatId) throws DoubleRegistrationException {
-        //TODO проверить выбрасывается ли ошибка
         try {
             jdbcTemplate.update(
-                "INSERT INTO users (chat_id) VALUES (?)",
+                "INSERT INTO scrapper.users (chat_id) VALUES (?)",
                 chatId.id()
             );
         } catch (DataIntegrityViolationException e) {
@@ -79,7 +78,7 @@ public class JdbcChatRepository implements ChatRepository {
     @Override
     public void deleteByChatId(ChatId chatId) throws NotExistTgChatException {
         int updatedRows = jdbcTemplate.update(
-            "DELETE FROM users WHERE chat_id = (?)",
+            "DELETE FROM scrapper.users WHERE chat_id = (?)",
             chatId.id()
         );
 

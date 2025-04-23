@@ -87,7 +87,7 @@ public class JdbcLinkService implements LinkService {
         Subscription subscription = subscriptionRepository.findByLinkIdAndUserId(link.linkId(), user.userId())
             .orElseThrow();
 
-        subscriptionRepository.remove(user, link);
+        subscriptionRepository.remove(user.userId(), link.linkId());
 
         return LinkMetadata.builder()
             .link(link)

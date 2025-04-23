@@ -5,10 +5,12 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Builder
 @Getter
+@EqualsAndHashCode
 @AllArgsConstructor
 public class Link {
     private LinkId linkId;

@@ -12,7 +12,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ComponentScan(basePackages = "general")
-@ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "app")
 public record ScrapperConfig(
         @Bean @NotNull Scheduler scheduler,
         @NotEmpty String githubToken,

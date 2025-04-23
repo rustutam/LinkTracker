@@ -1,22 +1,22 @@
 package backend.academy.scrapper.repository.database.jdbc;
 
+import backend.academy.scrapper.models.domain.Filter;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.LinkMetadata;
+import backend.academy.scrapper.models.domain.Tag;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.LinkId;
 import backend.academy.scrapper.models.domain.ids.SubscriptionId;
-import backend.academy.scrapper.models.entities.LinkMetadataEntity;
-import backend.academy.scrapper.repository.database.FilterRepository;
 import backend.academy.scrapper.repository.database.LinkMetadataRepository;
+import backend.academy.scrapper.repository.database.LinkRepository;
 import backend.academy.scrapper.repository.database.SubscriptionRepository;
-import backend.academy.scrapper.repository.database.TagRepository;
-import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
-import java.net.URI;
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -24,44 +24,40 @@ import java.util.List;
 public class JdbcLinkMetadataRepository implements LinkMetadataRepository {
     private final JdbcTemplate jdbcTemplate;
     private final SubscriptionRepository subscriptionRepository;
+    private final LinkRepository linkRepository;
 
     @Override
+    @Transactional
     public List<LinkMetadata> findAllLinkMetadataByChatId(ChatId chatId) {
         String sql = """
-            SELECT s.id AS subscription_id, l.id AS link_id, l.uri, l.last_modified_date AS link_last_modified_date,
-            FROM subscriptions s
-            JOIN users u ON s.user_id = u.id
-            JOIN links l ON s.link_id = l.id
+            SELECT s.id AS subscription_id, l.id AS link_id
+            FROM scrapper.subscriptions s
+            JOIN scrapper.users u ON s.user_id = u.id
+            JOIN scrapper.links l ON s.link_id = l.id
             WHERE u.chat_id = (?)
             """;
 
-        List<LinkMetadataEntity> linkMetadataEntities = jdbcTemplate.query(
+        return jdbcTemplate.query(
             sql,
-            JdbcRowMapperUtil::mapRowToLinkMetadataEntity,
-            chatId.id()
-        );
+            ps -> ps.setLong(1, chatId.id()),
+            rs -> {
+                List<LinkMetadata> result = new ArrayList<>();
 
+                while (rs.next()) {
+                    SubscriptionId subscriptionId = new SubscriptionId(rs.getLong("subscription_id"));
+                    LinkId linkId = new LinkId(rs.getLong("link_id"));
 
-        return linkMetadataEntities.stream()
-            .map(
-                linkMetadataEntity -> {
+                    Link link = linkRepository.findById(linkId).orElseThrow();
 
-                    Link link = Link.builder()
-                        .linkId(new LinkId(linkMetadataEntity.linkId()))
-                        .uri(URI.create(linkMetadataEntity.linkUri()))
-                        .lastUpdateTime(linkMetadataEntity.linkLastModifiedDate())
-                        .build();
+                    // Получаем метаинформацию
+                    List<Tag> tags = subscriptionRepository.findTagsBySubscriptionId(subscriptionId);
+                    List<Filter> filters = subscriptionRepository.findFiltersBySubscriptionId(subscriptionId);
 
-                    SubscriptionId subscriptionId = new SubscriptionId(linkMetadataEntity.subscriptionId());
-
-                    return LinkMetadata.builder()
-                        .link(link)
-                        .tags(subscriptionRepository.findTagsBySubscriptionId(subscriptionId))
-                        .filters(subscriptionRepository.findFiltersBySubscriptionId(subscriptionId))
-                        .build();
-
+                    result.add(new LinkMetadata(link, tags, filters));
                 }
-            )
-            .toList();
+
+                return result;
+            }
+        );
     }
 }
