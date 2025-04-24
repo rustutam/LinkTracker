@@ -1,17 +1,14 @@
 package backend.academy.scrapper.repository.database.jdbc;
 
-import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
 import backend.academy.scrapper.exceptions.NotExistLinkException;
 import backend.academy.scrapper.models.domain.Link;
-import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.LinkId;
-import backend.academy.scrapper.models.entities.LinkEntity;
+import backend.academy.scrapper.models.dto.LinkDto;
 import backend.academy.scrapper.repository.database.LinkRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
 import backend.academy.scrapper.repository.database.utilities.mapper.LinkMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +28,7 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public List<Link> findAll() {
-        List<LinkEntity> linkEntities = jdbcTemplate.query(
+        List<LinkDto> linkEntities = jdbcTemplate.query(
             "SELECT * FROM scrapper.links",
             JdbcRowMapperUtil::mapRowToLink
         );
@@ -41,7 +38,7 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public Optional<Link> findById(LinkId linkId) {
-        List<LinkEntity> linkEntities = jdbcTemplate.query(
+        List<LinkDto> linkEntities = jdbcTemplate.query(
             "SELECT * FROM scrapper.links WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToLink,
             linkId.id()
@@ -52,7 +49,7 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public Optional<Link> findByUri(URI uri) {
-        List<LinkEntity> linkEntities = jdbcTemplate.query(
+        List<LinkDto> linkEntities = jdbcTemplate.query(
             "SELECT * FROM scrapper.links WHERE uri = (?)",
             JdbcRowMapperUtil::mapRowToLink,
             uri.toString()
@@ -73,13 +70,13 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public Link save(URI uri) {
-        LinkEntity linkEntity = jdbcTemplate.queryForObject(
+        LinkDto linkDto = jdbcTemplate.queryForObject(
             "INSERT INTO scrapper.links (uri) VALUES (?) RETURNING id, uri, last_modified_date, created_at",
             JdbcRowMapperUtil::mapRowToLink,
             uri.toString()
         );
 
-        return LinkMapper.toDomain(linkEntity);
+        return LinkMapper.toDomain(linkDto);
     }
 
 
@@ -90,7 +87,7 @@ public class JdbcLinkRepository implements LinkRepository {
         int total = jdbcTemplate.queryForObject(countSql, Integer.class);
 
         // 2. Формируем запрос с пагинацией (LIMIT и OFFSET)
-        List<LinkEntity> linkEntities = jdbcTemplate.query(
+        List<LinkDto> linkEntities = jdbcTemplate.query(
             "SELECT * FROM scrapper.links ORDER BY id LIMIT (?) OFFSET (?)",
             JdbcRowMapperUtil::mapRowToLink,
             pageable.getPageSize(),

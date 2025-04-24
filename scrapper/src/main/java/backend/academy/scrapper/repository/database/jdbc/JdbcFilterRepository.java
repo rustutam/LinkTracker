@@ -2,8 +2,7 @@ package backend.academy.scrapper.repository.database.jdbc;
 
 import backend.academy.scrapper.models.domain.Filter;
 import backend.academy.scrapper.models.domain.ids.FilterId;
-import backend.academy.scrapper.models.domain.ids.SubscriptionId;
-import backend.academy.scrapper.models.entities.FilterEntity;
+import backend.academy.scrapper.models.dto.FilterDto;
 import backend.academy.scrapper.repository.database.FilterRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
 import backend.academy.scrapper.repository.database.utilities.mapper.FilterMapper;
@@ -22,7 +21,7 @@ public class JdbcFilterRepository implements FilterRepository {
 
     @Override
     public Optional<Filter> findById(FilterId filterId) {
-        List<FilterEntity> filterEntities = jdbcTemplate.query(
+        List<FilterDto> filterEntities = jdbcTemplate.query(
             "SELECT * FROM scrapper.filters WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToFilter,
             filterId.id()
@@ -33,7 +32,7 @@ public class JdbcFilterRepository implements FilterRepository {
 
     @Override
     public Optional<Filter> findByFilter(String filter) {
-        List<FilterEntity> filterEntities = jdbcTemplate.query(
+        List<FilterDto> filterEntities = jdbcTemplate.query(
             "SELECT * FROM scrapper.filters WHERE filter = (?)",
             JdbcRowMapperUtil::mapRowToFilter,
             filter
@@ -44,13 +43,13 @@ public class JdbcFilterRepository implements FilterRepository {
 
     @Override
     public Filter save(String filter) {
-        FilterEntity filterEntity = jdbcTemplate.queryForObject(
+        FilterDto filterDto = jdbcTemplate.queryForObject(
             "INSERT INTO scrapper.filters (filter) VALUES (?) RETURNING id, filter, created_at",
             JdbcRowMapperUtil::mapRowToFilter,
             filter
         );
 
-        return FilterMapper.toDomain(filterEntity);
+        return FilterMapper.toDomain(filterDto);
 
     }
 

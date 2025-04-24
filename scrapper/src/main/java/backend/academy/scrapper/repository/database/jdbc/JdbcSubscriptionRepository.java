@@ -1,24 +1,20 @@
 package backend.academy.scrapper.repository.database.jdbc;
 
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.models.domain.Filter;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.Subscription;
 import backend.academy.scrapper.models.domain.Tag;
-import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.FilterId;
 import backend.academy.scrapper.models.domain.ids.LinkId;
 import backend.academy.scrapper.models.domain.ids.SubscriptionId;
 import backend.academy.scrapper.models.domain.ids.TagId;
 import backend.academy.scrapper.models.domain.ids.UserId;
-import backend.academy.scrapper.models.entities.FilterEntity;
-import backend.academy.scrapper.models.entities.LinkEntity;
-import backend.academy.scrapper.models.entities.SubscriptionEntity;
-import backend.academy.scrapper.models.entities.TagEntity;
-import backend.academy.scrapper.repository.database.LinkRepository;
+import backend.academy.scrapper.models.dto.FilterDto;
+import backend.academy.scrapper.models.dto.LinkDto;
+import backend.academy.scrapper.models.dto.SubscriptionDto;
+import backend.academy.scrapper.models.dto.TagDto;
 import backend.academy.scrapper.repository.database.SubscriptionRepository;
-import backend.academy.scrapper.repository.database.ChatRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
 import backend.academy.scrapper.repository.database.utilities.mapper.FilterMapper;
 import backend.academy.scrapper.repository.database.utilities.mapper.LinkMapper;
@@ -80,7 +76,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
         WHERE u.chat_id = ?
         """;
 
-        List<LinkEntity> linkEntities = jdbcTemplate.query(
+        List<LinkDto> linkEntities = jdbcTemplate.query(
             sql,
             JdbcRowMapperUtil::mapRowToLink,
             chatId.id()
@@ -124,7 +120,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
             FROM scrapper.subscriptions s
             WHERE s.link_id = (?) AND s.user_id = (?)
             """;
-        List<SubscriptionEntity> subscriptions = jdbcTemplate.query(
+        List<SubscriptionDto> subscriptions = jdbcTemplate.query(
             sql,
             JdbcRowMapperUtil::mapRowToSubscriptionEntity,
             linkId.id(),
@@ -162,7 +158,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
             LEFT JOIN scrapper.filters f ON st.tag_id = f.id
             WHERE st.subscription_id = (?)
             """;
-        List<FilterEntity> filterEntities = jdbcTemplate.query(
+        List<FilterDto> filterEntities = jdbcTemplate.query(
             sql,
             JdbcRowMapperUtil::mapRowToFilter,
             subscriptionId.id()
@@ -198,7 +194,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
             LEFT JOIN scrapper.tags t ON st.tag_id = t.id
             WHERE st.subscription_id = (?)
             """;
-        List<TagEntity> tagEntities = jdbcTemplate.query(
+        List<TagDto> tagEntities = jdbcTemplate.query(
             sql,
             JdbcRowMapperUtil::mapRowToTag,
             subscriptionId.id()

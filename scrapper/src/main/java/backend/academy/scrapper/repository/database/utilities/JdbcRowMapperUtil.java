@@ -1,16 +1,14 @@
 package backend.academy.scrapper.repository.database.utilities;
 
-import backend.academy.scrapper.models.entities.FilterEntity;
-import backend.academy.scrapper.models.entities.LinkEntity;
-import backend.academy.scrapper.models.entities.LinkMetadataEntity;
-import backend.academy.scrapper.models.entities.SubscriptionEntity;
-import backend.academy.scrapper.models.entities.TagEntity;
-import backend.academy.scrapper.models.entities.UserEntity;
+import backend.academy.scrapper.models.dto.FilterDto;
+import backend.academy.scrapper.models.dto.LinkDto;
+import backend.academy.scrapper.models.dto.SubscriptionDto;
+import backend.academy.scrapper.models.dto.TagDto;
+import backend.academy.scrapper.models.dto.UserDto;
 import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import java.sql.ResultSet;
 import java.time.OffsetDateTime;
-import java.util.List;
 
 @SuppressWarnings("MultipleStringLiterals")
 @NoArgsConstructor
@@ -45,8 +43,8 @@ public final class JdbcRowMapperUtil {
      * @return LinkEntity entity.
      */
     @SneakyThrows
-    public static LinkEntity mapRowToLink(ResultSet row, int rowNum) {
-        return new LinkEntity(
+    public static LinkDto mapRowToLink(ResultSet row, int rowNum) {
+        return new LinkDto(
             row.getLong(COLUMN_ID),
             row.getString(LINK_TABLE_COLUMN_URI),
             row.getObject(LINK_TABLE_COLUMN_LAST_MODIFYING_DATE, OffsetDateTime.class),
@@ -55,8 +53,8 @@ public final class JdbcRowMapperUtil {
     }
 
     @SneakyThrows
-    public static TagEntity mapRowToTag(ResultSet row, int rowNum) {
-        return new TagEntity(
+    public static TagDto mapRowToTag(ResultSet row, int rowNum) {
+        return new TagDto(
             row.getLong(COLUMN_ID),
             row.getString(TAG_TABLE_COLUMN_TAG),
             row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
@@ -64,8 +62,8 @@ public final class JdbcRowMapperUtil {
     }
 
     @SneakyThrows
-    public static FilterEntity mapRowToFilter(ResultSet row, int rowNum) {
-        return new FilterEntity(
+    public static FilterDto mapRowToFilter(ResultSet row, int rowNum) {
+        return new FilterDto(
             row.getLong(COLUMN_ID),
             row.getString(FILTER_TABLE_COLUMN_TAG),
             row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
@@ -109,8 +107,8 @@ public final class JdbcRowMapperUtil {
      * @return TgChat entity from table tgchat.
      */
     @SneakyThrows
-    public static UserEntity mapRowToUserEntity(ResultSet row, int rowNum) {
-        return new UserEntity(
+    public static UserDto mapRowToUserEntity(ResultSet row, int rowNum) {
+        return new UserDto(
             row.getLong(COLUMN_ID),
             row.getLong(TG_CHAT_TABLE_COLUMN_CHAT_ID),
             row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
@@ -118,27 +116,12 @@ public final class JdbcRowMapperUtil {
     }
 
     @SneakyThrows
-    public static SubscriptionEntity mapRowToSubscriptionEntity(ResultSet row, int rowNum) {
-        return new SubscriptionEntity(
+    public static SubscriptionDto mapRowToSubscriptionEntity(ResultSet row, int rowNum) {
+        return new SubscriptionDto(
             row.getLong(COLUMN_ID),
             row.getLong(TG_CHAT_TABLE_COLUMN_USER_ID),
             row.getLong(LINK_METADATA_TABLE_COLUMN_LINK_ID),
             row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
-        );
-    }
-
-    @SneakyThrows
-    public static LinkMetadataEntity mapRowToLinkMetadataEntity(ResultSet row, int rowNum) {
-        //TODO добавить
-        return new LinkMetadataEntity(
-            row.getLong(LINK_METADATA_TABLE_COLUMN_SUBSCRIPTION_ID),
-            row.getLong(LINK_METADATA_TABLE_COLUMN_LINK_ID),
-            row.getString(LINK_TABLE_COLUMN_URI),
-            row.getObject(LINK_TABLE_COLUMN_LAST_MODIFYING_DATE, OffsetDateTime.class),
-            List.of(),
-            List.of(),
-            List.of(),
-            List.of()
         );
     }
 }

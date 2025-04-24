@@ -1,9 +1,8 @@
 package backend.academy.scrapper.repository.database.jdbc;
 
 import backend.academy.scrapper.models.domain.Tag;
-import backend.academy.scrapper.models.domain.ids.SubscriptionId;
 import backend.academy.scrapper.models.domain.ids.TagId;
-import backend.academy.scrapper.models.entities.TagEntity;
+import backend.academy.scrapper.models.dto.TagDto;
 import backend.academy.scrapper.repository.database.TagRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
 import java.util.List;
@@ -22,7 +21,7 @@ public class JdbcTagRepository implements TagRepository {
 
     @Override
     public Optional<Tag> findById(TagId tagId) {
-        List<TagEntity> tagEntities = jdbcTemplate.query(
+        List<TagDto> tagEntities = jdbcTemplate.query(
             "SELECT * FROM scrapper.tags WHERE id = (?)",
             JdbcRowMapperUtil::mapRowToTag,
             tagId.id()
@@ -33,7 +32,7 @@ public class JdbcTagRepository implements TagRepository {
 
     @Override
     public Optional<Tag> findByTag(String tag) {
-        List<TagEntity> tagEntities = jdbcTemplate.query(
+        List<TagDto> tagEntities = jdbcTemplate.query(
             "SELECT * FROM scrapper.tags WHERE tag = (?)",
             JdbcRowMapperUtil::mapRowToTag,
             tag
@@ -45,13 +44,13 @@ public class JdbcTagRepository implements TagRepository {
     @Override
     public Tag save(String tag) {
 
-        TagEntity tagEntity = jdbcTemplate.queryForObject(
+        TagDto tagDto = jdbcTemplate.queryForObject(
             "INSERT INTO scrapper.tags (tag) VALUES (?) RETURNING id, tag, created_at",
             JdbcRowMapperUtil::mapRowToTag,
             tag
         );
 
-        return TagMapper.toDomain(tagEntity);
+        return TagMapper.toDomain(tagDto);
     }
 
     @Override

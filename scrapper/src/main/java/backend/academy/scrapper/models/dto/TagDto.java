@@ -1,8 +1,8 @@
-package backend.academy.scrapper.models.entities;
+package backend.academy.scrapper.models.dto;
 
 import java.time.OffsetDateTime;
 
-public record FilterEntity(
+public record TagDto(
     Long id,
     String value,
     OffsetDateTime createdAt

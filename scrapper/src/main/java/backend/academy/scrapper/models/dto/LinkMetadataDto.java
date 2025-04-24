@@ -1,9 +1,9 @@
-package backend.academy.scrapper.models.entities;
+package backend.academy.scrapper.models.dto;
 
 import java.time.OffsetDateTime;
 import java.util.List;
 
-public record LinkMetadataEntity(
+public record LinkMetadataDto(
     long subscriptionId,
     long linkId,
     String linkUri,
