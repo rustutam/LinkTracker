@@ -65,8 +65,8 @@ public class JdbcUserRepository implements UserRepository {
         } catch (DataIntegrityViolationException e) {
             log.atError()
                 .addKeyValue("chatId", chatId)
-                .setMessage("Ошибка сохранения в базу данных пользователя")
-                .setMessage("Такой пользователь уже существует")
+                .addKeyValue("access-type", "ORM")
+                .setMessage("Ошибка сохранения: пользователь уже существует")
                 .log();
             throw new DoubleRegistrationException();
         }
