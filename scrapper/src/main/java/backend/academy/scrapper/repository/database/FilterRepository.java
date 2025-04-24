@@ -1,5 +1,6 @@
 package backend.academy.scrapper.repository.database;
 
+import backend.academy.scrapper.exceptions.NotExistFilterException;
 import backend.academy.scrapper.models.domain.Filter;
 import backend.academy.scrapper.models.domain.ids.FilterId;
 import backend.academy.scrapper.models.domain.ids.SubscriptionId;
@@ -13,5 +14,5 @@ public interface FilterRepository {
 
     Filter save(String filter);
 
-    void deleteById(FilterId filterId);
+    Filter deleteById(FilterId filterId) throws NotExistFilterException;
 }

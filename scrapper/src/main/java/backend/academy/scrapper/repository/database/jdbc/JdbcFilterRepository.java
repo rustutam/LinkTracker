@@ -1,5 +1,6 @@
 package backend.academy.scrapper.repository.database.jdbc;
 
+import backend.academy.scrapper.exceptions.NotExistFilterException;
 import backend.academy.scrapper.models.domain.Filter;
 import backend.academy.scrapper.models.domain.ids.FilterId;
 import backend.academy.scrapper.models.dto.FilterDto;
@@ -54,10 +55,12 @@ public class JdbcFilterRepository implements FilterRepository {
     }
 
     @Override
-    public void deleteById(FilterId filterId) {
+    public Filter deleteById(FilterId filterId) throws NotExistFilterException {
+        Filter filter = findById(filterId).orElseThrow(NotExistFilterException::new);
         jdbcTemplate.update(
             "DELETE FROM scrapper.filters WHERE id = (?)",
             filterId.id()
         );
+        return filter;
     }
 }
