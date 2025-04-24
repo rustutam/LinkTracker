@@ -52,7 +52,6 @@ CREATE TABLE scrapper.subscription_tags
 (
     subscription_id BIGINT NOT NULL,
     tag_id          BIGINT NOT NULL,
-    created_at      TIMESTAMP DEFAULT now(),
     PRIMARY KEY (subscription_id, tag_id),
     FOREIGN KEY (subscription_id) REFERENCES scrapper.subscriptions (id) ON DELETE CASCADE,
     FOREIGN KEY (tag_id) REFERENCES scrapper.tags (id) ON DELETE CASCADE
@@ -63,7 +62,6 @@ CREATE TABLE scrapper.subscription_filters
 (
     subscription_id BIGINT NOT NULL,
     filter_id       BIGINT NOT NULL,
-    created_at      TIMESTAMP DEFAULT now(),
     PRIMARY KEY (subscription_id, filter_id),
     FOREIGN KEY (subscription_id) REFERENCES scrapper.subscriptions (id) ON DELETE CASCADE,
     FOREIGN KEY (filter_id) REFERENCES scrapper.filters (id) ON DELETE CASCADE

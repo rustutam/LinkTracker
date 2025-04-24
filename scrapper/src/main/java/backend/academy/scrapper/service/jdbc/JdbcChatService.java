@@ -3,7 +3,7 @@ package backend.academy.scrapper.service.jdbc;
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
 import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.models.domain.ids.ChatId;
-import backend.academy.scrapper.repository.database.ChatRepository;
+import backend.academy.scrapper.repository.database.UserRepository;
 import backend.academy.scrapper.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcChatService implements ChatService {
-    private final ChatRepository chatRepository;
+    private final UserRepository userRepository;
 
     @Override
     public void register(ChatId chatId) {
         try {
-            chatRepository.save(chatId);
+            userRepository.save(chatId);
         } catch (DoubleRegistrationException e){
             log.atError()
                 .addKeyValue("chatId", chatId)
@@ -33,7 +33,7 @@ public class JdbcChatService implements ChatService {
     @Override
     public void unRegister(ChatId chatId) {
         try {
-            chatRepository.deleteByChatId(chatId);
+            userRepository.deleteByChatId(chatId);
         } catch (NotExistTgChatException e){
             throw new NotExistTgChatException();
         }

@@ -5,7 +5,7 @@ import backend.academy.scrapper.exceptions.NotExistTgChatException;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.UserId;
-import backend.academy.scrapper.repository.database.ChatRepository;
+import backend.academy.scrapper.repository.database.UserRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
 import backend.academy.scrapper.repository.database.utilities.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +20,7 @@ import java.util.Optional;
 @Repository
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
-public class JdbcChatRepository implements ChatRepository {
+public class JdbcUserRepository implements UserRepository {
     private final JdbcTemplate jdbcTemplate;
 
     /**

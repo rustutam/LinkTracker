@@ -2,10 +2,7 @@ package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.models.domain.LinkUpdateNotification;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
-import backend.academy.scrapper.models.domain.Subscription;
-import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.LinkId;
-import backend.academy.scrapper.repository.database.ChatRepository;
 import backend.academy.scrapper.repository.database.SubscriptionRepository;
 import backend.academy.scrapper.sender.Sender;
 import lombok.RequiredArgsConstructor;

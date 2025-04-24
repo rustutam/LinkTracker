@@ -10,10 +10,7 @@ import backend.academy.scrapper.models.domain.Subscription;
 import backend.academy.scrapper.models.domain.Tag;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
-import backend.academy.scrapper.models.domain.ids.FilterId;
-import backend.academy.scrapper.models.domain.ids.LinkId;
 import backend.academy.scrapper.models.domain.ids.SubscriptionId;
-import backend.academy.scrapper.models.domain.ids.TagId;
 import backend.academy.scrapper.repository.database.*;
 import backend.academy.scrapper.service.LinkService;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcLinkService implements LinkService {
-    private final ChatRepository chatRepository;
+    private final UserRepository userRepository;
     private final LinkRepository linkRepository;
     private final TagRepository tagRepository;
     private final FilterRepository filterRepository;
@@ -40,7 +35,7 @@ public class JdbcLinkService implements LinkService {
     @Override
     @Transactional
     public LinkMetadata addLink(ChatId chatId, LinkMetadata linkMetadata) {
-        User user = chatRepository.findByChatId(chatId)
+        User user = userRepository.findByChatId(chatId)
             .orElseThrow(NotExistTgChatException::new);
 
         if (linkRepository.findByUri(linkMetadata.link().uri())
@@ -77,7 +72,7 @@ public class JdbcLinkService implements LinkService {
     @Override
     @Transactional
     public LinkMetadata removeLink(ChatId chatId, URI uri) {
-        User user = chatRepository.findByChatId(chatId)
+        User user = userRepository.findByChatId(chatId)
             .orElseThrow(NotExistTgChatException::new);
 
         Link link = linkRepository.findByUri(uri)
