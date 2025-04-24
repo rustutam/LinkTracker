@@ -13,5 +13,5 @@ public interface TagRepository {
 
     Tag save(String tag);
 
-    void deleteById(TagId tagId);
+    Tag deleteById(TagId tagId);
 }

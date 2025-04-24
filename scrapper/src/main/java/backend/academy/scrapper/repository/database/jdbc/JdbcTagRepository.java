@@ -1,13 +1,14 @@
 package backend.academy.scrapper.repository.database.jdbc;
 
+import backend.academy.scrapper.exceptions.NotExistTagException;
 import backend.academy.scrapper.models.domain.Tag;
 import backend.academy.scrapper.models.domain.ids.TagId;
 import backend.academy.scrapper.models.dto.TagDto;
 import backend.academy.scrapper.repository.database.TagRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
+import backend.academy.scrapper.repository.database.utilities.mapper.TagMapper;
 import java.util.List;
 import java.util.Optional;
-import backend.academy.scrapper.repository.database.utilities.mapper.TagMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -54,10 +55,13 @@ public class JdbcTagRepository implements TagRepository {
     }
 
     @Override
-    public void deleteById(TagId tagId) {
+    public Tag deleteById(TagId tagId) {
+        Tag tag = findById(tagId).orElseThrow(NotExistTagException::new);
+        //TODO добавить проверку есть ли такая запись и если нет  удалять
         jdbcTemplate.update(
             "DELETE FROM scrapper.tags WHERE id = (?)",
             tagId.id()
         );
+        return tag;
     }
 }
