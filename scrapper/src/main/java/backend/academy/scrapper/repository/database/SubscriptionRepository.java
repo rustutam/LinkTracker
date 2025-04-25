@@ -15,28 +15,31 @@ import java.util.List;
 import java.util.Optional;
 
 public interface SubscriptionRepository {
-    SubscriptionId save(UserId userId, LinkId linkId);
+    Subscription save(Subscription subscription);
 
-    Subscription remove(UserId userId, LinkId linkId);
-
-    List<Link> findAllLinksByChatId(ChatId chatId);
-
-    List<ChatId> findAllChatIdsByLinkId(LinkId linkId);
+    Subscription remove(Subscription subscription);
 
     Optional<Subscription> findById(SubscriptionId subscriptionId);
 
-    Optional<Subscription> findByLinkIdAndUserId(LinkId linkId, UserId userId);
+    Optional<Subscription> findByUserAndLink(User user, Link link);
 
-    // Методы для управления связями many-to-many:
-    void addFilterToSubscription(SubscriptionId subscriptionId, FilterId filterId);
+    List<Subscription> findByUser(User user);
 
-    void removeFilterFromSubscription(SubscriptionId subscriptionId, FilterId filterId);
+    List<Subscription> findByLink(Link link);
 
-    List<Filter> findFiltersBySubscriptionId(SubscriptionId subscriptionId);
 
-    void addTagToSubscription(SubscriptionId subscriptionId, TagId tagId);
-
-    void removeTagFromSubscription(SubscriptionId subscriptionId, TagId tagId);
-
-    List<Tag> findTagsBySubscriptionId(SubscriptionId subscriptionId);
+//    List<ChatId> findAllChatIdsByLinkId(LinkId linkId);
+//
+//    // Методы для управления связями many-to-many:
+//    void addFilterToSubscription(SubscriptionId subscriptionId, FilterId filterId);
+//
+//    void removeFilterFromSubscription(SubscriptionId subscriptionId, FilterId filterId);
+//
+//    List<Filter> findFiltersBySubscriptionId(SubscriptionId subscriptionId);
+//
+//    void addTagToSubscription(SubscriptionId subscriptionId, TagId tagId);
+//
+//    void removeTagFromSubscription(SubscriptionId subscriptionId, TagId tagId);
+//
+//    List<Tag> findTagsBySubscriptionId(SubscriptionId subscriptionId);
 }

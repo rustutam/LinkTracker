@@ -1,10 +1,9 @@
-package backend.academy.scrapper.service.jdbc;
+package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
 import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.repository.database.UserRepository;
-import backend.academy.scrapper.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -14,7 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
-public class JdbcChatService implements ChatService {
+public class ChatServiceImpl implements ChatService {
     private final UserRepository userRepository;
 
     @Override

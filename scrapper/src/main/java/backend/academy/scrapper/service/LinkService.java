@@ -1,6 +1,7 @@
 package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.models.domain.LinkMetadata;
+import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import java.net.URI;
 import java.util.List;

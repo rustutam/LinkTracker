@@ -6,19 +6,24 @@ import backend.academy.scrapper.models.domain.ids.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import java.util.List;
 
 @Builder
 @Getter
 @AllArgsConstructor
 public class Subscription {
     private SubscriptionId subscriptionId;
-    private UserId userId;
-    private LinkId linkId;
+    private User user;
+    private Link link;
+    private List<Tag> tags;
+    private List<Filter> filters;
 
-    public Subscription(UserId userId, LinkId linkId) {
+    public Subscription(User user, Link link, List<Tag> tags, List<Filter> filters) {
         this.subscriptionId = new SubscriptionId(0L);
-        this.userId = userId;
-        this.linkId = linkId;
+        this.user = user;
+        this.link = link;
+        this.tags = List.of();
+        this.filters = List.of();
     }
 
 }
