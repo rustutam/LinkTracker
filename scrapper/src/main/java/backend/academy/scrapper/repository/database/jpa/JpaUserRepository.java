@@ -1,7 +1,7 @@
 package backend.academy.scrapper.repository.database.jpa;
 
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
+import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.UserId;
@@ -51,9 +51,9 @@ public class JpaUserRepository implements UserRepository {
     }
 
     @Override
-    public void deleteByChatId(ChatId chatId) throws NotExistTgChatException {
+    public void deleteByChatId(ChatId chatId) throws NotExistUserException {
         UserEntity user = userRepo.findByChatId(chatId.id())
-            .orElseThrow(NotExistTgChatException::new);
+            .orElseThrow(NotExistUserException::new);
 
         userRepo.delete(user);
     }

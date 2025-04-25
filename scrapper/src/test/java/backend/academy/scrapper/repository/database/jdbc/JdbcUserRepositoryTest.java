@@ -2,7 +2,7 @@ package backend.academy.scrapper.repository.database.jdbc;
 
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
+import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.UserId;
@@ -143,7 +143,7 @@ class JdbcUserRepositoryTest extends IntegrationEnvironment {
     void notExistTgChatThrowsExceptionTest() {
         ChatId chatId = new ChatId(99L);
 
-        assertThrows(NotExistTgChatException.class, () -> jdbcChatRepository.deleteByChatId(chatId));
+        assertThrows(NotExistUserException.class, () -> jdbcChatRepository.deleteByChatId(chatId));
     }
 
 

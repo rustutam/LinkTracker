@@ -59,7 +59,7 @@ public class JdbcLinkRepository implements LinkRepository {
     }
 
     @Override
-    public Link updateLastModifying(LinkId linkId, OffsetDateTime newLastModifyingTime) {
+    public Link updateLastUpdateTime(LinkId linkId, OffsetDateTime newLastModifyingTime) throws NotExistLinkException {
         jdbcTemplate.update(
             "UPDATE scrapper.links SET last_modified_date = (?) WHERE id = (?)",
             newLastModifyingTime,
@@ -81,7 +81,7 @@ public class JdbcLinkRepository implements LinkRepository {
 
 
     @Override
-    public Page<Link> findAll(Pageable pageable) {
+    public Page<Link> findAllPaginated(Pageable pageable) {
         // 1. Вычисляем общее количество записей в таблице
         String countSql = "SELECT COUNT(*) FROM scrapper.links";
         int total = jdbcTemplate.queryForObject(countSql, Integer.class);

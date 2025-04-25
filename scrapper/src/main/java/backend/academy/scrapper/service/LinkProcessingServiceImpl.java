@@ -29,7 +29,7 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
         int pageNumber = 0;
         while (true) {
             Pageable pageable = PageRequest.of(pageNumber, scrapperConfig.batchSize());
-            Page<Link> page = linkRepository.findAll(pageable);
+            Page<Link> page = linkRepository.findAllPaginated(pageable);
 
             if (!page.hasNext()) {
                 log.info("Завершение обработки ссылок");
@@ -57,7 +57,7 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
             // Если получена информация об обновлении, уведомляем пользователя
             if (linkChangeStatus.hasChanges()) {
                 senderNotificationService.notifySender(linkChangeStatus);
-                linkRepository.updateLastModifying(linkChangeStatus.link().linkId(), linkChangeStatus.link().lastUpdateTime());
+                linkRepository.updateLastUpdateTime(linkChangeStatus.link().linkId(), linkChangeStatus.link().lastUpdateTime());
                 log.atInfo()
                     .addKeyValue("Найдено обновление для ссылки", link.uri().toString())
                     .setMessage("Отправка уведомления")

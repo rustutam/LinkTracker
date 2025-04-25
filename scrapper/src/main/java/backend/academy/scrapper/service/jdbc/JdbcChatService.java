@@ -1,7 +1,7 @@
 package backend.academy.scrapper.service.jdbc;
 
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
+import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.repository.database.UserRepository;
 import backend.academy.scrapper.service.ChatService;
@@ -34,8 +34,8 @@ public class JdbcChatService implements ChatService {
     public void unRegister(ChatId chatId) {
         try {
             userRepository.deleteByChatId(chatId);
-        } catch (NotExistTgChatException e){
-            throw new NotExistTgChatException();
+        } catch (NotExistUserException e){
+            throw new NotExistUserException();
         }
     }
 }

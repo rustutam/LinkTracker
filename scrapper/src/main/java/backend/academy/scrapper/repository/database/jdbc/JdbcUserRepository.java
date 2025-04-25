@@ -1,7 +1,7 @@
 package backend.academy.scrapper.repository.database.jdbc;
 
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
+import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.UserId;
@@ -76,14 +76,14 @@ public class JdbcUserRepository implements UserRepository {
      * @param chatId
      */
     @Override
-    public void deleteByChatId(ChatId chatId) throws NotExistTgChatException {
+    public void deleteByChatId(ChatId chatId) throws NotExistUserException {
         int updatedRows = jdbcTemplate.update(
             "DELETE FROM scrapper.users WHERE chat_id = (?)",
             chatId.id()
         );
 
         if (updatedRows == 0) {
-            throw new NotExistTgChatException();
+            throw new NotExistUserException();
         }
     }
 }

@@ -1,7 +1,7 @@
 package backend.academy.scrapper.repository.database;
 
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
+import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.UserId;
@@ -14,6 +14,6 @@ public interface UserRepository {
 
     void save(ChatId chatId) throws DoubleRegistrationException;
 
-    void deleteByChatId(ChatId chatId) throws NotExistTgChatException;
+    void deleteByChatId(ChatId chatId) throws NotExistUserException;
 
 }

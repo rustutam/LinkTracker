@@ -15,8 +15,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.junit.jupiter.Testcontainers;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -31,13 +29,13 @@ class JdbcLinkRepositoryTest extends IntegrationEnvironment {
     @Test
     @Sql(scripts = "/sql/insert_links.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void findAllWithNonEmptyRepositoryTest() {
+    void findAllPaginatedWithNonEmptyRepositoryTest() {
         List<Link> links = jdbcLinkRepository.findAll();
         assertEquals(6, links.size());
     }
 
     @Test
-    void findAllWithEmptyRepositoryTest() {
+    void findAllPaginatedWithEmptyRepositoryTest() {
         List<Link> links = jdbcLinkRepository.findAll();
         assertEquals(0, links.size());
     }
@@ -92,11 +90,11 @@ class JdbcLinkRepositoryTest extends IntegrationEnvironment {
     @Test
     @Sql(scripts = "/sql/insert_links.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void updateLastModifyingTest() {
+    void updateLastUpdateTimeTest() {
         LinkId linkId = new LinkId(1L);
         OffsetDateTime newLastModifyingTime = OffsetDateTime.MAX;
 
-        Link updatedLink = jdbcLinkRepository.updateLastModifying(linkId, newLastModifyingTime);
+        Link updatedLink = jdbcLinkRepository.updateLastUpdateTime(linkId, newLastModifyingTime);
 
         assertEquals(linkId, updatedLink.linkId());
         assertEquals(newLastModifyingTime, updatedLink.lastUpdateTime());
@@ -105,12 +103,12 @@ class JdbcLinkRepositoryTest extends IntegrationEnvironment {
     @Test
     @Sql(scripts = "/sql/insert_links.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void updateLastModifyingWhenLinkNotFoundTest() {
+    void updateLastUpdateTimeWhenLinkNotFoundTest() {
         LinkId linkId = new LinkId(100L);
         OffsetDateTime newLastModifyingTime = OffsetDateTime.MAX;
 
         assertThrows(NotExistLinkException.class, () ->
-            jdbcLinkRepository.updateLastModifying(linkId, newLastModifyingTime)
+            jdbcLinkRepository.updateLastUpdateTime(linkId, newLastModifyingTime)
         );
     }
 
@@ -132,7 +130,7 @@ class JdbcLinkRepositoryTest extends IntegrationEnvironment {
     @Test
     @Sql(scripts = "/sql/insert_links.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void findAllWithPaginationTest() {
+    void findAllPaginatedWithPaginationTest() {
         // Arrange
         int pageSize = 2;
         Pageable firstPageable = PageRequest.of(0, pageSize);
@@ -156,9 +154,9 @@ class JdbcLinkRepositoryTest extends IntegrationEnvironment {
 
 
         // Act
-        Page<Link> firstPage = jdbcLinkRepository.findAll(firstPageable);
-        Page<Link> secondPage = jdbcLinkRepository.findAll(secondPageable);
-        Page<Link> thirdPage = jdbcLinkRepository.findAll(thirdPageable);
+        Page<Link> firstPage = jdbcLinkRepository.findAllPaginated(firstPageable);
+        Page<Link> secondPage = jdbcLinkRepository.findAllPaginated(secondPageable);
+        Page<Link> thirdPage = jdbcLinkRepository.findAllPaginated(thirdPageable);
 
         // Assert
         assertEquals(firstExpectedUris, firstPage.getContent().stream().map(Link::uri).toList());

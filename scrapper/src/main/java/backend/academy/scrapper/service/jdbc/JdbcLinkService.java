@@ -1,7 +1,7 @@
 package backend.academy.scrapper.service.jdbc;
 
 import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
+import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.exceptions.NotTrackLinkException;
 import backend.academy.scrapper.models.domain.Filter;
 import backend.academy.scrapper.models.domain.Link;
@@ -36,7 +36,7 @@ public class JdbcLinkService implements LinkService {
     @Transactional
     public LinkMetadata addLink(ChatId chatId, LinkMetadata linkMetadata) {
         User user = userRepository.findByChatId(chatId)
-            .orElseThrow(NotExistTgChatException::new);
+            .orElseThrow(NotExistUserException::new);
 
         if (linkRepository.findByUri(linkMetadata.link().uri())
             .filter(l -> subscriptionRepository.findAllLinksByChatId(user.chatId()).contains(l))
@@ -73,7 +73,7 @@ public class JdbcLinkService implements LinkService {
     @Transactional
     public LinkMetadata removeLink(ChatId chatId, URI uri) {
         User user = userRepository.findByChatId(chatId)
-            .orElseThrow(NotExistTgChatException::new);
+            .orElseThrow(NotExistUserException::new);
 
         Link link = linkRepository.findByUri(uri)
             .filter(l -> subscriptionRepository.findAllLinksByChatId(user.chatId()).contains(l))
