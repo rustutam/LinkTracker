@@ -38,9 +38,11 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
 
             t.id                         AS tag_id,
             t.tag                        AS tag_value,
+            t.created_at                 AS tag_created_at,
 
             f.id                         AS filter_id,
-            f.filter                     AS filter_value
+            f.filter                     AS filter_value,
+            f.created_at                 AS filter_created_at
         FROM scrapper.subscriptions s
         JOIN scrapper.users u  ON s.user_id = u.id
         JOIN scrapper.links l  ON s.link_id = l.id
