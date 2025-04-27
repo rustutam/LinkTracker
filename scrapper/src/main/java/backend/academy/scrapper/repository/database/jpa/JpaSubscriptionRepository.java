@@ -5,43 +5,39 @@ import backend.academy.scrapper.models.domain.Subscription;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.SubscriptionId;
 import backend.academy.scrapper.models.entity.SubscriptionEntity;
-import backend.academy.scrapper.models.entity.UserEntity;
 import backend.academy.scrapper.repository.database.SubscriptionRepository;
-import backend.academy.scrapper.repository.database.jpa.mapper.LinkMapper;
 import backend.academy.scrapper.repository.database.jpa.mapper.SubscriptionMapper;
-import backend.academy.scrapper.repository.database.jpa.mapper.UserMapper;
 import backend.academy.scrapper.repository.database.jpa.repo.SubscriptionRepo;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
 public class JpaSubscriptionRepository implements SubscriptionRepository {
     private final SubscriptionRepo subscriptionRepo;
+    private final SubscriptionMapper mapper;
 
     @Override
     public Subscription save(Subscription subscription) {
-        SubscriptionEntity entity = new SubscriptionEntity();
+        SubscriptionEntity entity = mapper.toEntity(subscription);
 
-        UserMapper..user();
-
-        entity.link(LinkMapper.map(subscription.link()));
-
-        entity = subscriptionRepo.save(entity);
-        return SubscriptionMapper.toDomain(entity);
+        SubscriptionEntity savedEntity = subscriptionRepo.save(entity);
+        return mapper.toDomain(savedEntity);
     }
 
     @Override
     public Subscription remove(Subscription subscription) {
-        return null;
+        SubscriptionEntity entity = mapper.toEntity(subscription);
+        subscriptionRepo.delete(entity);
+        return mapper.toDomain(entity);
     }
 
     @Override
     public Optional<Subscription> findById(SubscriptionId subscriptionId) {
         return subscriptionRepo.findById(subscriptionId.id())
-                .map(SubscriptionMapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
@@ -49,24 +45,24 @@ public class JpaSubscriptionRepository implements SubscriptionRepository {
         long userId = user.userId().id();
         long linkId = link.linkId().id();
         return subscriptionRepo.findByUserIdAndLinkId(userId, linkId)
-                .map(SubscriptionMapper::toDomain);
+            .map(mapper::toDomain);
     }
 
     @Override
     public List<Subscription> findByUser(User user) {
         long userId = user.userId().id();
         return subscriptionRepo.findAllByUserId(userId)
-                .stream()
-                .map(SubscriptionMapper::toDomain)
-                .toList();
+            .stream()
+            .map(mapper::toDomain)
+            .toList();
     }
 
     @Override
     public List<Subscription> findByLink(Link link) {
         long linkId = link.linkId().id();
         return subscriptionRepo.findAllByLinkId(linkId)
-                .stream()
-                .map(SubscriptionMapper::toDomain)
-                .toList();
+            .stream()
+            .map(mapper::toDomain)
+            .toList();
     }
 }

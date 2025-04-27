@@ -17,24 +17,25 @@ import org.springframework.stereotype.Repository;
 @ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "ORM")
 public class JpaTagRepository implements TagRepository {
     private final TagRepo tagRepo;
+    private final TagMapper mapper;
 
     @Override
     public Optional<Tag> findById(TagId tagId) {
         return tagRepo.findById(tagId.id())
-            .map(TagMapper::map);
+            .map(mapper::toDomain);
     }
 
     @Override
     public Optional<Tag> findByTag(String tag) {
         return tagRepo.findByTag(tag)
-            .map(TagMapper::map);
+            .map(mapper::toDomain);
     }
 
     @Override
     public Tag save(String tag) {
         TagEntity tagEntity = new TagEntity();
         tagEntity.tag(tag);
-        return TagMapper.map(tagRepo.save(tagEntity));
+        return mapper.toDomain(tagRepo.save(tagEntity));
     }
 
     @Override
@@ -42,6 +43,6 @@ public class JpaTagRepository implements TagRepository {
         TagEntity tagEntity = tagRepo.findById(tagId.id())
             .orElseThrow(NotExistTagException::new);
         tagRepo.delete(tagEntity);
-        return TagMapper.map(tagEntity);
+        return mapper.toDomain(tagEntity);
     }
 }

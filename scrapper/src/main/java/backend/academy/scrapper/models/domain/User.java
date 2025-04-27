@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import java.time.OffsetDateTime;
 
 
 @Builder
@@ -15,11 +16,13 @@ import lombok.Getter;
 public class User {
     private UserId userId;
     private ChatId chatId;
+    private OffsetDateTime createdAt;
+//TODO убрать коментарии
 
-    public static User of(ChatId chatId) {
-        return builder()
-            .userId(new UserId(0L))
-            .chatId(chatId)
-            .build();
-    }
+//    public static User of(ChatId chatId) {
+//        return builder()
+//            .userId(new UserId(0L))
+//            .chatId(chatId)
+//            .build();
+//    }
 }

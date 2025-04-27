@@ -16,6 +16,7 @@ public class Link {
     private LinkId linkId;
     private URI uri;
     private OffsetDateTime lastUpdateTime;
+    private OffsetDateTime createdAt;
 
     public static Link of(URI uri) {
         return builder()

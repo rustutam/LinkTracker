@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import java.time.OffsetDateTime;
 
 @Builder
 @Getter
@@ -13,6 +14,7 @@ import lombok.Getter;
 public class Filter {
     private FilterId filterId;
     private String value;
+    private OffsetDateTime createdAt;
 
     public static Filter of(String value) {
         return builder()

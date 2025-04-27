@@ -7,10 +7,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Builder
 @Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class Subscription {
@@ -19,13 +22,5 @@ public class Subscription {
     private Link link;
     private List<Tag> tags;
     private List<Filter> filters;
-
-    public Subscription(User user, Link link, List<Tag> tags, List<Filter> filters) {
-        this.subscriptionId = new SubscriptionId(0L);
-        this.user = user;
-        this.link = link;
-        this.tags = List.of();
-        this.filters = List.of();
-    }
-
+    private OffsetDateTime createdAt;
 }

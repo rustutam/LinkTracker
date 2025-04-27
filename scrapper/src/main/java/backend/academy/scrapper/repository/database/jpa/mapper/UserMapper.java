@@ -4,19 +4,25 @@ import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.UserId;
 import backend.academy.scrapper.models.entity.UserEntity;
+import org.springframework.stereotype.Component;
 
+@Component
 public class UserMapper {
-    public static User toDomain(UserEntity userEntity) {
+    public User toDomain(UserEntity entity) {
         return new User(
-            new UserId(userEntity.id()),
-            new ChatId(userEntity.chatId())
+            new UserId(entity.id()),
+            new ChatId(entity.chatId()),
+            entity.createdAt()
         );
     }
 
-    public static UserEntity toEntity(User domain) {
+    public UserEntity toEntity(User domain) {
         UserEntity entity = new UserEntity();
-        entity.id(domain.userId().id());
+        if (domain.userId() != null && domain.userId().id() != 0) {
+            entity.id(domain.userId().id());
+        }
         entity.chatId(domain.chatId().id());
+        entity.createdAt(domain.createdAt());
         return entity;
     }
 

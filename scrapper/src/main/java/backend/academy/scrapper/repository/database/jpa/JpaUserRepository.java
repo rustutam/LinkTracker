@@ -9,11 +9,11 @@ import backend.academy.scrapper.models.entity.UserEntity;
 import backend.academy.scrapper.repository.database.UserRepository;
 import backend.academy.scrapper.repository.database.jpa.mapper.UserMapper;
 import backend.academy.scrapper.repository.database.jpa.repo.UserRepo;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
-import java.util.Optional;
 
 @Slf4j
 @Repository
@@ -21,15 +21,17 @@ import java.util.Optional;
 @ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "ORM")
 public class JpaUserRepository implements UserRepository {
     private final UserRepo userRepo;
+    private final UserMapper mapper;
 
     @Override
     public Optional<User> findById(UserId userId) {
-        return userRepo.findById(userId.id()).map(UserMapper::toDomain);
+        return userRepo.findById(userId.id())
+            .map(mapper::toDomain);
     }
 
     @Override
     public Optional<User> findByChatId(ChatId chatId) {
-        return userRepo.findByChatId(chatId.id()).map(UserMapper::toDomain);
+        return userRepo.findByChatId(chatId.id()).map(mapper::toDomain);
     }
 
     @Override
