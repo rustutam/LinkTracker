@@ -5,25 +5,23 @@ import backend.academy.scrapper.models.domain.Subscription;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.SubscriptionId;
 import backend.academy.scrapper.repository.database.SubscriptionRepository;
+import backend.academy.scrapper.repository.database.jdbc.mapper.SubscriptionResultSetExtractor;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.support.DataAccessUtils;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Optional;
-
 @Repository
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcSubscriptionRepository implements SubscriptionRepository {
-    private final JdbcTemplate jdbcTemplate;
-    private final SubscriptionResultSetExtractor extractor;
-
     private static final String BASE_SELECT = """
         SELECT
             s.id                         AS subscription_id,
@@ -51,6 +49,15 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
         LEFT JOIN scrapper.subscription_filters sf ON s.id = sf.subscription_id
         LEFT JOIN scrapper.filters f               ON sf.filter_id = f.id
         """;
+    public static final String SELECT_BY_LINK = BASE_SELECT + " WHERE l.id = ?";
+    public static final String SELECT_BY_USER = BASE_SELECT + " WHERE u.id = ?";
+    public static final String SELECT_BY_USER_AND_LINK = BASE_SELECT + " WHERE u.id = ? AND l.id = ?";
+    public static final String SELECT_BY_ID = BASE_SELECT + " WHERE s.id = ?";
+    public static final String DELETE_SQL = "DELETE FROM scrapper.subscriptions WHERE user_id = ? AND link_id = ?";
+
+    private final JdbcTemplate jdbcTemplate;
+    private final SubscriptionResultSetExtractor extractor;
+
 
     @Override
     @Transactional
@@ -103,7 +110,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     @Transactional
     public Subscription remove(Subscription subscription) {
         jdbcTemplate.update(
-            "DELETE FROM scrapper.subscriptions WHERE user_id = ? AND link_id = ?",
+            DELETE_SQL,
             subscription.user().userId().id(),
             subscription.link().linkId().id()
         );
@@ -112,33 +119,29 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
 
     @Override
     public Optional<Subscription> findById(SubscriptionId id) {
-        String sql = BASE_SELECT + " WHERE s.id = ?";
-        List<Subscription> list = jdbcTemplate.query(sql, extractor, id.id());
-        return list.stream().findFirst();
+        List<Subscription> list = jdbcTemplate.query(SELECT_BY_ID, extractor, id.id());
+        return Optional.ofNullable(DataAccessUtils.singleResult(list));
     }
 
     @Override
     public Optional<Subscription> findByUserAndLink(User user, Link link) {
-        String sql = BASE_SELECT + " WHERE u.id = ? AND l.id = ?";
         List<Subscription> list = jdbcTemplate.query(
-            sql,
+            SELECT_BY_USER_AND_LINK,
             extractor,
             user.userId().id(),
             link.linkId().id()
         );
-        return list.stream().findFirst();
+        return Optional.ofNullable(DataAccessUtils.singleResult(list));
     }
 
     @Override
     public List<Subscription> findByUser(User user) {
-        String sql = BASE_SELECT + " WHERE u.id = ?";
-        return jdbcTemplate.query(sql, extractor, user.userId().id());
+        return jdbcTemplate.query(SELECT_BY_USER, extractor, user.userId().id());
     }
 
     @Override
     public List<Subscription> findByLink(Link link) {
-        String sql = BASE_SELECT + " WHERE l.id = ?";
-        return jdbcTemplate.query(sql, extractor, link.linkId().id());
+        return jdbcTemplate.query(SELECT_BY_LINK, extractor, link.linkId().id());
     }
 
 }

@@ -1,15 +1,26 @@
-package backend.academy.scrapper.repository.database.jdbc;
+package backend.academy.scrapper.repository.database.jdbc.mapper;
 
-import backend.academy.scrapper.models.domain.*;
-import backend.academy.scrapper.models.domain.ids.*;
-import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.stereotype.Component;
-
+import backend.academy.scrapper.models.domain.Filter;
+import backend.academy.scrapper.models.domain.Link;
+import backend.academy.scrapper.models.domain.Subscription;
+import backend.academy.scrapper.models.domain.Tag;
+import backend.academy.scrapper.models.domain.User;
+import backend.academy.scrapper.models.domain.ids.ChatId;
+import backend.academy.scrapper.models.domain.ids.FilterId;
+import backend.academy.scrapper.models.domain.ids.LinkId;
+import backend.academy.scrapper.models.domain.ids.SubscriptionId;
+import backend.academy.scrapper.models.domain.ids.TagId;
+import backend.academy.scrapper.models.domain.ids.UserId;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.OffsetDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.stereotype.Component;
 
 @Component
 public class SubscriptionResultSetExtractor implements ResultSetExtractor<List<Subscription>> {
