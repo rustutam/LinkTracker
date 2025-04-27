@@ -48,15 +48,19 @@ public class LinkServiceImpl implements LinkService {
             });
 
         // Получаем ссылку из бд
+        // Если ссылка не найдена сохраняем в бд
         Link savedLink = processLink(uri);
 
         // Получаем список тегов из бд
+        // Если тег не найден сохраняем в бд
         List<Tag> savedTags = processTags(tags);
 
         // Получаем список фильтров из бд
+        // Если фильтр не найден сохраняем в бд
         List<Filter> savedFilters = processFilters(filters);
 
         Subscription subscription = Subscription.builder()
+            .user(savedUser)
             .link(savedLink)
             .tags(savedTags)
             .filters(savedFilters)

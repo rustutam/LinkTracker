@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.database.utilities.mapper;
+package backend.academy.scrapper.repository.database.jdbc.mapper;
 
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
@@ -10,14 +10,6 @@ public class UserMapper {
         return new User(
             new UserId(entity.id()),
             new ChatId(entity.chatId())
-        );
-    }
-
-    public static UserDto toEntity(User domain) {
-        return new UserDto(
-            domain.userId().id(),
-            domain.chatId().id(),
-            null
         );
     }
 }

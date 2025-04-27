@@ -7,7 +7,7 @@ import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.UserId;
 import backend.academy.scrapper.repository.database.UserRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
-import backend.academy.scrapper.repository.database.utilities.mapper.UserMapper;
+import backend.academy.scrapper.repository.database.jdbc.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

@@ -6,7 +6,7 @@ import backend.academy.scrapper.models.domain.ids.TagId;
 import backend.academy.scrapper.models.dto.TagDto;
 import backend.academy.scrapper.repository.database.TagRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
-import backend.academy.scrapper.repository.database.utilities.mapper.TagMapper;
+import backend.academy.scrapper.repository.database.jdbc.mapper.TagMapper;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;

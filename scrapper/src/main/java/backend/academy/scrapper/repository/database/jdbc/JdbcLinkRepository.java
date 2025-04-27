@@ -6,7 +6,7 @@ import backend.academy.scrapper.models.domain.ids.LinkId;
 import backend.academy.scrapper.models.dto.LinkDto;
 import backend.academy.scrapper.repository.database.LinkRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
-import backend.academy.scrapper.repository.database.utilities.mapper.LinkMapper;
+import backend.academy.scrapper.repository.database.jdbc.mapper.LinkMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;

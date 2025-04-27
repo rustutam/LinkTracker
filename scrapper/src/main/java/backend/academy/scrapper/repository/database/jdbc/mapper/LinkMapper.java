@@ -1,4 +1,4 @@
-package backend.academy.scrapper.repository.database.utilities.mapper;
+package backend.academy.scrapper.repository.database.jdbc.mapper;
 
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.ids.LinkId;

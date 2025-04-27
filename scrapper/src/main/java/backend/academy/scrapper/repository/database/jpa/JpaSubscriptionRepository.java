@@ -23,8 +23,10 @@ public class JpaSubscriptionRepository implements SubscriptionRepository {
 
     @Override
     public Subscription save(Subscription subscription) {
-
         SubscriptionEntity entity = new SubscriptionEntity();
+
+        UserMapper..user();
+
         entity.link(LinkMapper.map(subscription.link()));
 
         entity = subscriptionRepo.save(entity);

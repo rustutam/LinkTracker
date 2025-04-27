@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.SneakyThrows;
 import java.sql.ResultSet;
 import java.time.OffsetDateTime;
+import java.util.List;
 
 @SuppressWarnings("MultipleStringLiterals")
 @NoArgsConstructor
@@ -117,11 +118,26 @@ public final class JdbcRowMapperUtil {
 
     @SneakyThrows
     public static SubscriptionDto mapRowToSubscriptionEntity(ResultSet row, int rowNum) {
+        UserDto user = new UserDto(
+            row.getLong("user_id"),
+            row.getLong("user_chat_id"),
+            row.getObject("user_created_at", OffsetDateTime.class)
+        );
+
+        LinkDto link = new LinkDto(
+            row.getLong("link_id"),
+            row.getString("link_uri"),
+            row.getObject("link_last_modified_date", OffsetDateTime.class),
+            row.getObject("link_created_at", OffsetDateTime.class)
+        );
+
         return new SubscriptionDto(
-            row.getLong(COLUMN_ID),
-            row.getLong(TG_CHAT_TABLE_COLUMN_USER_ID),
-            row.getLong(LINK_METADATA_TABLE_COLUMN_LINK_ID),
-            row.getObject(COLUMN_CREATE_AT, OffsetDateTime.class)
+            row.getLong("subscription_id"),
+            user,
+            link,
+            List.of(),
+            List.of(),
+            row.getObject("subscription_created_at", OffsetDateTime.class)
         );
     }
 }

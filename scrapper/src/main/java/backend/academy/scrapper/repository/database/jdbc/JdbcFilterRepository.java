@@ -6,7 +6,7 @@ import backend.academy.scrapper.models.domain.ids.FilterId;
 import backend.academy.scrapper.models.dto.FilterDto;
 import backend.academy.scrapper.repository.database.FilterRepository;
 import backend.academy.scrapper.repository.database.utilities.JdbcRowMapperUtil;
-import backend.academy.scrapper.repository.database.utilities.mapper.FilterMapper;
+import backend.academy.scrapper.repository.database.jdbc.mapper.FilterRowMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -19,27 +19,28 @@ import java.util.Optional;
 @ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcFilterRepository implements FilterRepository {
     private final JdbcTemplate jdbcTemplate;
+    private final FilterRowMapper rowMapper;
 
     @Override
     public Optional<Filter> findById(FilterId filterId) {
-        List<FilterDto> filterEntities = jdbcTemplate.query(
+        List<Filter> filters = jdbcTemplate.query(
             "SELECT * FROM scrapper.filters WHERE id = (?)",
-            JdbcRowMapperUtil::mapRowToFilter,
+            rowMapper,
             filterId.id()
         );
 
-        return filterEntities.stream().map(FilterMapper::toDomain).findFirst();
+        return filters.stream().findFirst();
     }
 
     @Override
     public Optional<Filter> findByFilter(String filter) {
-        List<FilterDto> filterEntities = jdbcTemplate.query(
+        List<Filter> filters = jdbcTemplate.query(
             "SELECT * FROM scrapper.filters WHERE filter = (?)",
-            JdbcRowMapperUtil::mapRowToFilter,
+            rowMapper,
             filter
         );
 
-        return filterEntities.stream().map(FilterMapper::toDomain).findFirst();
+        return filters.stream().findFirst();
     }
 
     @Override
@@ -50,7 +51,7 @@ public class JdbcFilterRepository implements FilterRepository {
             filter
         );
 
-        return FilterMapper.toDomain(filterDto);
+        return FilterRowMapper.toDomain(filterDto);
 
     }
 
