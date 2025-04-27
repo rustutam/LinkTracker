@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface LinkService extends EndpointControleService {
 
-    LinkMetadata addLink(ChatId chatId, LinkMetadata link);
+    LinkMetadata addLink(ChatId chatId, URI link, List<String> tags, List<String> filters);
 
     LinkMetadata removeLink(ChatId chatId, URI link);
 

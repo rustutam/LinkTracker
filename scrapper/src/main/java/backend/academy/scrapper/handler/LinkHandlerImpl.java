@@ -30,12 +30,14 @@ public class LinkHandlerImpl implements LinkHandler {
         if (new GeneralParseLink().start(addLinkRequest.link()) == null) {
             throw new InvalidLinkException();
         }
-
-        LinkMetadata mappedLinkMetadata = mapAddLinkRequestToLinkMetadata(addLinkRequest);
+//
+//        LinkMetadata mappedLinkMetadata = mapAddLinkRequestToLinkMetadata(addLinkRequest);
 
         LinkMetadata linkMetadata = linkService.addLink(
             new ChatId(chatId),
-            mappedLinkMetadata
+            URI.create(addLinkRequest.link()),
+            addLinkRequest.tags(),
+            addLinkRequest.filters()
             );
 
         return mapLinkMetadataToLinkResponse(linkMetadata);
@@ -61,17 +63,17 @@ public class LinkHandlerImpl implements LinkHandler {
         return new ListLinksResponse(linkResponses, linkResponses.size());
     }
 
-    private LinkMetadata mapAddLinkRequestToLinkMetadata(AddLinkRequest addLinkRequest){
-        Link link = Link.of(URI.create(addLinkRequest.link()));
-        List<Tag> tags = addLinkRequest.tags().stream().map(Tag::of).toList();
-        List<Filter> filters = addLinkRequest.filters().stream().map(Filter::of).toList();
-
-        return LinkMetadata.builder()
-            .link(link)
-            .tags(tags)
-            .filters(filters)
-            .build();
-    }
+//    private LinkMetadata mapAddLinkRequestToLinkMetadata(AddLinkRequest addLinkRequest){
+//        Link link = Link.of(URI.create(addLinkRequest.link()));
+//        List<Tag> tags = addLinkRequest.tags().stream().map(Tag::of).toList();
+//        List<Filter> filters = addLinkRequest.filters().stream().map(Filter::of).toList();
+//
+//        return LinkMetadata.builder()
+//            .link(link)
+//            .tags(tags)
+//            .filters(filters)
+//            .build();
+//    }
 
     private LinkResponse mapLinkMetadataToLinkResponse(LinkMetadata linkMetadata) {
         return new LinkResponse(

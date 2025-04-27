@@ -6,11 +6,13 @@ import backend.academy.scrapper.models.domain.ids.UserId;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import java.util.List;
 
 @Builder
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class Subscription {
     private SubscriptionId subscriptionId;
     private User user;

@@ -14,6 +14,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
@@ -21,7 +23,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-
+@Getter
+@Setter
 @Entity
 @Table(name = "subscriptions", schema = "scrapper",
     uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "link_id"}))
@@ -49,7 +52,7 @@ public class SubscriptionEntity {
         joinColumns = @JoinColumn(name = "subscription_id"),
         inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
-    private Set<TagEntity> tags = new HashSet<>();
+    private List<TagEntity> tags = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -58,5 +61,5 @@ public class SubscriptionEntity {
         joinColumns = @JoinColumn(name = "subscription_id"),
         inverseJoinColumns = @JoinColumn(name = "filter_id")
     )
-    private Set<FilterEntity> filters = new HashSet<>();
+    private List<FilterEntity> filters = new ArrayList<>();
 }

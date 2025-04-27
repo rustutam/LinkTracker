@@ -24,12 +24,12 @@ public class JpaUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findById(UserId userId) {
-        return userRepo.findById(userId.id()).map(UserMapper::map);
+        return userRepo.findById(userId.id()).map(UserMapper::toDomain);
     }
 
     @Override
     public Optional<User> findByChatId(ChatId chatId) {
-        return userRepo.findByChatId(chatId.id()).map(UserMapper::map);
+        return userRepo.findByChatId(chatId.id()).map(UserMapper::toDomain);
     }
 
     @Override
