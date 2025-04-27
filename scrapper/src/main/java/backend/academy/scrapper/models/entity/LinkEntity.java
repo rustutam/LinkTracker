@@ -8,12 +8,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 @Getter
 @Setter
@@ -33,7 +33,7 @@ public class LinkEntity {
 
     @CreationTimestamp
     @Column(name = "created_at")
-    private OffsetDateTime  createdAt;
+    private OffsetDateTime createdAt;
 
     @OneToMany(mappedBy = "link", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<SubscriptionEntity> subscriptions = new ArrayList<>();

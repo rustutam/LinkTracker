@@ -10,4 +10,5 @@ public record LinkUpdateNotification(
     URI uri,
     String description,
     List<ChatId> chatIds
-) {}
+) {
+}

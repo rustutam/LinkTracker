@@ -1,21 +1,17 @@
 package backend.academy.scrapper.models.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToMany;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
-import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -34,6 +30,6 @@ public class TagEntity {
     private OffsetDateTime createdAt;
 
     @ManyToMany(mappedBy = "tags")
-    private Set<SubscriptionEntity> subscriptions;
+    private List<SubscriptionEntity> subscriptions;
 }
 

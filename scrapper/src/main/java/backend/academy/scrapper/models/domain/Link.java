@@ -17,13 +17,4 @@ public class Link {
     private URI uri;
     private OffsetDateTime lastUpdateTime;
     private OffsetDateTime createdAt;
-
-    public static Link of(URI uri) {
-        return builder()
-            .linkId(new LinkId(0L))
-            .uri(uri)
-            .lastUpdateTime(OffsetDateTime.MIN)
-            .build();
-
-    }
 }

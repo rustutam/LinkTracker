@@ -4,13 +4,12 @@ package backend.academy.scrapper.repository.database;
 import backend.academy.scrapper.exceptions.NotExistLinkException;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.ids.LinkId;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface LinkRepository {
     List<Link> findAll();
