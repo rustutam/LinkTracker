@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class ChatServiceImpl implements ChatService {
     private final UserRepository userRepository;
 

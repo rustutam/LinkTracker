@@ -13,6 +13,7 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @Repository
 @RequiredArgsConstructor
@@ -37,12 +38,14 @@ public class JpaSubscriptionRepository implements SubscriptionRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Subscription> findById(SubscriptionId subscriptionId) {
         return subscriptionRepo.findById(subscriptionId.id())
             .map(mapper::toDomain);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Optional<Subscription> findByUserAndLink(User user, Link link) {
         long userId = user.userId().id();
         long linkId = link.linkId().id();
@@ -51,6 +54,7 @@ public class JpaSubscriptionRepository implements SubscriptionRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Subscription> findByUser(User user) {
         long userId = user.userId().id();
         return subscriptionRepo.findAllByUserId(userId)
@@ -60,6 +64,7 @@ public class JpaSubscriptionRepository implements SubscriptionRepository {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Subscription> findByLink(Link link) {
         long linkId = link.linkId().id();
         return subscriptionRepo.findAllByLinkId(linkId)
