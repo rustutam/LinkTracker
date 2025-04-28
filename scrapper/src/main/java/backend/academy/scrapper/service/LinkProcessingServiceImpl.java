@@ -32,11 +32,15 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
             Page<Link> page = linkRepository.findAllPaginated(pageable);
 
             if (!page.hasNext()) {
-                log.info("Завершение обработки ссылок");
+                log.atInfo()
+                    .setMessage("Завершение обработки ссылок")
+                    .log();
                 return;
 
             }
-            log.info("Обработка страницы {}. Количество ссылок: {}", pageNumber, page.getNumberOfElements());
+            log.atInfo()
+                .setMessage("Обработка страницы " + pageNumber + ". Количество ссылок: " + page.getNumberOfElements())
+                .log();
 
             // Обрабатываем каждую ссылку на текущей странице
             page.getContent().forEach(this::processLink);
@@ -52,7 +56,7 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
     private void processLink(Link link) {
         try {
             // Вызываем сервис для проверки обновлений по URL ссылки
-            LinkChangeStatus linkChangeStatus =  updateCheckService.detectChanges(link);
+            LinkChangeStatus linkChangeStatus = updateCheckService.detectChanges(link);
 
             // Если получена информация об обновлении, уведомляем пользователя
             if (linkChangeStatus.hasChanges()) {

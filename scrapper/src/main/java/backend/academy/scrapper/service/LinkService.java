@@ -1,12 +1,11 @@
 package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.models.domain.LinkMetadata;
-import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import java.net.URI;
 import java.util.List;
 
-public interface LinkService extends EndpointControleService {
+public interface LinkService {
 
     LinkMetadata addLink(ChatId chatId, URI link, List<String> tags, List<String> filters);
 

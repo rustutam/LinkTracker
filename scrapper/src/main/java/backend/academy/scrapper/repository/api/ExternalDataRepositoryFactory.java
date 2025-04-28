@@ -18,7 +18,7 @@ public class ExternalDataRepositoryFactory {
     public ExternalDataRepository getExternalDataRepository(Link link) {
         String uri = link.uri().toString();
 
-        ExternalDataRepository repository = switch (uri) {
+        return switch (uri) {
             case String u when regexCheck.isGithub(u) -> gitHubRepository;
             case String u when regexCheck.isStackOverflow(u) -> stackOverflowRepository;
             default -> {
@@ -29,7 +29,5 @@ public class ExternalDataRepositoryFactory {
                 throw new IllegalArgumentException("Неподдерживаемая ссылка");
             }
         };
-
-        return repository;
     }
 }

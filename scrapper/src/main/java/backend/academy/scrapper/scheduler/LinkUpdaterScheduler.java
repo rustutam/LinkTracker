@@ -16,7 +16,9 @@ public class LinkUpdaterScheduler {
 
     @Scheduled(fixedDelayString = "#{@schedulerIntervalMs}")
     public void update() {
-        log.info("Updating the link on a schedule");
+        log.atInfo()
+            .setMessage("Запуск планировщика обновления ссылок")
+            .log();
         linkProcessingService.processLinks();
     }
 }
