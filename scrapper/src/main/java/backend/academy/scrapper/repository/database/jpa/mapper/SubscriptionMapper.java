@@ -22,6 +22,7 @@ public class SubscriptionMapper {
             .subscriptionId(new SubscriptionId(entity.id()))
             .user(userMapper.toDomain(entity.user()))
             .link(linkMapper.toDomain(entity.link()))
+            .createdAt(entity.createdAt())
             .build();
 
         // добавить теги и фильтры

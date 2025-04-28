@@ -51,6 +51,7 @@ public class JpaSubscriptionRepository implements SubscriptionRepository {
         long linkId = link.linkId().id();
         return subscriptionRepo.findByUserIdAndLinkId(userId, linkId)
             .map(mapper::toDomain);
+
     }
 
     @Override

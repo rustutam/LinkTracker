@@ -372,7 +372,6 @@ public abstract class SubscriptionRepositoryTest extends IntegrationEnvironment 
 
         List<Subscription> actualSubscriptions = subscriptionRepository.findByLink(savedLink);
 
-
         assertFalse(actualSubscriptions.isEmpty());
         assertThat(actualSubscriptions)
             .usingRecursiveFieldByFieldElementComparator(config)
