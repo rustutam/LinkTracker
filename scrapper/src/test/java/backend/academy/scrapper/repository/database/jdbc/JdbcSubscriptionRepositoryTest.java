@@ -1,154 +1,186 @@
 package backend.academy.scrapper.repository.database.jdbc;
 
 import backend.academy.scrapper.IntegrationEnvironment;
+import backend.academy.scrapper.TestUtils;
 import backend.academy.scrapper.models.domain.Filter;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.Subscription;
 import backend.academy.scrapper.models.domain.Tag;
+import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.FilterId;
 import backend.academy.scrapper.models.domain.ids.LinkId;
 import backend.academy.scrapper.models.domain.ids.SubscriptionId;
 import backend.academy.scrapper.models.domain.ids.TagId;
 import backend.academy.scrapper.models.domain.ids.UserId;
+import backend.academy.scrapper.repository.database.FilterRepository;
+import backend.academy.scrapper.repository.database.LinkRepository;
+import backend.academy.scrapper.repository.database.TagRepository;
+import backend.academy.scrapper.repository.database.UserRepository;
 import java.net.URI;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.junit.jupiter.Testcontainers;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
+@TestPropertySource(properties = "app.access-type=SQL")
 class JdbcSubscriptionRepositoryTest extends IntegrationEnvironment {
 
     @Autowired
     private JdbcSubscriptionRepository jdbcSubscriptionRepository;
 
     @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private LinkRepository linkRepository;
+
+    @Autowired
+    private TagRepository tagRepository;
+
+    @Autowired
+    private FilterRepository filterRepository;
+
+    @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private RecursiveComparisonConfiguration config;
+
+    @BeforeEach
+    void setUp() {
+        config = TestUtils.CONFIG();
+    }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void saveSubscriptionTest() {
-        UserId userId = new UserId(1L);
-        LinkId linkId = new LinkId(6L);
+        User savedUser = userRepository.findById(new UserId(1L)).orElseThrow();
+        Link savedLink = linkRepository.findById(new LinkId(6L)).orElseThrow();
+        List<Tag> savedTags = List.of(
+            tagRepository.findById(new TagId(1L)).orElseThrow(),
+            tagRepository.findById(new TagId(3L)).orElseThrow(),
+            tagRepository.findById(new TagId(4L)).orElseThrow()
+        );
+        List<Filter> savedFilters = List.of(
+            filterRepository.findById(new FilterId(1L)).orElseThrow(),
+            filterRepository.findById(new FilterId(5L)).orElseThrow()
+        );
 
-        SubscriptionId savedSubscriptionId = jdbcSubscriptionRepository.save(userId, linkId);
 
-        assertNotNull(savedSubscriptionId);
-        assertTrue(jdbcSubscriptionRepository.findById(savedSubscriptionId).isPresent());
+        Subscription subscription = Subscription.builder()
+            .user(savedUser)
+            .link(savedLink)
+            .tags(savedTags)
+            .filters(savedFilters)
+            .build();
+
+
+        Subscription savedSubscription = jdbcSubscriptionRepository.save(subscription);
+
+        assertNotNull(savedSubscription.subscriptionId());
+        assertThat(savedSubscription)
+            .usingRecursiveComparison(config)
+            .ignoringFields("subscriptionId", "createdAt")
+            .isEqualTo(subscription);
+
+        Subscription result = jdbcSubscriptionRepository.findById(savedSubscription.subscriptionId()).orElseThrow();
+        assertThat(savedSubscription)
+            .usingRecursiveComparison(config)
+            .isEqualTo(result);
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void removeSubscriptionTest() {
-        UserId userId = new UserId(2L);
-        LinkId linkId = new LinkId(4L);
-
-        Subscription removedSubscription = jdbcSubscriptionRepository.remove(userId, linkId);
-
-        assertEquals(removedSubscription.userId(), userId);
-        assertEquals(removedSubscription.linkId(), linkId);
-        assertTrue(jdbcSubscriptionRepository.findById(removedSubscription.subscriptionId()).isEmpty());
-    }
-
-    @Test
-    @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void findAllLinksByChatIdTest() {
-        ChatId firstChatId = new ChatId(100L);
-        ChatId secondChatId = new ChatId(101L);
-        ChatId thirdChatId = new ChatId(102L);
-
-        URI linkUri1 = URI.create("https://github.com/java-rustutam/semester1");
-        URI linkUri2 = URI.create("https://github.com/java-rustutam/semester2");
-        URI linkUri3 = URI.create("https://github.com/java-rustutam/semester3");
-        URI linkUri4 = URI.create("https://github.com/java-rustutam/semester4");
-        URI linkUri5 = URI.create("https://github.com/java-rustutam/semester5");
-
-        OffsetDateTime linkLastModifiedDate1 = OffsetDateTime.parse("2024-01-01 10:00:00", formatter.withZone(ZoneOffset.UTC));
-        OffsetDateTime linkLastModifiedDate2 = OffsetDateTime.parse("2024-01-02 10:00:00", formatter.withZone(ZoneOffset.UTC));
-        OffsetDateTime linkLastModifiedDate3 = OffsetDateTime.parse("2024-01-03 10:00:00", formatter.withZone(ZoneOffset.UTC));
-        OffsetDateTime linkLastModifiedDate4 = OffsetDateTime.parse("2024-01-04 10:00:00", formatter.withZone(ZoneOffset.UTC));
-        OffsetDateTime linkLastModifiedDate5 = OffsetDateTime.parse("2024-01-05 10:00:00", formatter.withZone(ZoneOffset.UTC));
-
-
-        List<Link> expectedFirstUserLinks = List.of(
-            new Link(new LinkId(1L), linkUri1, linkLastModifiedDate1),
-            new Link(new LinkId(2L), linkUri2, linkLastModifiedDate2),
-            new Link(new LinkId(3L), linkUri3, linkLastModifiedDate3)
+        User savedUser = userRepository.findById(new UserId(1L)).orElseThrow();
+        Link savedLink = linkRepository.findById(new LinkId(1L)).orElseThrow();
+        List<Tag> savedTags = List.of(
+            tagRepository.findById(new TagId(1L)).orElseThrow(),
+            tagRepository.findById(new TagId(3L)).orElseThrow()
+        );
+        List<Filter> savedFilters = List.of(
+            filterRepository.findById(new FilterId(1L)).orElseThrow(),
+            filterRepository.findById(new FilterId(3L)).orElseThrow()
         );
 
+        Subscription subscription = Subscription.builder()
+            .subscriptionId(new SubscriptionId(1L))
+            .user(savedUser)
+            .link(savedLink)
+            .tags(savedTags)
+            .filters(savedFilters)
+            .build();
 
-        List<Link> expectedSecondUserLinks = List.of(
-            new Link(new LinkId(4L), linkUri4, linkLastModifiedDate4),
-            new Link(new LinkId(5L), linkUri5, linkLastModifiedDate5)
+
+        Subscription deletedSubscription = jdbcSubscriptionRepository.remove(subscription);
+
+        assertNotNull(deletedSubscription);
+        assertThat(deletedSubscription)
+            .usingRecursiveComparison(config)
+            .isEqualTo(subscription);
+
+        assertTrue(jdbcSubscriptionRepository.findById(deletedSubscription.subscriptionId()).isEmpty());
+
+        Integer tagsCount = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM scrapper.subscription_tags WHERE subscription_id = ?",
+            Integer.class,
+            subscription.subscriptionId().id()
         );
 
-        List<Link> firstUserLinks = jdbcSubscriptionRepository.findAllLinksByChatId(firstChatId);
-        List<Link> secondUserLinks = jdbcSubscriptionRepository.findAllLinksByChatId(secondChatId);
-        List<Link> thirdUserLinks = jdbcSubscriptionRepository.findAllLinksByChatId(thirdChatId);
-
-        assertEquals(expectedFirstUserLinks, firstUserLinks);
-        assertEquals(expectedSecondUserLinks, secondUserLinks);
-        assertTrue(thirdUserLinks.isEmpty());
-    }
-
-    @Test
-    @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void findAllChatIdsByLinkIdTest() {
-        LinkId firstLinkId = new LinkId(1L);
-        LinkId secondLinkId = new LinkId(2L);
-        LinkId sixthLinkId = new LinkId(6L);
-
-        List<ChatId> expectedFirstLinkChatIds = List.of(
-            new ChatId(100L)
-        );
-        List<ChatId> expectedSecondLinkChatIds = List.of(
-            new ChatId(100L),
-            new ChatId(103L),
-            new ChatId(104L)
+        Integer filtersCount = jdbcTemplate.queryForObject(
+            "SELECT COUNT(*) FROM scrapper.subscription_filters WHERE subscription_id = ?",
+            Integer.class,
+            subscription.subscriptionId().id()
         );
 
-
-        List<ChatId> firstLinkChatIds = jdbcSubscriptionRepository.findAllChatIdsByLinkId(firstLinkId);
-        List<ChatId> secondLinkChatIds = jdbcSubscriptionRepository.findAllChatIdsByLinkId(secondLinkId);
-        List<ChatId> sixthLinkChatIds = jdbcSubscriptionRepository.findAllChatIdsByLinkId(sixthLinkId);
-
-        assertEquals(expectedFirstLinkChatIds, firstLinkChatIds);
-        assertEquals(expectedSecondLinkChatIds, secondLinkChatIds);
-        assertTrue(sixthLinkChatIds.isEmpty());
+        assertThat(tagsCount).isZero();
+        assertThat(filtersCount).isZero();
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findByIdTest() {
-        SubscriptionId subscriptionId = new SubscriptionId(2L);
-        UserId userId = new UserId(1L);
-        LinkId linkId = new LinkId(2L);
+        User savedUser = userRepository.findById(new UserId(1L)).orElseThrow();
+        Link savedLink = linkRepository.findById(new LinkId(1L)).orElseThrow();
+        List<Tag> savedTags = List.of(
+            tagRepository.findById(new TagId(1L)).orElseThrow(),
+            tagRepository.findById(new TagId(3L)).orElseThrow()
+        );
+        List<Filter> savedFilters = List.of(
+            filterRepository.findById(new FilterId(1L)).orElseThrow(),
+            filterRepository.findById(new FilterId(3L)).orElseThrow()
+        );
 
-        Optional<Subscription> subscription = jdbcSubscriptionRepository.findById(subscriptionId);
+        Subscription expectedSubscription = Subscription.builder()
+            .subscriptionId(new SubscriptionId(1L))
+            .user(savedUser)
+            .link(savedLink)
+            .tags(savedTags)
+            .filters(savedFilters)
+            .createdAt(OffsetDateTime.parse("2024-01-02T10:00:00Z"))
+            .build();
 
-        assertTrue(subscription.isPresent());
-        assertEquals(subscriptionId, subscription.get().subscriptionId());
-        assertEquals(userId, subscription.get().userId());
-        assertEquals(linkId, subscription.get().linkId());
+        Subscription actualSubscription = jdbcSubscriptionRepository.findById(new SubscriptionId(1L)).orElse(null);
+
+        assertNotNull(actualSubscription);
+        assertThat(actualSubscription)
+            .usingRecursiveComparison(config)
+            .isEqualTo(expectedSubscription);
     }
 
     @Test
@@ -165,27 +197,44 @@ class JdbcSubscriptionRepositoryTest extends IntegrationEnvironment {
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void findByLinkIdAndUserId() {
-        SubscriptionId subscriptionId = new SubscriptionId(2L);
-        UserId userId = new UserId(1L);
-        LinkId linkId = new LinkId(2L);
+    void findByUserAndLinkTest() {
+        User savedUser = userRepository.findById(new UserId(1L)).orElseThrow();
+        Link savedLink = linkRepository.findById(new LinkId(1L)).orElseThrow();
+        List<Tag> savedTags = List.of(
+            tagRepository.findById(new TagId(1L)).orElseThrow(),
+            tagRepository.findById(new TagId(3L)).orElseThrow()
+        );
+        List<Filter> savedFilters = List.of(
+            filterRepository.findById(new FilterId(1L)).orElseThrow(),
+            filterRepository.findById(new FilterId(3L)).orElseThrow()
+        );
 
-        Optional<Subscription> subscription = jdbcSubscriptionRepository.findByLinkIdAndUserId(linkId, userId);
+        Subscription expectedSubscription = Subscription.builder()
+            .subscriptionId(new SubscriptionId(1L))
+            .user(savedUser)
+            .link(savedLink)
+            .tags(savedTags)
+            .filters(savedFilters)
+            .createdAt(OffsetDateTime.parse("2024-01-02T10:00:00Z"))
+            .build();
 
-        assertTrue(subscription.isPresent());
-        assertEquals(subscriptionId, subscription.get().subscriptionId());
-        assertEquals(userId, subscription.get().userId());
-        assertEquals(linkId, subscription.get().linkId());
+        Subscription actualSubscription =
+            jdbcSubscriptionRepository.findByUserAndLink(savedUser, savedLink).orElse(null);
+
+        assertNotNull(actualSubscription);
+        assertThat(actualSubscription)
+            .usingRecursiveComparison(config)
+            .isEqualTo(expectedSubscription);
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void findByLinkIdAndUserIdWhenSubscriptionNotFoundTest() {
-        UserId userId = new UserId(10L);
-        LinkId linkId = new LinkId(2L);
+    void findByUserAndLinkWhenSubscriptionNotFoundTest() {
+        User savedUser = userRepository.findById(new UserId(1L)).orElseThrow();
+        Link savedLink = linkRepository.findById(new LinkId(6L)).orElseThrow();
 
-        Optional<Subscription> subscription = jdbcSubscriptionRepository.findByLinkIdAndUserId(linkId, userId);
+        Optional<Subscription> subscription = jdbcSubscriptionRepository.findByUserAndLink(savedUser, savedLink);
 
         assertTrue(subscription.isEmpty());
     }
@@ -193,134 +242,177 @@ class JdbcSubscriptionRepositoryTest extends IntegrationEnvironment {
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void addFilterToSubscriptionTest() {
-        SubscriptionId subscriptionId = new SubscriptionId(6L);
-        FilterId filterId = new FilterId(5L);
+    void findByUserTest() {
+        User savedUser = userRepository.findById(new UserId(1L)).orElseThrow();
 
-        jdbcSubscriptionRepository.addFilterToSubscription(subscriptionId, filterId);
-
-        Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM scrapper.subscription_filters WHERE subscription_id = ? AND filter_id = ?",
-            Integer.class,
-            subscriptionId.id(),
-            filterId.id()
+        Link savedLink1 = linkRepository.findById(new LinkId(1L)).orElseThrow();
+        List<Tag> savedTags1 = List.of(
+            tagRepository.findById(new TagId(1L)).orElseThrow(),
+            tagRepository.findById(new TagId(3L)).orElseThrow()
+        );
+        List<Filter> savedFilters1 = List.of(
+            filterRepository.findById(new FilterId(1L)).orElseThrow(),
+            filterRepository.findById(new FilterId(3L)).orElseThrow()
         );
 
-        assertNotNull(count);
-        assertEquals(1, count);
+        Subscription firstSub = Subscription.builder()
+            .subscriptionId(new SubscriptionId(1L))
+            .user(savedUser)
+            .link(savedLink1)
+            .tags(savedTags1)
+            .filters(savedFilters1)
+            .createdAt(OffsetDateTime.parse("2024-01-02T10:00:00Z"))
+            .build();
+
+
+        Link savedLink2 = linkRepository.findById(new LinkId(2L)).orElseThrow();
+        List<Tag> savedTags2 = List.of(
+            tagRepository.findById(new TagId(2L)).orElseThrow()
+        );
+        List<Filter> savedFilters2 = List.of(
+            filterRepository.findById(new FilterId(2L)).orElseThrow()
+        );
+
+        Subscription secondSub = Subscription.builder()
+            .subscriptionId(new SubscriptionId(2L))
+            .user(savedUser)
+            .link(savedLink2)
+            .tags(savedTags2)
+            .filters(savedFilters2)
+            .createdAt(OffsetDateTime.parse("2024-01-03T10:00:00Z"))
+            .build();
+
+        Link savedLink3 = linkRepository.findById(new LinkId(3L)).orElseThrow();
+
+        Subscription thirdSub = Subscription.builder()
+            .subscriptionId(new SubscriptionId(3L))
+            .user(savedUser)
+            .link(savedLink3)
+            .tags(List.of())
+            .filters(List.of())
+            .createdAt(OffsetDateTime.parse("2024-01-12T10:00:00Z"))
+            .build();
+        List<Subscription> expectedSubscriptions = List.of(firstSub, secondSub, thirdSub);
+
+        List<Subscription> actualSubscriptions = jdbcSubscriptionRepository.findByUser(savedUser);
+
+        assertFalse(actualSubscriptions.isEmpty());
+        assertThat(actualSubscriptions)
+            .usingRecursiveFieldByFieldElementComparator(config)
+            .containsExactlyInAnyOrderElementsOf(expectedSubscriptions);
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void removeFilterFromSubscriptionTest() {
-        SubscriptionId subscriptionId = new SubscriptionId(1L);
-        FilterId filterId = new FilterId(1L);
-
-        // Проверяем что есть строка
-        Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM scrapper.subscription_filters WHERE subscription_id = ? AND filter_id = ?",
-            Integer.class,
-            subscriptionId.id(),
-            filterId.id()
+    void findByUserWhenSubscriptionsNotFoundTest() {
+        User user = new User(
+            new UserId(13L),
+            new ChatId(23L),
+            OffsetDateTime.MIN
         );
 
-        assertNotNull(count);
-        assertEquals(1, count);
+        List<Subscription> subscriptions = jdbcSubscriptionRepository.findByUser(user);
 
-        jdbcSubscriptionRepository.removeFilterFromSubscription(subscriptionId, filterId);
-
-        Integer mutationCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM scrapper.subscription_filters WHERE subscription_id = ? AND filter_id = ?",
-            Integer.class,
-            subscriptionId.id(),
-            filterId.id()
-        );
-
-        assertNotNull(mutationCount);
-        assertEquals(0, mutationCount);
+        assertTrue(subscriptions.isEmpty());
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void findFiltersBySubscriptionIdTest() {
-        SubscriptionId subscriptionId = new SubscriptionId(1L);
-        List<Filter> expectedFilters = List.of(
-            new Filter(new FilterId(1L), "filter1"),
-            new Filter(new FilterId(3L), "filter3")
-        );
+    void findByUserWhenUserFoundAndSubscriptionsNotFoundTest() {
+        User savedUser = userRepository.findById(new UserId(3L)).orElseThrow();
 
-        List<Filter> filter = jdbcSubscriptionRepository.findFiltersBySubscriptionId(subscriptionId);
+        List<Subscription> subscriptions = jdbcSubscriptionRepository.findByUser(savedUser);
 
-        assertEquals(2, filter.size());
-        assertEquals(expectedFilters, filter);
+        assertTrue(subscriptions.isEmpty());
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void addTagToSubscriptionTest() {
-        SubscriptionId subscriptionId = new SubscriptionId(6L);
-        TagId tagId = new TagId(5L);
+    void findByLinkTest() {
+        Link savedLink = linkRepository.findById(new LinkId(1L)).orElseThrow();
 
-        jdbcSubscriptionRepository.addTagToSubscription(subscriptionId, tagId);
-
-        Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM scrapper.subscription_tags WHERE subscription_id = ? AND tag_id = ?",
-            Integer.class,
-            subscriptionId.id(),
-            tagId.id()
+        User savedUser1 = userRepository.findById(new UserId(1L)).orElseThrow();
+        List<Tag> savedTags1 = List.of(
+            tagRepository.findById(new TagId(1L)).orElseThrow(),
+            tagRepository.findById(new TagId(3L)).orElseThrow()
+        );
+        List<Filter> savedFilters1 = List.of(
+            filterRepository.findById(new FilterId(1L)).orElseThrow(),
+            filterRepository.findById(new FilterId(3L)).orElseThrow()
         );
 
-        assertNotNull(count);
-        assertEquals(1, count);
+        Subscription firstSub = Subscription.builder()
+            .subscriptionId(new SubscriptionId(1L))
+            .user(savedUser1)
+            .link(savedLink)
+            .tags(savedTags1)
+            .filters(savedFilters1)
+            .createdAt(OffsetDateTime.parse("2024-01-02T10:00:00Z"))
+            .build();
+
+        User savedUser2 = userRepository.findById(new UserId(4L)).orElseThrow();
+
+        Subscription secondSub = Subscription.builder()
+            .subscriptionId(new SubscriptionId(6L))
+            .user(savedUser2)
+            .link(savedLink)
+            .tags(List.of())
+            .filters(List.of())
+            .createdAt(OffsetDateTime.parse("2024-01-12T10:00:00Z"))
+            .build();
+
+        User savedUser3 = userRepository.findById(new UserId(5L)).orElseThrow();
+
+        Subscription thirdSub = Subscription.builder()
+            .subscriptionId(new SubscriptionId(7L))
+            .user(savedUser3)
+            .link(savedLink)
+            .tags(List.of())
+            .filters(List.of())
+            .createdAt(OffsetDateTime.parse("2024-01-01T10:00:00Z"))
+            .build();
+
+        List<Subscription> expectedSubscriptions = List.of(firstSub, secondSub, thirdSub);
+
+
+        List<Subscription> actualSubscriptions = jdbcSubscriptionRepository.findByLink(savedLink);
+
+
+        assertFalse(actualSubscriptions.isEmpty());
+        assertThat(actualSubscriptions)
+            .usingRecursiveFieldByFieldElementComparator(config)
+            .containsExactlyInAnyOrderElementsOf(expectedSubscriptions);
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void removeTagFromSubscriptionTest() {
-        SubscriptionId subscriptionId = new SubscriptionId(1L);
-        TagId tagId = new TagId(1L);
-
-        // Проверяем что есть строка
-        Integer count = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM scrapper.subscription_tags WHERE subscription_id = ? AND tag_id = ?",
-            Integer.class,
-            subscriptionId.id(),
-            tagId.id()
+    void findByLinkWhenSubscriptionsNotFoundTest() {
+        Link link = new Link(
+            new LinkId(13L),
+            URI.create("abracadabra"),
+            OffsetDateTime.MIN,
+            OffsetDateTime.MIN
         );
 
-        assertNotNull(count);
-        assertEquals(1, count);
+        List<Subscription> subscriptions = jdbcSubscriptionRepository.findByLink(link);
 
-        jdbcSubscriptionRepository.removeTagFromSubscription(subscriptionId, tagId);
-
-        Integer mutationCount = jdbcTemplate.queryForObject(
-            "SELECT COUNT(*) FROM scrapper.subscription_tags WHERE subscription_id = ? AND tag_id = ?",
-            Integer.class,
-            subscriptionId.id(),
-            tagId.id()
-        );
-
-        assertNotNull(mutationCount);
-        assertEquals(0, mutationCount);
+        assertTrue(subscriptions.isEmpty());
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void findTagsBySubscriptionIdTest() {
-        SubscriptionId subscriptionId = new SubscriptionId(1L);
-        List<Tag> expectedTags = List.of(
-            new Tag(new TagId(1L), "tag1"),
-            new Tag(new TagId(3L), "tag3")
-        );
+    void findByLinkWhenUserFoundAndSubscriptionsNotFoundTest() {
+        Link savedLink = linkRepository.findById(new LinkId(6L)).orElseThrow();
 
-        List<Tag> tag = jdbcSubscriptionRepository.findTagsBySubscriptionId(subscriptionId);
+        List<Subscription> subscriptions = jdbcSubscriptionRepository.findByLink(savedLink);
 
-        assertEquals(2, tag.size());
-        assertEquals(expectedTags, tag);
+        assertTrue(subscriptions.isEmpty());
     }
+
+
 }

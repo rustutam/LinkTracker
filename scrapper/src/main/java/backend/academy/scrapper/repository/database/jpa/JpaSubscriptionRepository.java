@@ -11,10 +11,12 @@ import backend.academy.scrapper.repository.database.jpa.repo.SubscriptionRepo;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 @Repository
 @RequiredArgsConstructor
+@ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "ORM")
 public class JpaSubscriptionRepository implements SubscriptionRepository {
     private final SubscriptionRepo subscriptionRepo;
     private final SubscriptionMapper mapper;

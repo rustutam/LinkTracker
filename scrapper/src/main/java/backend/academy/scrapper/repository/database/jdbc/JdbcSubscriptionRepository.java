@@ -8,7 +8,9 @@ import backend.academy.scrapper.repository.database.SubscriptionRepository;
 import backend.academy.scrapper.repository.database.jdbc.mapper.SubscriptionResultSetExtractor;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -73,27 +75,36 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
             )
         );
 
-        batchInsert("subscription_tags", newSubscriptionId.id(),
+        tagBatchInsert(newSubscriptionId.id(),
             subscription.tags().stream().map(t -> t.tagId().id()).toList());
-        batchInsert("subscription_filters", newSubscriptionId.id(),
+        filterBatchInsert(newSubscriptionId.id(),
             subscription.filters().stream().map(f -> f.filterId().id()).toList());
 
-        // Обновляем ID в доменной модели
-        return Subscription.builder()
-            .subscriptionId(newSubscriptionId)
-            .user(subscription.user())
-            .link(subscription.link())
-            .tags(subscription.tags())
-            .filters(subscription.filters())
-            .build();
+        return findById(newSubscriptionId).orElseThrow();
     }
 
-    private void batchInsert(String table, Long subscriptionId, List<Long> ids) {
+    private void tagBatchInsert(Long subscriptionId, List<Long> ids) {
         if (ids.isEmpty()) return;
-        String sql = String.format(
-            "INSERT INTO scrapper.%s (subscription_id, %s_id) VALUES (?, ?)",
-            table, table.replace("subscription_", "")
-        );
+        String sql =
+            "INSERT INTO scrapper.subscription_tags (subscription_id, tag_id) VALUES (?, ?)";
+        jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
+            @Override
+            public void setValues(PreparedStatement ps, int i) throws SQLException {
+                ps.setLong(1, subscriptionId);
+                ps.setLong(2, ids.get(i));
+            }
+
+            @Override
+            public int getBatchSize() {
+                return ids.size();
+            }
+        });
+    }
+
+    private void filterBatchInsert(Long subscriptionId, List<Long> ids) {
+        if (ids.isEmpty()) return;
+        String sql =
+            "INSERT INTO scrapper.subscription_filters (subscription_id, filter_id) VALUES (?, ?)";
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {

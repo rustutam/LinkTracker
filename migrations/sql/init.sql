@@ -5,7 +5,7 @@ CREATE TABLE scrapper.users
 (
     id         BIGSERIAL PRIMARY KEY,
     chat_id    BIGINT NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT now()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- Ссылки
@@ -13,8 +13,8 @@ CREATE TABLE scrapper.links
 (
     id                 BIGSERIAL PRIMARY KEY,
     uri                TEXT NOT NULL UNIQUE,
-    last_modified_date TIMESTAMP DEFAULT now(),
-    created_at         TIMESTAMP DEFAULT now()
+    last_modified_date TIMESTAMP WITH TIME ZONE DEFAULT now(),
+    created_at         TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- Подписки. Таблица для связывания пользователей и ссылок
@@ -23,7 +23,7 @@ CREATE TABLE scrapper.subscriptions
     id         BIGSERIAL PRIMARY KEY,
     user_id    BIGINT NOT NULL,
     link_id    BIGINT NOT NULL,
-    created_at TIMESTAMP DEFAULT now(),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
 
     FOREIGN KEY (user_id) REFERENCES scrapper.users (id) ON DELETE CASCADE,
     FOREIGN KEY (link_id) REFERENCES scrapper.links (id) ON DELETE CASCADE,
@@ -36,15 +36,15 @@ CREATE TABLE scrapper.tags
 (
     id         BIGSERIAL PRIMARY KEY,
     tag        TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT now()
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 -- Фильтры
 CREATE TABLE scrapper.filters
 (
     id         BIGSERIAL PRIMARY KEY,
-    filter    TEXT NOT NULL UNIQUE,
-    created_at TIMESTAMP DEFAULT now()
+    filter     TEXT NOT NULL UNIQUE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT now()
 );
 
 --Таблица связи подписок и тегов

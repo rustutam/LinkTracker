@@ -6,16 +6,19 @@ import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.UserId;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
+@TestPropertySource(properties = "app.access-type=SQL")
 class JdbcUserRepositoryTest extends IntegrationEnvironment {
 
     @Autowired
@@ -27,19 +30,21 @@ class JdbcUserRepositoryTest extends IntegrationEnvironment {
     void findByIdTest() {
         UserId userId = new UserId(1L);
         ChatId expectedChatId = new ChatId(100L);
+        OffsetDateTime expectedCreatedAt = OffsetDateTime.parse("2024-10-01T21:35:03Z");
 
         Optional<User> user = jdbcChatRepository.findById(userId);
 
         assertTrue(user.isPresent());
         assertEquals(userId, user.get().userId());
         assertEquals(expectedChatId, user.get().chatId());
+        assertEquals(expectedCreatedAt, user.get().createdAt());
     }
 
     @Test
     @Sql(scripts = "/sql/insert_users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findByIdWhenLinkNotFoundTest() {
-        UserId userId = new UserId(101L);
+        UserId userId = new UserId(99L);
 
         Optional<User> user = jdbcChatRepository.findById(userId);
 
@@ -50,14 +55,16 @@ class JdbcUserRepositoryTest extends IntegrationEnvironment {
     @Sql(scripts = "/sql/insert_users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findByChatIdTest() {
-        UserId expectedUserId = new UserId(1L);
         ChatId chatId = new ChatId(100L);
+        UserId expectedUserId = new UserId(1L);
+        OffsetDateTime expectedCreatedAt = OffsetDateTime.parse("2024-10-01T21:35:03Z");
 
         Optional<User> user = jdbcChatRepository.findByChatId(chatId);
 
         assertTrue(user.isPresent());
         assertEquals(chatId, user.get().chatId());
         assertEquals(expectedUserId, user.get().userId());
+        assertEquals(expectedCreatedAt, user.get().createdAt());
     }
 
     @Test
