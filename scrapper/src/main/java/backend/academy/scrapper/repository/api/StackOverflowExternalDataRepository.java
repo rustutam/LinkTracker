@@ -48,8 +48,11 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
             jsonNode.get("items").forEach(item -> {
                 String ownerName = item.get("owner").get("display_name").asText();
                 String body = item.get("body").asText();
+                String preview = body.length() > 200
+                    ? body.substring(0, 200)
+                    : body;
                 OffsetDateTime creationDate = OffsetDateTime.parse(item.get("creation_date").asText());
-                allContent.add(new ChangeInfo(title, ownerName, creationDate, body));
+                allContent.add(new ChangeInfo(title, ownerName, creationDate, preview));
             });
             return allContent;
         } catch (Exception e) {

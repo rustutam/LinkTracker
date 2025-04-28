@@ -34,11 +34,16 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
             JsonNode jsonResponse = objectMapper.readTree(responce);
 
             jsonResponse.forEach(content -> {
+                    String body = content.get("body").asText();
+                    String preview = body.length() > 200
+                        ? body.substring(0, 200)
+                        : body;
+
                     ChangeInfo changeInfo = ChangeInfo.builder()
                         .title(content.get("title").asText())
                         .username(content.get("user").get("login").asText())
                         .creationTime(OffsetDateTime.parse(content.get("created_at").asText()))
-                        .preview(content.get("body").asText())
+                        .preview(preview)
                         .build();
 
                     allContent.add(changeInfo);

@@ -78,7 +78,7 @@ public class JdbcLinkRepository implements LinkRepository {
             log.atError()
                 .addKeyValue("linkId", linkId.id())
                 .addKeyValue("access-type", "SQL")
-                .setMessage("Не существует ссылка с id = " + linkId + " в базе данных")
+                .setMessage("Не существует ссылка с id = " + linkId.id() + " в базе данных")
                 .log();
             throw new NotExistLinkException();
         }
