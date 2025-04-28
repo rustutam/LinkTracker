@@ -67,4 +67,26 @@ CREATE TABLE scrapper.subscription_filters
     FOREIGN KEY (filter_id) REFERENCES scrapper.filters (id) ON DELETE CASCADE
 );
 
--- TODO добавить индексы на поля
+CREATE INDEX IF NOT EXISTS idx_subscriptions_user_id
+    ON scrapper.subscriptions (user_id);
+
+CREATE INDEX IF NOT EXISTS idx_subscriptions_link_id
+    ON scrapper.subscriptions (link_id);
+
+CREATE INDEX IF NOT EXISTS idx_subscription_tags_tag_id
+    ON scrapper.subscription_tags (tag_id);
+
+CREATE INDEX IF NOT EXISTS idx_subscription_filters_filter_id
+    ON scrapper.subscription_filters (filter_id);
+
+CREATE INDEX IF NOT EXISTS idx_links_last_modified_date
+    ON scrapper.links (last_modified_date);
+
+CREATE INDEX IF NOT EXISTS idx_links_created_at
+    ON scrapper.links (created_at);
+
+CREATE INDEX IF NOT EXISTS idx_tags_tag_exact
+    ON scrapper.tags (tag);
+
+CREATE INDEX IF NOT EXISTS idx_filters_filter_exact
+    ON scrapper.filters (filter);
