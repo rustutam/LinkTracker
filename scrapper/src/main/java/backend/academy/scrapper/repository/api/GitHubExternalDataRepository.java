@@ -23,6 +23,7 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
     private final GithubClient githubClient;
     private final ObjectMapper objectMapper;
 
+
     @Override
     public List<ChangeInfo> getChangeInfoByLink(Link link) {
         //TODO написано на скорую руку, переделать

@@ -26,7 +26,7 @@ public class LinkHandlerImpl implements LinkHandler {
 
     @Override
     public LinkResponse addLink(long chatId, AddLinkRequest addLinkRequest) {
-        //TODO разобраться как тут лучше валидироваь сслыку чтобы не пропусктаь плохие ссылки внутрь
+        // TODO разобраться как тут лучше валидироваь сслыку чтобы не пропусктаь плохие ссылки внутрь
         if (new GeneralParseLink().start(addLinkRequest.link()) == null) {
             throw new InvalidLinkException();
         }
