@@ -11,26 +11,29 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-@ComponentScan(basePackages = "general")
 @ConfigurationProperties(prefix = "app")
 public record ScrapperConfig(
-        @Bean @NotNull Scheduler scheduler,
-        @NotEmpty String githubToken,
-        @NotEmpty String githubUri,
-        StackOverflowCredentials stackOverflow,
-        @NotEmpty String stackOverflowUri,
-        @NotEmpty String baseUri,
-        @NotNull int batchSize
+    @NotNull Scheduler scheduler,
+    @NotNull Integer batchSize,
+    GitHubConfig github,
+    StackOverflowConfig stackOverflow,
+    TgBotConfig tgBot
 ) {
-    public record StackOverflowCredentials(@NotEmpty String key, @NotEmpty String accessToken) {}
-
     public record Scheduler(@NotNull Duration interval) {}
 
-    @Bean
-    public ObjectMapper createObjectMapper() {
-        return new ObjectMapper();
-    }
+    public record GitHubConfig(
+        @NotEmpty String baseUri,
+        @NotEmpty String token
+    ) {}
 
-    @Bean
-    public RegexCheck createRegexCheck() { return new RegexCheck(); }
+    public record StackOverflowConfig(
+        @NotEmpty String baseUri,
+        @NotEmpty String key,
+        @NotEmpty String accessToken
+    ) {}
+
+    public record TgBotConfig(
+        @NotEmpty String baseUri
+    ) {}
 }
+

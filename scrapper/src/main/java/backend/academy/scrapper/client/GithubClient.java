@@ -1,6 +1,7 @@
 package backend.academy.scrapper.client;
 
-import backend.academy.scrapper.configuration.GitHubConfig;
+import backend.academy.scrapper.configuration.ScrapperConfig;
+import backend.academy.scrapper.configuration.ScrapperConfig.GitHubConfig;
 import backend.academy.scrapper.exceptions.RepositoryNotFoundException;
 import backend.academy.scrapper.models.external.github.CommitDto;
 import backend.academy.scrapper.models.external.github.IssueDto;
@@ -21,11 +22,11 @@ public class GithubClient {
     private final RestClient restClient;
     private final GitHubConfig gitHubConfig;
 
-    public GithubClient(GitHubConfig gitHubConfig) {
+    public GithubClient(ScrapperConfig scrapperConfig) {
         restClient = RestClient.builder()
-            .baseUrl(gitHubConfig.baseUrl())
+            .baseUrl(scrapperConfig.github().baseUri())
             .build();
-        this.gitHubConfig = gitHubConfig;
+        this.gitHubConfig = scrapperConfig.github();
     }
 
     public String issuesRequest(String owner, String repository) {
@@ -34,7 +35,7 @@ public class GithubClient {
                 .get()
                 .uri("repos/{owner}/{repo}/issues", owner, repository)
                 .header("Accept", "application/vnd.github+json")
-                .header("Authorization", "Bearer " + gitHubConfig.githubToken())
+                .header("Authorization", "Bearer " + gitHubConfig.token())
                 .retrieve()
                 .body(String.class);
         } catch (RestClientResponseException e ) {

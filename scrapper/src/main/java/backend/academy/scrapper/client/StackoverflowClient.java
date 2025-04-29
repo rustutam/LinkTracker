@@ -1,6 +1,7 @@
 package backend.academy.scrapper.client;
 
-import backend.academy.scrapper.configuration.StackOverflowConfig;
+import backend.academy.scrapper.configuration.ScrapperConfig;
+import backend.academy.scrapper.configuration.ScrapperConfig.StackOverflowConfig;
 import backend.academy.scrapper.exceptions.QuestionNotFoundException;
 import backend.academy.scrapper.models.external.stackoverflow.StackoverflowQuestionDTO;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +17,9 @@ public class StackoverflowClient {
     private final String filter = "withbody";
     private static final String REQUEST_ERROR = "Ошибка при запросе";
 
-    public StackoverflowClient(StackOverflowConfig stackOverflowConfig) {
-        restClient = RestClient.builder().baseUrl(stackOverflowConfig.baseUrl()).build();
-        this.stackOverflowConfig = stackOverflowConfig;
+    public StackoverflowClient(ScrapperConfig scrapperConfig) {
+        restClient = RestClient.builder().baseUrl(scrapperConfig.stackOverflow().baseUri()).build();
+        this.stackOverflowConfig = scrapperConfig.stackOverflow();
     }
 
     public String getQuestionComments(String site, String questionId) {
