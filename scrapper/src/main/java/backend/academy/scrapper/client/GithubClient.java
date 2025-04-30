@@ -3,15 +3,8 @@ package backend.academy.scrapper.client;
 import backend.academy.scrapper.configuration.ScrapperConfig;
 import backend.academy.scrapper.configuration.ScrapperConfig.GitHubConfig;
 import backend.academy.scrapper.exceptions.RepositoryNotFoundException;
-import backend.academy.scrapper.models.external.github.CommitDto;
-import backend.academy.scrapper.models.external.github.IssueDto;
 import backend.academy.scrapper.models.external.github.RepositoryDto;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.AllArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
@@ -38,7 +31,7 @@ public class GithubClient {
                 .header("Authorization", "Bearer " + gitHubConfig.token())
                 .retrieve()
                 .body(String.class);
-        } catch (RestClientResponseException e ) {
+        } catch (RestClientResponseException e) {
             log.atError()
                 .setMessage("Не удалось найти репозиторий")
                 .log();

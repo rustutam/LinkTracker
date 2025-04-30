@@ -20,6 +20,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class GitHubExternalDataRepository extends ExternalDataRepository {
+    private static final String PR_ISSUE_DESCRIPTION = "Новый PR/Issue";
+
     private final GithubClient githubClient;
     private final ObjectMapper objectMapper;
 
@@ -35,16 +37,12 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
             JsonNode jsonResponse = objectMapper.readTree(responce);
 
             jsonResponse.forEach(content -> {
-                    String body = content.get("body").asText();
-                    String preview = body.length() > 200
-                        ? body.substring(0, 200)
-                        : body;
-
                     ChangeInfo changeInfo = ChangeInfo.builder()
+                        .description(PR_ISSUE_DESCRIPTION)
                         .title(content.get("title").asText())
                         .username(content.get("user").get("login").asText())
                         .creationTime(OffsetDateTime.parse(content.get("created_at").asText()))
-                        .preview(preview)
+                        .preview(truncatePreview(content.get("body").asText()))
                         .build();
 
                     allContent.add(changeInfo);

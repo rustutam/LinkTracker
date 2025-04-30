@@ -38,7 +38,7 @@ public class StackoverflowClient {
     }
 
     public String getQuestionAnswerCommits(String site, String answerId) {
-        String content = String.format("https://api.stackexchange.com/2.3/answers/%s/comments?site=%s", answerId, site);
+        String content = String.format("/answers/%s/comments?site=%s", answerId, site);
         return performRequest(content);
     }
 

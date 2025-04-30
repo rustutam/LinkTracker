@@ -21,7 +21,7 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
     public void notifySender(LinkChangeStatus linkChangeStatus) {
         String description = linkChangeStatus.changeInfoList().stream()
             .map(Object::toString)
-            .collect(Collectors.joining("\n"));
+            .collect(Collectors.joining("\n\n"));
 
         LinkId linkId = linkChangeStatus.link().linkId();
 
@@ -39,6 +39,5 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
 
         sender.send(linkUpdateNotification);
     }
-
 }
 

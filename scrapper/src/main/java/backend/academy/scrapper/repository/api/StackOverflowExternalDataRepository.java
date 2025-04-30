@@ -4,16 +4,15 @@ import backend.academy.scrapper.client.StackoverflowClient;
 import backend.academy.scrapper.exceptions.QuestionNotFoundException;
 import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.Link;
-import backend.academy.scrapper.models.domain.LinkChangeStatus;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -23,10 +22,14 @@ import org.springframework.stereotype.Repository;
 @Repository
 @RequiredArgsConstructor
 public class StackOverflowExternalDataRepository extends ExternalDataRepository {
-    private final StackoverflowClient stackoverflowClient;
-    private final ObjectMapper objectMapper;
+    private static final String QUESTION_ANSWERS_DESCRIPTION = "Новый ответ на вопрос";
+    private static final String QUESTION_COMMENTS_DESCRIPTION = "Новые комментарии к вопросу";
+    private static final String ANSWER_COMMENTS_DESCRIPTION = "Новые комментарии к ответу";
+
     private static final String JSON_ERROR = "Ошибка при разборе JSON-Ответа";
     private static final String REQUEST_ERROR = "Ошибка при запросе";
+    private final StackoverflowClient stackoverflowClient;
+    private final ObjectMapper objectMapper;
 
     @Override
     public List<ChangeInfo> getChangeInfoByLink(Link link) {
@@ -41,18 +44,15 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
         return allContent;
     }
 
-    private List<ChangeInfo> parseContentList(String jsonResponse, String url, String title) {
+    private List<ChangeInfo> parseContentList(String description, String jsonResponse, String url, String title) {
         List<ChangeInfo> allContent = new ArrayList<>();
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonResponse);
             jsonNode.get("items").forEach(item -> {
                 String ownerName = item.get("owner").get("display_name").asText();
-                String body = item.get("body").asText();
-                String preview = body.length() > 200
-                    ? body.substring(0, 200)
-                    : body;
+                String preview = truncatePreview(item.get("body").asText());
                 OffsetDateTime creationDate = OffsetDateTime.parse(item.get("creation_date").asText());
-                allContent.add(new ChangeInfo(title, ownerName, creationDate, preview));
+                allContent.add(new ChangeInfo(description, title, ownerName, creationDate, preview));
             });
             return allContent;
         } catch (Exception e) {
@@ -82,13 +82,13 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
     private List<ChangeInfo> getComments(URI link, String title) {
         QuestionInfo questionInfo = getQuestionInfo(link);
         String questionComments = stackoverflowClient.getQuestionComments(questionInfo.site, questionInfo.questionId);
-        return parseContentList(questionComments, link.toString(), title);
+        return parseContentList(QUESTION_COMMENTS_DESCRIPTION, questionComments, link.toString(), title);
     }
 
     private List<ChangeInfo> getAnswers(URI link, String title) {
         QuestionInfo questionInfo = getQuestionInfo(link);
-        String questionAnswers =  stackoverflowClient.getQuestionAnswers(questionInfo.site, questionInfo.questionId);
-        return parseContentList(questionAnswers, link.toString(), title);
+        String questionAnswers = stackoverflowClient.getQuestionAnswers(questionInfo.site, questionInfo.questionId);
+        return parseContentList(QUESTION_ANSWERS_DESCRIPTION, questionAnswers, link.toString(), title);
     }
 
     private List<ChangeInfo> getAnswerComments(URI link, String title) {
@@ -101,7 +101,7 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
             jsonNode.get("items").forEach(item -> {
                 String answerId = item.get("answer_id").asText();
                 String questionAnswerCommits = stackoverflowClient.getQuestionAnswerCommits(questionInfo.site, questionInfo.questionId);
-                content.addAll(parseContentList(questionAnswerCommits, link.toString(), title));
+                content.addAll(parseContentList(ANSWER_COMMENTS_DESCRIPTION, questionAnswerCommits, link.toString(), title));
             });
         } catch (HttpMessageNotReadableException | JsonProcessingException e) {
             log.atError().addKeyValue("link", link.toString()).setMessage(REQUEST_ERROR).log();

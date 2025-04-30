@@ -10,4 +10,13 @@ public abstract class ExternalDataRepository {
 
     protected abstract boolean isProcessingUri(URI uri);
 
+    protected static final int MAX_PREVIEW_LENGTH = 100;
+
+    protected String truncatePreview(String text) {
+        if (text.length() > MAX_PREVIEW_LENGTH) {
+            return text.substring(0, MAX_PREVIEW_LENGTH) + "...";
+        }
+        return text;
+    }
+
 }
