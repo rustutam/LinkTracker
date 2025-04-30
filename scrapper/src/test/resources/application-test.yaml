@@ -1,0 +1,36 @@
+app:
+  scheduler:
+    interval: 10s
+  batch-size: 1000
+  github:
+    token: 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
+    base-uri: https://api.github.com
+  stackoverflow:
+    key: test-key
+    access-token: test-token
+    base-uri: https://api.stackexchange.com/2.3
+  tg-bot:
+    base-uri: http://localhost:8080
+  access-type: SQL
+
+spring:
+  application:
+    name: Scrapper
+  datasource:
+    url: jdbc:postgresql://localhost:5432/scrapper
+    username: postgres
+    password: postgres
+  liquibase:
+    enabled: false
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+server:
+  port: 8081
+
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
