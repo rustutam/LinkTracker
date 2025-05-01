@@ -1,5 +1,8 @@
 package backend.academy.scrapper.service;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
 import backend.academy.scrapper.exceptions.NotExistUserException;
@@ -10,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class ChatServiceImplTest extends IntegrationEnvironment {

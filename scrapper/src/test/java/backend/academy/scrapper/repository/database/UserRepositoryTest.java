@@ -1,5 +1,9 @@
 package backend.academy.scrapper.repository.database;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
 import backend.academy.scrapper.exceptions.NotExistUserException;
@@ -11,9 +15,6 @@ import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class UserRepositoryTest extends IntegrationEnvironment {
 
@@ -148,6 +149,4 @@ public abstract class UserRepositoryTest extends IntegrationEnvironment {
 
         assertThrows(NotExistUserException.class, () -> userRepository.deleteByChatId(chatId));
     }
-
-
 }

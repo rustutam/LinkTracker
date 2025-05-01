@@ -16,35 +16,32 @@ public class GithubClient {
     private final GitHubConfig gitHubConfig;
 
     public GithubClient(ScrapperConfig scrapperConfig) {
-        restClient = RestClient.builder()
-            .baseUrl(scrapperConfig.github().baseUri())
-            .build();
+        restClient =
+                RestClient.builder().baseUrl(scrapperConfig.github().baseUri()).build();
         this.gitHubConfig = scrapperConfig.github();
     }
 
     public String issuesRequest(String owner, String repository) {
         try {
             return restClient
-                .get()
-                .uri("repos/{owner}/{repo}/issues", owner, repository)
-                .header("Accept", "application/vnd.github+json")
-                .header("Authorization", "Bearer " + gitHubConfig.token())
-                .retrieve()
-                .body(String.class);
+                    .get()
+                    .uri("repos/{owner}/{repo}/issues", owner, repository)
+                    .header("Accept", "application/vnd.github+json")
+                    .header("Authorization", "Bearer " + gitHubConfig.token())
+                    .retrieve()
+                    .body(String.class);
         } catch (RestClientResponseException e) {
-            log.atError()
-                .setMessage("Не удалось найти репозиторий")
-                .log();
+            log.atError().setMessage("Не удалось найти репозиторий").log();
             throw new RepositoryNotFoundException("Репозиторий не найден");
         }
     }
 
     public RepositoryDto repoRequest(String owner, String repository) {
         RepositoryDto body = restClient
-            .get()
-            .uri("repos/{owner}/{repo}", owner, repository)
-            .retrieve()
-            .body(RepositoryDto.class);
+                .get()
+                .uri("repos/{owner}/{repo}", owner, repository)
+                .retrieve()
+                .body(RepositoryDto.class);
 
         return body;
     }

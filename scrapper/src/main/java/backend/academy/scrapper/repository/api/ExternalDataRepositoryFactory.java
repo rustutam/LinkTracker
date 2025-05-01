@@ -13,18 +13,17 @@ public class ExternalDataRepositoryFactory {
     private final GitHubExternalDataRepository gitHubRepository;
     private final StackOverflowExternalDataRepository stackOverflowRepository;
 
-
     public ExternalDataRepository getExternalDataRepository(String uri) {
-        return switch (uri) {
-            case String u when regexCheck.isGithub(u) -> gitHubRepository;
-            case String u when regexCheck.isStackOverflow(u) -> stackOverflowRepository;
-            default -> {
-                log.atError()
+        if (regexCheck.isGithub(uri)) {
+            return gitHubRepository;
+        } else if (regexCheck.isStackOverflow(uri)) {
+            return stackOverflowRepository;
+        } else {
+            log.atError()
                     .addKeyValue("link", uri)
                     .setMessage("Неподдерживаемая ссылка")
                     .log();
-                throw new IllegalArgumentException("Неподдерживаемая ссылка");
-            }
-        };
+            throw new IllegalArgumentException("Неподдерживаемая ссылка");
+        }
     }
 }

@@ -1,6 +1,5 @@
 package backend.academy.scrapper.repository.database;
 
-
 import backend.academy.scrapper.exceptions.NotExistLinkException;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.ids.LinkId;

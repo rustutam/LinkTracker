@@ -21,14 +21,12 @@ public class JpaTagRepository implements TagRepository {
 
     @Override
     public Optional<Tag> findById(TagId tagId) {
-        return tagRepo.findById(tagId.id())
-            .map(mapper::toDomain);
+        return tagRepo.findById(tagId.id()).map(mapper::toDomain);
     }
 
     @Override
     public Optional<Tag> findByTag(String tag) {
-        return tagRepo.findByTag(tag)
-            .map(mapper::toDomain);
+        return tagRepo.findByTag(tag).map(mapper::toDomain);
     }
 
     @Override
@@ -40,8 +38,7 @@ public class JpaTagRepository implements TagRepository {
 
     @Override
     public Tag deleteById(TagId tagId) {
-        TagEntity tagEntity = tagRepo.findById(tagId.id())
-            .orElseThrow(NotExistTagException::new);
+        TagEntity tagEntity = tagRepo.findById(tagId.id()).orElseThrow(NotExistTagException::new);
         tagRepo.delete(tagEntity);
         return mapper.toDomain(tagEntity);
     }

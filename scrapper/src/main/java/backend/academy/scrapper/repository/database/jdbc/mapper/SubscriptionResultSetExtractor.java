@@ -37,26 +37,24 @@ public class SubscriptionResultSetExtractor implements ResultSetExtractor<List<S
             Subscription subscription = map.get(subId);
             if (subscription == null) {
                 User user = new User(
-                    new UserId(rs.getLong("user_id")),
-                    new ChatId(rs.getLong("user_chat_id")),
-                    rs.getObject("user_created_at", OffsetDateTime.class)
-                );
+                        new UserId(rs.getLong("user_id")),
+                        new ChatId(rs.getLong("user_chat_id")),
+                        rs.getObject("user_created_at", OffsetDateTime.class));
 
                 Link link = new Link(
-                    new LinkId(rs.getLong("link_id")),
-                    URI.create(rs.getString("link_uri")),
-                    rs.getObject("link_last_modified_date", OffsetDateTime.class),
-                    rs.getObject("link_created_at", OffsetDateTime.class)
-                );
+                        new LinkId(rs.getLong("link_id")),
+                        URI.create(rs.getString("link_uri")),
+                        rs.getObject("link_last_modified_date", OffsetDateTime.class),
+                        rs.getObject("link_created_at", OffsetDateTime.class));
 
                 subscription = Subscription.builder()
-                    .subscriptionId(new SubscriptionId(subId))
-                    .user(user)
-                    .link(link)
-                    .tags(new ArrayList<>())
-                    .filters(new ArrayList<>())
-                    .createdAt(rs.getObject("subscription_created_at", OffsetDateTime.class))
-                    .build();
+                        .subscriptionId(new SubscriptionId(subId))
+                        .user(user)
+                        .link(link)
+                        .tags(new ArrayList<>())
+                        .filters(new ArrayList<>())
+                        .createdAt(rs.getObject("subscription_created_at", OffsetDateTime.class))
+                        .build();
 
                 map.put(subId, subscription);
             }
@@ -65,10 +63,9 @@ public class SubscriptionResultSetExtractor implements ResultSetExtractor<List<S
             long tagId = rs.getLong("tag_id");
             if (!rs.wasNull()) {
                 Tag tag = new Tag(
-                    new TagId(tagId),
-                    rs.getString("tag_value"),
-                    rs.getObject("tag_created_at", OffsetDateTime.class)
-                );
+                        new TagId(tagId),
+                        rs.getString("tag_value"),
+                        rs.getObject("tag_created_at", OffsetDateTime.class));
                 if (!subscription.tags().contains(tag)) {
                     subscription.tags().add(tag);
                 }
@@ -78,10 +75,9 @@ public class SubscriptionResultSetExtractor implements ResultSetExtractor<List<S
             long filterId = rs.getLong("filter_id");
             if (!rs.wasNull()) {
                 Filter filter = new Filter(
-                    new FilterId(filterId),
-                    rs.getString("filter_value"),
-                    rs.getObject("filter_created_at", OffsetDateTime.class)
-                );
+                        new FilterId(filterId),
+                        rs.getString("filter_value"),
+                        rs.getObject("filter_created_at", OffsetDateTime.class));
                 if (!subscription.filters().contains(filter)) {
                     subscription.filters().add(filter);
                 }
@@ -91,4 +87,3 @@ public class SubscriptionResultSetExtractor implements ResultSetExtractor<List<S
         return new ArrayList<>(map.values());
     }
 }
-

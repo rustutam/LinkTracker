@@ -1,4 +1,3 @@
 package backend.academy.scrapper.exceptions;
 
-public class NotExistSubscriptionException extends RuntimeException {
-}
+public class NotExistSubscriptionException extends RuntimeException {}

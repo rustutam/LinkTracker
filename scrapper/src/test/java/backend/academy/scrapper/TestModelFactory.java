@@ -15,9 +15,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-/**
- * Утилитный класс для генерации тестовых доменных моделей.
- */
+/** Утилитный класс для генерации тестовых доменных моделей. */
 public class TestModelFactory {
 
     private static final AtomicLong COUNTER = new AtomicLong(0);
@@ -28,51 +26,34 @@ public class TestModelFactory {
 
     public static User createUser() {
         long id = nextId();
-        return new User(
-            new UserId(id),
-            new ChatId(id),
-            OffsetDateTime.now()
-        );
+        return new User(new UserId(id), new ChatId(id), OffsetDateTime.now());
     }
 
     public static Link createLink() {
         long id = nextId();
         return new Link(
-            new LinkId(id),
-            URI.create("https://github.com//resource/" + id),
-            OffsetDateTime.now(),
-            OffsetDateTime.now()
-        );
+                new LinkId(id),
+                URI.create("https://github.com//resource/" + id),
+                OffsetDateTime.now(),
+                OffsetDateTime.now());
     }
 
     public static Tag createTag() {
         long id = nextId();
-        return new Tag(
-            new TagId(id),
-            "tag-" + id,
-            OffsetDateTime.now()
-        );
+        return new Tag(new TagId(id), "tag-" + id, OffsetDateTime.now());
     }
 
     public static Filter createFilter() {
         long id = nextId();
-        return new Filter(
-            new FilterId(id),
-            "value-" + id,
-            OffsetDateTime.now()
-        );
+        return new Filter(new FilterId(id), "value-" + id, OffsetDateTime.now());
     }
 
     public static List<Tag> createTags(int count) {
-        return IntStream.rangeClosed(1, count)
-            .mapToObj(i -> createTag())
-            .collect(Collectors.toList());
+        return IntStream.rangeClosed(1, count).mapToObj(i -> createTag()).collect(Collectors.toList());
     }
 
     public static List<Filter> createFilters(int count) {
-        return IntStream.rangeClosed(1, count)
-            .mapToObj(i -> createFilter())
-            .collect(Collectors.toList());
+        return IntStream.rangeClosed(1, count).mapToObj(i -> createFilter()).collect(Collectors.toList());
     }
 
     public static Subscription createSubscription() {
@@ -82,33 +63,23 @@ public class TestModelFactory {
         List<Filter> filters = createFilters(2);
         long id = nextId();
         return new Subscription(
-            new SubscriptionId(id),
-            user,
-            link,
-            new ArrayList<>(tags),
-            new ArrayList<>(filters),
-            OffsetDateTime.now()
-        );
+                new SubscriptionId(id),
+                user,
+                link,
+                new ArrayList<>(tags),
+                new ArrayList<>(filters),
+                OffsetDateTime.now());
     }
 
-    /**
-     * Создает подписку с заданными частями, остальные поля генерируются автоматически.
-     */
-    public static Subscription createSubscription(
-        User user,
-        Link link,
-        List<Tag> tags,
-        List<Filter> filters
-    ) {
+    /** Создает подписку с заданными частями, остальные поля генерируются автоматически. */
+    public static Subscription createSubscription(User user, Link link, List<Tag> tags, List<Filter> filters) {
         long id = nextId();
         return new Subscription(
-            new SubscriptionId(id),
-            user,
-            link,
-            tags != null ? new ArrayList<>(tags) : createTags(1),
-            filters != null ? new ArrayList<>(filters) : createFilters(1),
-            OffsetDateTime.now()
-        );
+                new SubscriptionId(id),
+                user,
+                link,
+                tags != null ? new ArrayList<>(tags) : createTags(1),
+                filters != null ? new ArrayList<>(filters) : createFilters(1),
+                OffsetDateTime.now());
     }
 }
-

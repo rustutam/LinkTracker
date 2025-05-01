@@ -1,5 +1,9 @@
 package backend.academy.scrapper.repository.database;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.TestUtils;
 import backend.academy.scrapper.models.domain.Filter;
@@ -11,9 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class FilterRepositoryTest extends IntegrationEnvironment {
 
@@ -92,11 +93,8 @@ public abstract class FilterRepositoryTest extends IntegrationEnvironment {
         Optional<Filter> maybeFilter = filterRepository.findByFilter(filterValue);
         assertTrue(maybeFilter.isPresent());
 
-        assertThat(savedFilter)
-            .usingRecursiveComparison(config)
-            .isEqualTo(maybeFilter.get());
+        assertThat(savedFilter).usingRecursiveComparison(config).isEqualTo(maybeFilter.get());
     }
-
 
     @Test
     @Sql(scripts = "/sql/insert_filters.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
@@ -129,7 +127,5 @@ public abstract class FilterRepositoryTest extends IntegrationEnvironment {
         assertTrue(filterRepository.findById(filterId3).isEmpty());
         assertTrue(filterRepository.findById(filterId4).isEmpty());
         assertTrue(filterRepository.findById(filterId5).isPresent());
-
-
     }
 }

@@ -1,17 +1,19 @@
 package backend.academy.scrapper.repository.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import general.RegexCheck;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
 class ExternalDataRepositoryFactoryTest {
     @Autowired
     private RegexCheck regexCheck;
+
     @Autowired
     private ExternalDataRepositoryFactory repositoryFactory;
 
@@ -26,7 +28,6 @@ class ExternalDataRepositoryFactoryTest {
         // Assert
         assertInstanceOf(GitHubExternalDataRepository.class, result);
     }
-
 
     @Test
     void shouldReturnStackOverflowRepositoryForStackoverflowLinks() {
@@ -47,9 +48,7 @@ class ExternalDataRepositoryFactoryTest {
 
         // Act & Assert
         IllegalArgumentException exception = assertThrows(
-            IllegalArgumentException.class,
-            () -> repositoryFactory.getExternalDataRepository(invalidUri)
-        );
+                IllegalArgumentException.class, () -> repositoryFactory.getExternalDataRepository(invalidUri));
 
         assertEquals("Неподдерживаемая ссылка", exception.getMessage());
     }

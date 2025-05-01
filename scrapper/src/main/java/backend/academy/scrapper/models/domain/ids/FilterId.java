@@ -1,6 +1,3 @@
 package backend.academy.scrapper.models.domain.ids;
 
-public record FilterId(
-    Long id
-) {
-}
+public record FilterId(Long id) {}

@@ -22,8 +22,10 @@ import org.hibernate.annotations.CreationTimestamp;
 @Getter
 @Setter
 @Entity
-@Table(name = "subscriptions", schema = "scrapper",
-    uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "link_id"}))
+@Table(
+        name = "subscriptions",
+        schema = "scrapper",
+        uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "link_id"}))
 public class SubscriptionEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,19 +45,17 @@ public class SubscriptionEntity {
 
     @ManyToMany
     @JoinTable(
-        name = "subscription_tags",
-        schema = "scrapper",
-        joinColumns = @JoinColumn(name = "subscription_id"),
-        inverseJoinColumns = @JoinColumn(name = "tag_id")
-    )
+            name = "subscription_tags",
+            schema = "scrapper",
+            joinColumns = @JoinColumn(name = "subscription_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private List<TagEntity> tags = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
-        name = "subscription_filters",
-        schema = "scrapper",
-        joinColumns = @JoinColumn(name = "subscription_id"),
-        inverseJoinColumns = @JoinColumn(name = "filter_id")
-    )
+            name = "subscription_filters",
+            schema = "scrapper",
+            joinColumns = @JoinColumn(name = "subscription_id"),
+            inverseJoinColumns = @JoinColumn(name = "filter_id"))
     private List<FilterEntity> filters = new ArrayList<>();
 }

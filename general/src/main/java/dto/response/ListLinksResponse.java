@@ -5,9 +5,9 @@ import java.util.List;
 
 /** ListLinksResponse */
 public record ListLinksResponse(@Valid List<@Valid LinkResponse> links, Integer size) {
-//TODO убрать это
+    // TODO убрать это
 
-        @Override
+    @Override
     public String toString() {
         if (size == 0) {
             return "Список отслеживаемых ссылок пуст!";

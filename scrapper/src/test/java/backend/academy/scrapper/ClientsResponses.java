@@ -1,7 +1,8 @@
 package backend.academy.scrapper;
 
 public class ClientsResponses {
-    public static final String githubApiResponseJsonString = """
+    public static final String githubApiResponseJsonString =
+            """
             [
               {
                 "url": "https://api.github.com/repos/rustutam/TestRepo/issues/3",

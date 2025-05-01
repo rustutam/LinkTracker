@@ -8,8 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
@@ -21,8 +21,8 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
     private final ScrapperConfig scrapperConfig;
 
     /**
-     * Метод обрабатывает ссылки из базы данных пакетами (страницами) и проверяет наличие обновлений.
-     * Если обновление обнаружено – уведомляет пользователя через SenderNotificationService.
+     * Метод обрабатывает ссылки из базы данных пакетами (страницами) и проверяет наличие обновлений. Если обновление
+     * обнаружено – уведомляет пользователя через SenderNotificationService.
      */
     @Override
     public void processLinks() {
@@ -33,17 +33,16 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
             page = linkRepository.findAllPaginated(pageable);
 
             log.atInfo()
-                .setMessage("Обработка страницы " + pageNumber + ". Количество ссылок: " + page.getNumberOfElements())
-                .log();
+                    .setMessage(
+                            "Обработка страницы " + pageNumber + ". Количество ссылок: " + page.getNumberOfElements())
+                    .log();
 
             page.getContent().forEach(this::processLink);
 
             pageNumber++;
         } while (page.hasNext());
 
-        log.atInfo()
-            .setMessage("Завершение обработки ссылок")
-            .log();
+        log.atInfo().setMessage("Завершение обработки ссылок").log();
     }
 
     /**
@@ -59,17 +58,19 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
             // Если получена информация об обновлении, уведомляем пользователя
             if (linkChangeStatus.hasChanges()) {
                 senderNotificationService.notifySender(linkChangeStatus);
-                linkRepository.updateLastUpdateTime(linkChangeStatus.link().linkId(), linkChangeStatus.link().lastUpdateTime());
+                linkRepository.updateLastUpdateTime(
+                        linkChangeStatus.link().linkId(),
+                        linkChangeStatus.link().lastUpdateTime());
                 log.atInfo()
-                    .addKeyValue("Найдено обновление для ссылки", link.uri().toString())
-                    .setMessage("Отправка уведомления")
-                    .log();
+                        .addKeyValue("Найдено обновление для ссылки", link.uri().toString())
+                        .setMessage("Отправка уведомления")
+                        .log();
             }
         } catch (Exception ex) {
             log.atError()
-                .addKeyValue("Ошибка при обработке ссылки", link.uri().toString())
-                .setMessage(ex.getMessage())
-                .log();
+                    .addKeyValue("Ошибка при обработке ссылки", link.uri().toString())
+                    .setMessage(ex.getMessage())
+                    .log();
         }
     }
 }

@@ -17,9 +17,8 @@ public class FilterRowMapper implements RowMapper<Filter> {
     @Override
     public Filter mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new Filter(
-            new FilterId(rs.getLong(COLUMN_ID)),
-            rs.getString(COLUMN_FILTER),
-            rs.getObject(COLUMN_CREATED_AT, OffsetDateTime.class)
-        );
+                new FilterId(rs.getLong(COLUMN_ID)),
+                rs.getString(COLUMN_FILTER),
+                rs.getObject(COLUMN_CREATED_AT, OffsetDateTime.class));
     }
 }

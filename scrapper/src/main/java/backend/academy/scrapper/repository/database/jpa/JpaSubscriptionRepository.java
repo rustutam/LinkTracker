@@ -40,8 +40,7 @@ public class JpaSubscriptionRepository implements SubscriptionRepository {
     @Override
     @Transactional(readOnly = true)
     public Optional<Subscription> findById(SubscriptionId subscriptionId) {
-        return subscriptionRepo.findById(subscriptionId.id())
-            .map(mapper::toDomain);
+        return subscriptionRepo.findById(subscriptionId.id()).map(mapper::toDomain);
     }
 
     @Override
@@ -49,28 +48,24 @@ public class JpaSubscriptionRepository implements SubscriptionRepository {
     public Optional<Subscription> findByUserAndLink(User user, Link link) {
         long userId = user.userId().id();
         long linkId = link.linkId().id();
-        return subscriptionRepo.findByUserIdAndLinkId(userId, linkId)
-            .map(mapper::toDomain);
-
+        return subscriptionRepo.findByUserIdAndLinkId(userId, linkId).map(mapper::toDomain);
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Subscription> findByUser(User user) {
         long userId = user.userId().id();
-        return subscriptionRepo.findAllByUserId(userId)
-            .stream()
-            .map(mapper::toDomain)
-            .toList();
+        return subscriptionRepo.findAllByUserId(userId).stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Subscription> findByLink(Link link) {
         long linkId = link.linkId().id();
-        return subscriptionRepo.findAllByLinkId(linkId)
-            .stream()
-            .map(mapper::toDomain)
-            .toList();
+        return subscriptionRepo.findAllByLinkId(linkId).stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 }

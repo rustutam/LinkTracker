@@ -25,8 +25,7 @@ public class JpaUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findById(UserId userId) {
-        return userRepo.findById(userId.id())
-            .map(mapper::toDomain);
+        return userRepo.findById(userId.id()).map(mapper::toDomain);
     }
 
     @Override
@@ -38,10 +37,10 @@ public class JpaUserRepository implements UserRepository {
     public void save(ChatId chatId) throws DoubleRegistrationException {
         if (userRepo.existsByChatId(chatId.id())) {
             log.atError()
-                .addKeyValue("chatId", chatId)
-                .addKeyValue("access-type", "ORM")
-                .setMessage("Ошибка сохранения: пользователь уже существует")
-                .log();
+                    .addKeyValue("chatId", chatId)
+                    .addKeyValue("access-type", "ORM")
+                    .setMessage("Ошибка сохранения: пользователь уже существует")
+                    .log();
 
             throw new DoubleRegistrationException();
         }
@@ -54,8 +53,7 @@ public class JpaUserRepository implements UserRepository {
 
     @Override
     public void deleteByChatId(ChatId chatId) throws NotExistUserException {
-        UserEntity user = userRepo.findByChatId(chatId.id())
-            .orElseThrow(NotExistUserException::new);
+        UserEntity user = userRepo.findByChatId(chatId.id()).orElseThrow(NotExistUserException::new);
 
         userRepo.delete(user);
     }

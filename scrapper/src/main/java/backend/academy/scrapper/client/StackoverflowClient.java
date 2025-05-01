@@ -3,7 +3,6 @@ package backend.academy.scrapper.client;
 import backend.academy.scrapper.configuration.ScrapperConfig;
 import backend.academy.scrapper.configuration.ScrapperConfig.StackOverflowConfig;
 import backend.academy.scrapper.exceptions.QuestionNotFoundException;
-import backend.academy.scrapper.models.external.stackoverflow.StackoverflowQuestionDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
@@ -18,7 +17,9 @@ public class StackoverflowClient {
     private static final String REQUEST_ERROR = "Ошибка при запросе";
 
     public StackoverflowClient(ScrapperConfig scrapperConfig) {
-        restClient = RestClient.builder().baseUrl(scrapperConfig.stackOverflow().baseUri()).build();
+        restClient = RestClient.builder()
+                .baseUrl(scrapperConfig.stackOverflow().baseUri())
+                .build();
         this.stackOverflowConfig = scrapperConfig.stackOverflow();
     }
 
@@ -42,9 +43,9 @@ public class StackoverflowClient {
         return performRequest(content);
     }
 
-
     private String performRequest(String url) {
-        url += "&key=" + stackOverflowConfig.key() + "&access_token=" + stackOverflowConfig.accessToken() + "&filter=" + filter;
+        url += "&key=" + stackOverflowConfig.key() + "&access_token=" + stackOverflowConfig.accessToken() + "&filter="
+                + filter;
 
         try {
             return restClient.get().uri(url).retrieve().body(String.class);
@@ -55,8 +56,8 @@ public class StackoverflowClient {
     }
 }
 
-//Для StackOverflow новый ответ или комментарий, сообщение включает:
-//текст темы вопроса
-//имя пользователя
-//время создания
-//превью ответа или комментария (первые 200 символов)
+// Для StackOverflow новый ответ или комментарий, сообщение включает:
+// текст темы вопроса
+// имя пользователя
+// время создания
+// превью ответа или комментария (первые 200 символов)

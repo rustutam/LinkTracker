@@ -1,5 +1,12 @@
 package backend.academy.scrapper.controller;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.models.domain.User;
 import backend.academy.scrapper.models.domain.ids.ChatId;
@@ -17,12 +24,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -49,10 +50,7 @@ class LinksControllerTest extends IntegrationEnvironment {
 
     @Test
     void whenGetLinksWithInvalidStringHeaderThenReturnBadRequest() throws Exception {
-        mockMvc.perform(get("/links")
-                .header("Tg-Chat-Id", "invalid_string"))
-            .andExpect(status().isBadRequest());
-
+        mockMvc.perform(get("/links").header("Tg-Chat-Id", "invalid_string")).andExpect(status().isBadRequest());
     }
 
     @Test
@@ -60,14 +58,13 @@ class LinksControllerTest extends IntegrationEnvironment {
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenGetLinksThenReturnLinks() throws Exception {
 
-        mockMvc.perform(get("/links")
-                .header("Tg-Chat-Id", "104"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.size").value(1))
-            .andExpect(jsonPath("$.links[0].id").value(1))
-            .andExpect(jsonPath("$.links[0].url").value("https://github.com/java-rustutam/semester1"))
-            .andExpect(jsonPath("$.links[0].tags").isEmpty())
-            .andExpect(jsonPath("$.links[0].filters").isEmpty());
+        mockMvc.perform(get("/links").header("Tg-Chat-Id", "104"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size").value(1))
+                .andExpect(jsonPath("$.links[0].id").value(1))
+                .andExpect(jsonPath("$.links[0].url").value("https://github.com/java-rustutam/semester1"))
+                .andExpect(jsonPath("$.links[0].tags").isEmpty())
+                .andExpect(jsonPath("$.links[0].filters").isEmpty());
     }
 
     @Test
@@ -75,41 +72,40 @@ class LinksControllerTest extends IntegrationEnvironment {
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenGetLinkForUserWithoutLinksThenReturnEmptyList() throws Exception {
 
-        mockMvc.perform(get("/links")
-                .header("Tg-Chat-Id", "102"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.size").value(0))
-            .andExpect(jsonPath("$.links").isEmpty());
+        mockMvc.perform(get("/links").header("Tg-Chat-Id", "102"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.size").value(0))
+                .andExpect(jsonPath("$.links").isEmpty());
     }
 
     @Test
     void whenGetLinksWithUnauthorizedUserThenReturnUnauthorized() throws Exception {
 
-        mockMvc.perform(get("/links")
-                .header("Tg-Chat-Id", "1000"))
-            .andExpect(status().isUnauthorized());
+        mockMvc.perform(get("/links").header("Tg-Chat-Id", "1000")).andExpect(status().isUnauthorized());
     }
 
     @Test
     @Sql(scripts = "/sql/insert_users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenAddLinksThenReturnLinkResponse() throws Exception {
-        mockMvc.perform(post("/links")
-                .header("Tg-Chat-Id", "102")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        mockMvc.perform(
+                        post("/links")
+                                .header("Tg-Chat-Id", "102")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                     {
                         "link": "https://github.com/rustutam/TestRepo",
                         "tags": ["tag1", "tag22"],
                         "filters": ["filter1", "filter22"]
                     }
                     """))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.url").value("https://github.com/rustutam/TestRepo"))
-            .andExpect(jsonPath("$.tags[0]").value("tag1"))
-            .andExpect(jsonPath("$.tags[1]").value("tag22"))
-            .andExpect(jsonPath("$.filters[0]").value("filter1"))
-            .andExpect(jsonPath("$.filters[1]").value("filter22"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.url").value("https://github.com/rustutam/TestRepo"))
+                .andExpect(jsonPath("$.tags[0]").value("tag1"))
+                .andExpect(jsonPath("$.tags[1]").value("tag22"))
+                .andExpect(jsonPath("$.filters[0]").value("filter1"))
+                .andExpect(jsonPath("$.filters[1]").value("filter22"));
 
         URI uri = URI.create("https://github.com/rustutam/TestRepo");
         assertTrue(linkRepository.findByUri(uri).isPresent());
@@ -121,92 +117,104 @@ class LinksControllerTest extends IntegrationEnvironment {
 
     @Test
     void whenAddLinksWithInvalidLinkThenReturnBadRequest() throws Exception {
-        mockMvc.perform(post("/links")
-                .header("Tg-Chat-Id", "102")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        mockMvc.perform(
+                        post("/links")
+                                .header("Tg-Chat-Id", "102")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                     {
                         "link": "https://invalidLink.ru",
                         "tags": ["tag1", "tag22"],
                         "filters": ["filter1", "filter22"]
                     }
                     """))
-            .andExpect(status().isBadRequest());
+                .andExpect(status().isBadRequest());
     }
 
     @Test
     void whenAddLinksForUnauthorizedUserThenReturnUnauthorized() throws Exception {
-        mockMvc.perform(post("/links")
-                .header("Tg-Chat-Id", "1234")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        mockMvc.perform(
+                        post("/links")
+                                .header("Tg-Chat-Id", "1234")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                     {
                         "link": "https://github.com/rustutam/TestRepo",
                         "tags": ["tag1", "tag22"],
                         "filters": ["filter1", "filter22"]
                     }
                     """))
-            .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenAddLinksAndLinkAlreadyTrackThenReturnPreconditionFailed() throws Exception {
-        mockMvc.perform(post("/links")
-                .header("Tg-Chat-Id", "100")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        mockMvc.perform(
+                        post("/links")
+                                .header("Tg-Chat-Id", "100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                     {
                         "link": "https://github.com/java-rustutam/semester2",
                         "tags": ["tag1", "tag22"],
                         "filters": ["filter1", "filter22"]
                     }
                     """))
-            .andExpect(status().isPreconditionFailed());
+                .andExpect(status().isPreconditionFailed());
     }
 
     @Test
     void whenDeleteLinksForUnauthorizedUserThenReturnUnauthorized() throws Exception {
-        mockMvc.perform(delete("/links")
-                .header("Tg-Chat-Id", "1234")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        mockMvc.perform(
+                        delete("/links")
+                                .header("Tg-Chat-Id", "1234")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                     {
                         "link": "https://github.com/rustutam/TestRepo"
                     }
                     """))
-            .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenDeleteLinksAndLinkNotExistThenReturnForbidden() throws Exception {
-        mockMvc.perform(delete("/links")
-                .header("Tg-Chat-Id", "100")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        mockMvc.perform(
+                        delete("/links")
+                                .header("Tg-Chat-Id", "100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                     {
                         "link": "https://github.com/rustutam/TestRepo"
                     }
                     """))
-            .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
     }
 
     @Test
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenDeleteLinksAndUserNotTrackLinkThenReturnForbidden() throws Exception {
-        mockMvc.perform(delete("/links")
-                .header("Tg-Chat-Id", "100")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        mockMvc.perform(
+                        delete("/links")
+                                .header("Tg-Chat-Id", "100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                     {
                         "link": "https://github.com/java-rustutam/semester5"
                     }
                     """))
-            .andExpect(status().isForbidden());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -215,28 +223,29 @@ class LinksControllerTest extends IntegrationEnvironment {
     void whenDeleteLinksThenReturnLinkResponse() throws Exception {
         String uri = "https://github.com/java-rustutam/semester1";
 
-        mockMvc.perform(delete("/links")
-                .header("Tg-Chat-Id", "100")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("""
+        mockMvc.perform(
+                        delete("/links")
+                                .header("Tg-Chat-Id", "100")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(
+                                        """
                     {
                         "link": "https://github.com/java-rustutam/semester1"
                     }
                     """))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.id").value(1))
-            .andExpect(jsonPath("$.url").value(uri))
-            .andExpect(jsonPath("$.tags[0]").value("tag1"))
-            .andExpect(jsonPath("$.tags[1]").value("tag3"))
-            .andExpect(jsonPath("$.filters[0]").value("filter1"))
-            .andExpect(jsonPath("$.filters[1]").value("filter3"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.url").value(uri))
+                .andExpect(jsonPath("$.tags[0]").value("tag1"))
+                .andExpect(jsonPath("$.tags[1]").value("tag3"))
+                .andExpect(jsonPath("$.filters[0]").value("filter1"))
+                .andExpect(jsonPath("$.filters[1]").value("filter3"));
 
         User foundUser = userRepository.findByChatId(new ChatId(100L)).orElseThrow();
 
-        boolean isUriContainsInUserLinks = subscriptionRepository.findByUser(foundUser)
-            .stream()
-            .map(sub -> sub.link().uri().toString())
-            .noneMatch(uri::equals);
+        boolean isUriContainsInUserLinks = subscriptionRepository.findByUser(foundUser).stream()
+                .map(sub -> sub.link().uri().toString())
+                .noneMatch(uri::equals);
 
         assertTrue(isUriContainsInUserLinks);
     }

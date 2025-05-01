@@ -6,7 +6,6 @@ import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.repository.database.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -19,11 +18,11 @@ public class ChatServiceImpl implements ChatService {
     public void register(ChatId chatId) {
         try {
             userRepository.save(chatId);
-        } catch (DoubleRegistrationException e){
+        } catch (DoubleRegistrationException e) {
             log.atError()
-                .addKeyValue("chatId", chatId)
-                .setMessage("Пользователь с таким chatId уже зарегистрирован")
-                .log();
+                    .addKeyValue("chatId", chatId)
+                    .setMessage("Пользователь с таким chatId уже зарегистрирован")
+                    .log();
             throw new DoubleRegistrationException();
         }
     }
@@ -32,7 +31,7 @@ public class ChatServiceImpl implements ChatService {
     public void unRegister(ChatId chatId) {
         try {
             userRepository.deleteByChatId(chatId);
-        } catch (NotExistUserException e){
+        } catch (NotExistUserException e) {
             throw new NotExistUserException();
         }
     }

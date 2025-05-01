@@ -21,14 +21,12 @@ public class JpaFilterRepository implements FilterRepository {
 
     @Override
     public Optional<Filter> findById(FilterId filterId) {
-        return filterRepo.findById(filterId.id())
-            .map(mapper::toDomain);
+        return filterRepo.findById(filterId.id()).map(mapper::toDomain);
     }
 
     @Override
     public Optional<Filter> findByFilter(String filter) {
-        return filterRepo.findByFilter(filter)
-            .map(mapper::toDomain);
+        return filterRepo.findByFilter(filter).map(mapper::toDomain);
     }
 
     @Override
@@ -40,8 +38,7 @@ public class JpaFilterRepository implements FilterRepository {
 
     @Override
     public Filter deleteById(FilterId filterId) throws NotExistFilterException {
-        FilterEntity filterEntity = filterRepo.findById(filterId.id())
-            .orElseThrow(NotExistFilterException::new);
+        FilterEntity filterEntity = filterRepo.findById(filterId.id()).orElseThrow(NotExistFilterException::new);
         filterRepo.delete(filterEntity);
         return mapper.toDomain(filterEntity);
     }

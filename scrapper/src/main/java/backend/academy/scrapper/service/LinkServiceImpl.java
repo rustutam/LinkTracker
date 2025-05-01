@@ -35,17 +35,15 @@ public class LinkServiceImpl implements LinkService {
     @Transactional
     public LinkMetadata addLink(ChatId chatId, URI uri, List<String> tags, List<String> filters) {
         // Проверяем что пользователь существует
-        User savedUser = userRepository.findByChatId(chatId)
-            .orElseThrow(NotExistUserException::new);
+        User savedUser = userRepository.findByChatId(chatId).orElseThrow(NotExistUserException::new);
 
         // Проверяем что пользователь не подписан на эту ссылку
-        subscriptionRepository.findByUser(savedUser)
-            .stream()
-            .filter(s -> s.link().uri().toString().equals(uri.toString()))
-            .findFirst()
-            .ifPresent(l -> {
-                throw new AlreadyTrackLinkException();
-            });
+        subscriptionRepository.findByUser(savedUser).stream()
+                .filter(s -> s.link().uri().toString().equals(uri.toString()))
+                .findFirst()
+                .ifPresent(l -> {
+                    throw new AlreadyTrackLinkException();
+                });
 
         // Получаем ссылку из бд
         // Если ссылка не найдена сохраняем в бд
@@ -60,87 +58,73 @@ public class LinkServiceImpl implements LinkService {
         List<Filter> savedFilters = processFilters(filters);
 
         Subscription subscription = Subscription.builder()
-            .user(savedUser)
-            .link(savedLink)
-            .tags(savedTags)
-            .filters(savedFilters)
-            .build();
+                .user(savedUser)
+                .link(savedLink)
+                .tags(savedTags)
+                .filters(savedFilters)
+                .build();
 
         // Подписываем пользователя на ссылку с тегами и фильтрами
         Subscription savedSubscription = subscriptionRepository.save(subscription);
 
         return LinkMetadata.builder()
-            .link(savedSubscription.link())
-            .tags(savedSubscription.tags())
-            .filters(savedSubscription.filters())
-            .build();
+                .link(savedSubscription.link())
+                .tags(savedSubscription.tags())
+                .filters(savedSubscription.filters())
+                .build();
     }
 
     private Link processLink(URI uri) {
-        return linkRepository.findByUri(uri)
-            .orElseGet(() -> linkRepository.save(uri));
+        return linkRepository.findByUri(uri).orElseGet(() -> linkRepository.save(uri));
     }
 
     private List<Tag> processTags(List<String> tags) {
         return tags.stream()
-            .map(tagValue -> tagRepository.findByTag(tagValue)
-                .orElseGet(() -> tagRepository.save(tagValue)))
-            .collect(Collectors.toList());
+                .map(tagValue -> tagRepository.findByTag(tagValue).orElseGet(() -> tagRepository.save(tagValue)))
+                .collect(Collectors.toList());
     }
 
     private List<Filter> processFilters(List<String> filters) {
         return filters.stream()
-            .map(filterValue -> filterRepository.findByFilter(filterValue)
-                .orElseGet(() -> filterRepository.save(filterValue)))
-            .collect(Collectors.toList());
+                .map(filterValue ->
+                        filterRepository.findByFilter(filterValue).orElseGet(() -> filterRepository.save(filterValue)))
+                .collect(Collectors.toList());
     }
-
 
     @Override
     @Transactional
     public LinkMetadata removeLink(ChatId chatId, URI uri) {
         // Проверяем что пользователь существует
-        User user = userRepository.findByChatId(chatId)
-            .orElseThrow(NotExistUserException::new);
+        User user = userRepository.findByChatId(chatId).orElseThrow(NotExistUserException::new);
 
         // Проверяем что ссылка существует
         // Если такого Link не существует - это означает что пользователь не подписан на эту ссылку
-        Link link = linkRepository.findByUri(uri)
-            .orElseThrow(NotTrackLinkException::new);
+        Link link = linkRepository.findByUri(uri).orElseThrow(NotTrackLinkException::new);
 
         // Получаем подписку,
         // Проверяем что пользователь подписан на эту ссылку
-        Subscription subscription = subscriptionRepository.findByUserAndLink(user, link)
-            .stream()
-            .findFirst()
-            .orElseThrow(NotTrackLinkException::new);
+        Subscription subscription = subscriptionRepository.findByUserAndLink(user, link).stream()
+                .findFirst()
+                .orElseThrow(NotTrackLinkException::new);
 
         // Удаляем подписку на ссылку
         subscriptionRepository.remove(subscription);
 
         return LinkMetadata.builder()
-            .link(subscription.link())
-            .tags(subscription.tags())
-            .filters(subscription.filters())
-            .build();
+                .link(subscription.link())
+                .tags(subscription.tags())
+                .filters(subscription.filters())
+                .build();
     }
 
     @Override
     public List<LinkMetadata> getLinks(ChatId chatId) {
         // Проверяем что пользователь существует
-        User user = userRepository.findByChatId(chatId)
-            .orElseThrow(NotExistUserException::new);
+        User user = userRepository.findByChatId(chatId).orElseThrow(NotExistUserException::new);
 
         // Получаем все подписки пользователя
-        return subscriptionRepository.findByUser(user)
-            .stream()
-            .map(s ->
-                new LinkMetadata(
-                    s.link(),
-                    s.tags(),
-                    s.filters()
-                )
-            )
-            .toList();
+        return subscriptionRepository.findByUser(user).stream()
+                .map(s -> new LinkMetadata(s.link(), s.tags(), s.filters()))
+                .toList();
     }
 }

@@ -1,5 +1,9 @@
 package backend.academy.scrapper.repository.api;
 
+import static backend.academy.scrapper.ClientsResponses.githubApiResponseJsonString;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+
 import backend.academy.scrapper.client.GithubClient;
 import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.Link;
@@ -10,17 +14,14 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import static backend.academy.scrapper.ClientsResponses.githubApiResponseJsonString;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @ActiveProfiles("test")
 @SpringBootTest
 class GitHubExternalDataRepositoryTest {
 
-    @MockBean
+    @MockitoBean
     private GithubClient githubClient;
 
     @Autowired
@@ -29,19 +30,16 @@ class GitHubExternalDataRepositoryTest {
     @Test
     void whenCallGetChangeInfoByLinkThenReturnListWithLinkUpdates() {
 
-        when(githubClient.issuesRequest("rustutam", "TestRepo"))
-            .thenReturn(githubApiResponseJsonString);
+        when(githubClient.issuesRequest("rustutam", "TestRepo")).thenReturn(githubApiResponseJsonString);
 
         Link link = new Link(
-            new LinkId(1L),
-            URI.create("https://github.com/rustutam/TestRepo"),
-            OffsetDateTime.parse("2023-10-10T12:00:00Z"),
-            OffsetDateTime.parse("2023-10-10T12:00:00Z")
-        );
+                new LinkId(1L),
+                URI.create("https://github.com/rustutam/TestRepo"),
+                OffsetDateTime.parse("2023-10-10T12:00:00Z"),
+                OffsetDateTime.parse("2023-10-10T12:00:00Z"));
 
         List<ChangeInfo> changeInfoByLink = gitHubExternalDataRepository.getChangeInfoByLink(link);
 
         assertNotNull(changeInfoByLink);
     }
-
 }

@@ -1,5 +1,9 @@
 package backend.academy.scrapper.repository.database;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.TestUtils;
 import backend.academy.scrapper.models.domain.Tag;
@@ -11,10 +15,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 
 public abstract class TagRepositoryTest extends IntegrationEnvironment {
 
@@ -92,9 +92,7 @@ public abstract class TagRepositoryTest extends IntegrationEnvironment {
 
         Optional<Tag> maybeTag = tagRepository.findByTag(tagValue);
         assertTrue(maybeTag.isPresent());
-        assertThat(savedTag)
-            .usingRecursiveComparison(config)
-            .isEqualTo(maybeTag.get());
+        assertThat(savedTag).usingRecursiveComparison(config).isEqualTo(maybeTag.get());
     }
 
     @Test
@@ -128,8 +126,5 @@ public abstract class TagRepositoryTest extends IntegrationEnvironment {
         assertTrue(tagRepository.findById(tagId3).isEmpty());
         assertTrue(tagRepository.findById(tagId4).isEmpty());
         assertTrue(tagRepository.findById(tagId5).isPresent());
-
-
     }
 }
-

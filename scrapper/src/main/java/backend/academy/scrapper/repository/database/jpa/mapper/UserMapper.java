@@ -9,11 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UserMapper {
     public User toDomain(UserEntity entity) {
-        return new User(
-            new UserId(entity.id()),
-            new ChatId(entity.chatId()),
-            entity.createdAt()
-        );
+        return new User(new UserId(entity.id()), new ChatId(entity.chatId()), entity.createdAt());
     }
 
     public UserEntity toEntity(User domain) {
@@ -25,5 +21,4 @@ public class UserMapper {
         entity.createdAt(domain.createdAt());
         return entity;
     }
-
 }

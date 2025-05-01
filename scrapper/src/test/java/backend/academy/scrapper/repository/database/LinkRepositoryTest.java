@@ -1,5 +1,10 @@
 package backend.academy.scrapper.repository.database;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.TestUtils;
 import backend.academy.scrapper.exceptions.NotExistLinkException;
@@ -17,10 +22,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.jdbc.Sql;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public abstract class LinkRepositoryTest extends IntegrationEnvironment {
 
@@ -127,9 +128,8 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment {
         LinkId linkId = new LinkId(100L);
         OffsetDateTime newLastModifyingTime = OffsetDateTime.MIN;
 
-        assertThrows(NotExistLinkException.class, () ->
-            linkRepository.updateLastUpdateTime(linkId, newLastModifyingTime)
-        );
+        assertThrows(
+                NotExistLinkException.class, () -> linkRepository.updateLastUpdateTime(linkId, newLastModifyingTime));
     }
 
     @Test
@@ -141,11 +141,7 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment {
 
         Optional<Link> maybeLink = linkRepository.findById(savedLink.linkId());
         assertTrue(maybeLink.isPresent());
-        assertThat(savedLink)
-            .usingRecursiveComparison(
-                config
-            )
-            .isEqualTo(maybeLink.get());
+        assertThat(savedLink).usingRecursiveComparison(config).isEqualTo(maybeLink.get());
     }
 
     @Test
@@ -178,18 +174,10 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment {
         Page<Link> thirdPage = linkRepository.findAllPaginated(thirdPageable);
 
         // Assert
-        assertThat(firstPage.getContent())
-            .usingRecursiveComparison(config)
-            .isEqualTo(List.of(link1, link2));
+        assertThat(firstPage.getContent()).usingRecursiveComparison(config).isEqualTo(List.of(link1, link2));
 
-        assertThat(secondPage.getContent())
-            .usingRecursiveComparison(config)
-            .isEqualTo(List.of(link3, link4));
+        assertThat(secondPage.getContent()).usingRecursiveComparison(config).isEqualTo(List.of(link3, link4));
 
-        assertThat(thirdPage.getContent())
-            .usingRecursiveComparison(config)
-            .isEqualTo(List.of(link5, link6));
+        assertThat(thirdPage.getContent()).usingRecursiveComparison(config).isEqualTo(List.of(link5, link6));
     }
-
-
 }

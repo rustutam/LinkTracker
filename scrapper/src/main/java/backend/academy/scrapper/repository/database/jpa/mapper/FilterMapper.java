@@ -9,11 +9,7 @@ import org.springframework.stereotype.Component;
 public class FilterMapper {
 
     public Filter toDomain(FilterEntity filterEntity) {
-        return new Filter(
-            new FilterId(filterEntity.id()),
-            filterEntity.filter(),
-            filterEntity.createdAt()
-        );
+        return new Filter(new FilterId(filterEntity.id()), filterEntity.filter(), filterEntity.createdAt());
     }
 
     public FilterEntity toEntity(Filter filter) {
@@ -25,5 +21,4 @@ public class FilterMapper {
         entity.createdAt(filter.createdAt());
         return entity;
     }
-
 }

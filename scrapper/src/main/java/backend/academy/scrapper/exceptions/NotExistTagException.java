@@ -1,4 +1,3 @@
 package backend.academy.scrapper.exceptions;
 
-public class NotExistTagException extends RuntimeException {
-}
+public class NotExistTagException extends RuntimeException {}

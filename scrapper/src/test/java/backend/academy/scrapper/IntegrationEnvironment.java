@@ -18,18 +18,16 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
-import org.testcontainers.junit.jupiter.Container;
-import org.testcontainers.junit.jupiter.Testcontainers;
 
 @AutoConfigureMockMvc
 public abstract class IntegrationEnvironment {
 
     public static PostgreSQLContainer<?> postgres;
+
     static {
         postgres = new PostgreSQLContainer<>("postgres:17");
         postgres.start();
     }
-
 
     @Autowired
     protected MockMvc mockMvc;
@@ -59,8 +57,8 @@ public abstract class IntegrationEnvironment {
 
             Scope.child("resourceAccessor", new DirectoryResourceAccessor(migrationsPath.toFile()), () -> {
                 CommandScope updateCommand = new CommandScope("update")
-                    .addArgumentValue("changelogFile", "changelog-master.xml")
-                    .addArgumentValue("database", database);
+                        .addArgumentValue("changelogFile", "changelog-master.xml")
+                        .addArgumentValue("database", database);
                 updateCommand.execute();
             });
         }
@@ -69,7 +67,7 @@ public abstract class IntegrationEnvironment {
     @BeforeAll
     protected static void beforeAll() {
         try (Connection conn =
-                 DriverManager.getConnection(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())) {
+                DriverManager.getConnection(postgres.getJdbcUrl(), postgres.getUsername(), postgres.getPassword())) {
             runMigrations(conn);
             System.out.println("RunMigrationCorrect");
         } catch (Exception e) {

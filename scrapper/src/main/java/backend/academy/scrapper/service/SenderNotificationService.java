@@ -1,8 +1,6 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
-import java.util.List;
 
 public interface SenderNotificationService {
     void notifySender(LinkChangeStatus linkChangeStatus);

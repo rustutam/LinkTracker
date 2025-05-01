@@ -15,5 +15,4 @@ public interface UserRepository {
     void save(ChatId chatId) throws DoubleRegistrationException;
 
     void deleteByChatId(ChatId chatId) throws NotExistUserException;
-
 }

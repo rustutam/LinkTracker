@@ -18,9 +18,8 @@ public class UserRowMapper implements RowMapper<User> {
     @Override
     public User mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new User(
-            new UserId(rs.getLong(COLUMN_ID)),
-            new ChatId(rs.getLong(COLUMN_CHAT_ID)),
-            rs.getObject(COLUMN_CREATED_AT, OffsetDateTime.class)
-        );
+                new UserId(rs.getLong(COLUMN_ID)),
+                new ChatId(rs.getLong(COLUMN_CHAT_ID)),
+                rs.getObject(COLUMN_CREATED_AT, OffsetDateTime.class));
     }
 }

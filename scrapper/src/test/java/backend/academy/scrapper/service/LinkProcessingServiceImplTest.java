@@ -1,29 +1,23 @@
 package backend.academy.scrapper.service;
 
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
 
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
-import backend.academy.scrapper.models.domain.LinkUpdateNotification;
 import backend.academy.scrapper.repository.database.LinkRepository;
 import backend.academy.scrapper.scheduler.LinkUpdaterScheduler;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.jdbc.Sql;
-import java.util.List;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
@@ -35,13 +29,13 @@ class LinkProcessingServiceImplTest extends IntegrationEnvironment {
     @Autowired
     private LinkRepository linkRepository;
 
-    @MockBean
+    @MockitoBean
     private UpdateCheckService updateCheckService;
 
-    @MockBean
+    @MockitoBean
     private SenderNotificationService senderNotificationService;
 
-    @MockBean
+    @MockitoBean
     private LinkUpdaterScheduler linkUpdaterScheduler;
 
     @Test
@@ -56,7 +50,7 @@ class LinkProcessingServiceImplTest extends IntegrationEnvironment {
     @Sql(scripts = "/sql/insert_links.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void ProcessLinksTest() {
-        //Arrange
+        // Arrange
         List<Link> links = linkRepository.findAll();
 
         LinkChangeStatus st0 = getLinkChangeStatusWithChange(links.getFirst());
@@ -72,7 +66,7 @@ class LinkProcessingServiceImplTest extends IntegrationEnvironment {
         when(updateCheckService.detectChanges(links.get(3))).thenReturn(st3);
         when(updateCheckService.detectChanges(links.get(4))).thenReturn(st4);
         when(updateCheckService.detectChanges(links.get(5))).thenReturn(st5);
-//        doNothing().when(senderNotificationService).notifySender(any(LinkChangeStatus.class));
+        //        doNothing().when(senderNotificationService).notifySender(any(LinkChangeStatus.class));
 
         // Act
         service.processLinks();
@@ -87,28 +81,16 @@ class LinkProcessingServiceImplTest extends IntegrationEnvironment {
     }
 
     private LinkChangeStatus getLinkChangeStatusWithChange(Link link) {
-        List<ChangeInfo> changeInfoList = List.of(
-            new ChangeInfo(
+        List<ChangeInfo> changeInfoList = List.of(new ChangeInfo(
                 "Новый PR" + link.linkId().id(),
                 "Добавление нового поля в бд. Время" + link.lastUpdateTime().toString(),
                 "rust",
                 link.createdAt(),
-                "Добавил поле в доменную модель в " + link.uri().toString()
-            )
-        );
-        return new LinkChangeStatus(
-            link,
-            true,
-            changeInfoList
-        );
+                "Добавил поле в доменную модель в " + link.uri().toString()));
+        return new LinkChangeStatus(link, true, changeInfoList);
     }
 
     private LinkChangeStatus getLinkChangeStatusWithoutChange(Link link) {
-        return new LinkChangeStatus(
-            link,
-            false,
-            List.of()
-        );
+        return new LinkChangeStatus(link, false, List.of());
     }
-
 }

@@ -18,5 +18,4 @@ public abstract class ExternalDataRepository {
         }
         return text;
     }
-
 }

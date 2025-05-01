@@ -8,9 +8,7 @@ import backend.academy.scrapper.repository.database.SubscriptionRepository;
 import backend.academy.scrapper.repository.database.jdbc.mapper.SubscriptionResultSetExtractor;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -24,7 +22,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @ConditionalOnProperty(prefix = "app", name = "access-type", havingValue = "SQL")
 public class JdbcSubscriptionRepository implements SubscriptionRepository {
-    private static final String BASE_SELECT = """
+    private static final String BASE_SELECT =
+            """
         SELECT
             s.id                         AS subscription_id,
             s.created_at                 AS subscription_created_at,
@@ -62,31 +61,28 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     private final JdbcTemplate jdbcTemplate;
     private final SubscriptionResultSetExtractor extractor;
 
-
     @Override
     @Transactional
     public Subscription save(Subscription subscription) {
-        SubscriptionId newSubscriptionId = new SubscriptionId(
-            jdbcTemplate.queryForObject(
+        SubscriptionId newSubscriptionId = new SubscriptionId(jdbcTemplate.queryForObject(
                 "INSERT INTO scrapper.subscriptions (user_id, link_id) VALUES (?, ?) RETURNING id",
                 Long.class,
                 subscription.user().userId().id(),
-                subscription.link().linkId().id()
-            )
-        );
+                subscription.link().linkId().id()));
 
-        tagBatchInsert(newSubscriptionId.id(),
-            subscription.tags().stream().map(t -> t.tagId().id()).toList());
-        filterBatchInsert(newSubscriptionId.id(),
-            subscription.filters().stream().map(f -> f.filterId().id()).toList());
+        tagBatchInsert(
+                newSubscriptionId.id(),
+                subscription.tags().stream().map(t -> t.tagId().id()).toList());
+        filterBatchInsert(
+                newSubscriptionId.id(),
+                subscription.filters().stream().map(f -> f.filterId().id()).toList());
 
         return findById(newSubscriptionId).orElseThrow();
     }
 
     private void tagBatchInsert(Long subscriptionId, List<Long> ids) {
         if (ids.isEmpty()) return;
-        String sql =
-            "INSERT INTO scrapper.subscription_tags (subscription_id, tag_id) VALUES (?, ?)";
+        String sql = "INSERT INTO scrapper.subscription_tags (subscription_id, tag_id) VALUES (?, ?)";
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -103,8 +99,7 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
 
     private void filterBatchInsert(Long subscriptionId, List<Long> ids) {
         if (ids.isEmpty()) return;
-        String sql =
-            "INSERT INTO scrapper.subscription_filters (subscription_id, filter_id) VALUES (?, ?)";
+        String sql = "INSERT INTO scrapper.subscription_filters (subscription_id, filter_id) VALUES (?, ?)";
         jdbcTemplate.batchUpdate(sql, new BatchPreparedStatementSetter() {
             @Override
             public void setValues(PreparedStatement ps, int i) throws SQLException {
@@ -123,10 +118,9 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     @Transactional
     public Subscription remove(Subscription subscription) {
         jdbcTemplate.update(
-            DELETE_SQL,
-            subscription.user().userId().id(),
-            subscription.link().linkId().id()
-        );
+                DELETE_SQL,
+                subscription.user().userId().id(),
+                subscription.link().linkId().id());
         return subscription;
     }
 
@@ -139,11 +133,10 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     @Override
     public Optional<Subscription> findByUserAndLink(User user, Link link) {
         List<Subscription> list = jdbcTemplate.query(
-            SELECT_BY_USER_AND_LINK,
-            extractor,
-            user.userId().id(),
-            link.linkId().id()
-        );
+                SELECT_BY_USER_AND_LINK,
+                extractor,
+                user.userId().id(),
+                link.linkId().id());
         return Optional.ofNullable(DataAccessUtils.singleResult(list));
     }
 
@@ -156,5 +149,4 @@ public class JdbcSubscriptionRepository implements SubscriptionRepository {
     public List<Subscription> findByLink(Link link) {
         return jdbcTemplate.query(SELECT_BY_LINK, extractor, link.linkId().id());
     }
-
 }

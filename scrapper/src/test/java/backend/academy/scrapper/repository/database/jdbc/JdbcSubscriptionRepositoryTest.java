@@ -6,5 +6,4 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @TestPropertySource(properties = "app.access-type=SQL")
-public class JdbcSubscriptionRepositoryTest extends SubscriptionRepositoryTest {
-}
+public class JdbcSubscriptionRepositoryTest extends SubscriptionRepositoryTest {}

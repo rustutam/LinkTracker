@@ -27,28 +27,23 @@ public class JpaLinkRepository implements LinkRepository {
 
     @Override
     public List<Link> findAll() {
-        return linkRepo.findAll().stream()
-            .map(mapper::toDomain)
-            .toList();
+        return linkRepo.findAll().stream().map(mapper::toDomain).toList();
     }
 
     @Override
     public Optional<Link> findById(LinkId linkId) {
-        return linkRepo.findById(linkId.id())
-            .map(mapper::toDomain);
+        return linkRepo.findById(linkId.id()).map(mapper::toDomain);
     }
 
     @Override
     public Optional<Link> findByUri(URI uri) {
-        return linkRepo.findByUri(uri.toString())
-            .map(mapper::toDomain);
+        return linkRepo.findByUri(uri.toString()).map(mapper::toDomain);
     }
 
     @Override
     @Transactional
     public Link updateLastUpdateTime(LinkId id, OffsetDateTime newLastModifyingTime) throws NotExistLinkException {
-        LinkEntity entity = linkRepo.findById(id.id())
-            .orElseThrow(NotExistLinkException::new);
+        LinkEntity entity = linkRepo.findById(id.id()).orElseThrow(NotExistLinkException::new);
         entity.lastModifiedDate(newLastModifyingTime);
         return mapper.toDomain(entity);
     }
@@ -62,7 +57,6 @@ public class JpaLinkRepository implements LinkRepository {
 
     @Override
     public Page<Link> findAllPaginated(Pageable pageable) {
-        return linkRepo.findAll(pageable)
-            .map(mapper::toDomain);
+        return linkRepo.findAll(pageable).map(mapper::toDomain);
     }
 }

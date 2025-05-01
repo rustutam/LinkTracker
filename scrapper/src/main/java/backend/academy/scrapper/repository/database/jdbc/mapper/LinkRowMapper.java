@@ -19,10 +19,9 @@ public class LinkRowMapper implements RowMapper<Link> {
     @Override
     public Link mapRow(ResultSet rs, int rowNum) throws SQLException {
         return new Link(
-            new LinkId(rs.getLong(COLUMN_ID)),
-            URI.create(rs.getString(COLUMN_URI)),
-            rs.getObject(COLUMN_LAST_MODIFIED_DATE, OffsetDateTime.class),
-            rs.getObject(COLUMN_CREATED_AT, OffsetDateTime.class)
-        );
+                new LinkId(rs.getLong(COLUMN_ID)),
+                URI.create(rs.getString(COLUMN_URI)),
+                rs.getObject(COLUMN_LAST_MODIFIED_DATE, OffsetDateTime.class),
+                rs.getObject(COLUMN_CREATED_AT, OffsetDateTime.class));
     }
 }

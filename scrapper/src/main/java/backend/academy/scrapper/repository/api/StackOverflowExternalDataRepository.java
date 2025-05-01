@@ -51,7 +51,8 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
             jsonNode.get("items").forEach(item -> {
                 String ownerName = item.get("owner").get("display_name").asText();
                 String preview = truncatePreview(item.get("body").asText());
-                OffsetDateTime creationDate = OffsetDateTime.parse(item.get("creation_date").asText());
+                OffsetDateTime creationDate =
+                        OffsetDateTime.parse(item.get("creation_date").asText());
                 allContent.add(new ChangeInfo(description, title, ownerName, creationDate, preview));
             });
             return allContent;
@@ -68,13 +69,16 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
             JsonNode jsonNode = objectMapper.readTree(content);
             return jsonNode.get("items").get(0).get("title").asText();
         } catch (HttpMessageNotReadableException | JsonProcessingException e) {
-            log.atError().addKeyValue("link", link.toString()).setMessage(JSON_ERROR).log();
+            log.atError()
+                    .addKeyValue("link", link.toString())
+                    .setMessage(JSON_ERROR)
+                    .log();
             throw new HttpMessageNotReadableException("Ошибка при разборе JSON-ответа по URL " + link.toString());
         } catch (Exception e) {
             log.atError()
-                .addKeyValue("link", link.toString())
-                .setMessage("Некорректное тело запроса")
-                .log();
+                    .addKeyValue("link", link.toString())
+                    .setMessage("Некорректное тело запроса")
+                    .log();
             throw new RuntimeException("Некорректное тело запроса по URL " + link.toString());
         }
     }
@@ -100,14 +104,22 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
             JsonNode jsonNode = objectMapper.readTree(questionAnswers);
             jsonNode.get("items").forEach(item -> {
                 String answerId = item.get("answer_id").asText();
-                String questionAnswerCommits = stackoverflowClient.getQuestionAnswerCommits(questionInfo.site, questionInfo.questionId);
-                content.addAll(parseContentList(ANSWER_COMMENTS_DESCRIPTION, questionAnswerCommits, link.toString(), title));
+                String questionAnswerCommits =
+                        stackoverflowClient.getQuestionAnswerCommits(questionInfo.site, questionInfo.questionId);
+                content.addAll(
+                        parseContentList(ANSWER_COMMENTS_DESCRIPTION, questionAnswerCommits, link.toString(), title));
             });
         } catch (HttpMessageNotReadableException | JsonProcessingException e) {
-            log.atError().addKeyValue("link", link.toString()).setMessage(REQUEST_ERROR).log();
+            log.atError()
+                    .addKeyValue("link", link.toString())
+                    .setMessage(REQUEST_ERROR)
+                    .log();
             throw new HttpMessageNotReadableException(e.getMessage());
         } catch (Exception e) {
-            log.atError().addKeyValue("link", link.toString()).setMessage(REQUEST_ERROR).log();
+            log.atError()
+                    .addKeyValue("link", link.toString())
+                    .setMessage(REQUEST_ERROR)
+                    .log();
             throw new QuestionNotFoundException(e.getMessage());
         }
 
@@ -129,6 +141,5 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
         return new QuestionInfo(host, parts[2]);
     }
 
-    private record QuestionInfo(String site, String questionId) {
-    }
+    private record QuestionInfo(String site, String questionId) {}
 }

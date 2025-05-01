@@ -10,5 +10,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface LinkRepo extends JpaRepository<LinkEntity, Long> {
     Optional<LinkEntity> findByUri(String uri);
 
-    @NotNull Page<LinkEntity> findAll(@NotNull Pageable pageable);
+    @NotNull
+    Page<LinkEntity> findAll(@NotNull Pageable pageable);
 }

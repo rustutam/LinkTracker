@@ -20,8 +20,8 @@ public class ChangeInfo {
     @Override
     public String toString() {
 
-        return description + ". " + title + ".\n" +
-            "Автор: " + username + ". Дата: " + creationTime +
-            ".\n Описание: " + preview;
+        return description + ". " + title + ".\n" + "Автор: "
+                + username + ". Дата: " + creationTime + ".\n Описание: "
+                + preview;
     }
 }

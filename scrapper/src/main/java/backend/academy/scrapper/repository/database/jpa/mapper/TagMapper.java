@@ -8,11 +8,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class TagMapper {
     public Tag toDomain(TagEntity entity) {
-        return new Tag(
-            new TagId(entity.id()),
-            entity.tag(),
-            entity.createdAt()
-        );
+        return new Tag(new TagId(entity.id()), entity.tag(), entity.createdAt());
     }
 
     public TagEntity toEntity(Tag domain) {
@@ -24,6 +20,4 @@ public class TagMapper {
         entity.createdAt(domain.createdAt());
         return entity;
     }
-
-
 }

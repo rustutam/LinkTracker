@@ -50,10 +50,10 @@ public class JdbcUserRepository implements UserRepository {
             jdbcTemplate.update(INSERT_SQL, chatId.id());
         } catch (DataIntegrityViolationException ex) {
             log.atError()
-                .addKeyValue("chatId", chatId.id())
-                .addKeyValue("access-type", "SQL")
-                .setMessage("Ошибка сохранения: пользователь уже существует")
-                .log();
+                    .addKeyValue("chatId", chatId.id())
+                    .addKeyValue("access-type", "SQL")
+                    .setMessage("Ошибка сохранения: пользователь уже существует")
+                    .log();
             throw new DoubleRegistrationException();
         }
     }

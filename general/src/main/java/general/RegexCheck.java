@@ -2,7 +2,6 @@ package general;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Component;
 
 @Component

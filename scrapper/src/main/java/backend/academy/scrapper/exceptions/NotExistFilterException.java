@@ -1,4 +1,3 @@
 package backend.academy.scrapper.exceptions;
 
-public class NotExistFilterException extends RuntimeException {
-}
+public class NotExistFilterException extends RuntimeException {}

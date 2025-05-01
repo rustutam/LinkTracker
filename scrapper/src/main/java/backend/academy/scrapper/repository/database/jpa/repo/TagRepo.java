@@ -6,5 +6,4 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface TagRepo extends JpaRepository<TagEntity, Long> {
     Optional<TagEntity> findByTag(String tag);
-
 }

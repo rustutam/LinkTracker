@@ -6,5 +6,4 @@ import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
 @TestPropertySource(properties = "app.access-type=ORM")
-public class JpaUserRepositoryTest extends UserRepositoryTest {
-}
+public class JpaUserRepositoryTest extends UserRepositoryTest {}

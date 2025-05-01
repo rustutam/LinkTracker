@@ -12,7 +12,8 @@ public class TgBotClient {
     private final RestClient restClient;
 
     public TgBotClient(ScrapperConfig scrapperConfig) {
-        this.restClient = RestClient.builder().baseUrl(scrapperConfig.tgBot().baseUri()).build();
+        this.restClient =
+                RestClient.builder().baseUrl(scrapperConfig.tgBot().baseUri()).build();
     }
 
     public void send(LinkUpdate linkUpdate) {

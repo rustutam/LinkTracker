@@ -4,7 +4,7 @@ import java.util.List;
 
 /** LinkResponse */
 public record LinkResponse(Long id, String url, List<String> tags, List<String> filters) {
-//TODO убрать это
+    // TODO убрать это
 
     @Override
     public String toString() {
