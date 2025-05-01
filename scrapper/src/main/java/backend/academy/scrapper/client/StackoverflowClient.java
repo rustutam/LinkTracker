@@ -13,7 +13,7 @@ import org.springframework.web.client.RestClientResponseException;
 public class StackoverflowClient {
     private final RestClient restClient;
     private final StackOverflowConfig stackOverflowConfig;
-    private final String filter = "withbody";
+    private static final String WITH_BODY = "withbody";
     private static final String REQUEST_ERROR = "Ошибка при запросе";
 
     public StackoverflowClient(ScrapperConfig scrapperConfig) {
@@ -45,7 +45,7 @@ public class StackoverflowClient {
 
     private String performRequest(String url) {
         url += "&key=" + stackOverflowConfig.key() + "&access_token=" + stackOverflowConfig.accessToken() + "&filter="
-                + filter;
+                + WITH_BODY;
 
         try {
             return restClient.get().uri(url).retrieve().body(String.class);

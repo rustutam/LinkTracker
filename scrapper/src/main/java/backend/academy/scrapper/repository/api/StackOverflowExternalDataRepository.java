@@ -28,6 +28,7 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
 
     private static final String JSON_ERROR = "Ошибка при разборе JSON-Ответа";
     private static final String REQUEST_ERROR = "Ошибка при запросе";
+    public static final String ITEMS = "items";
     private final StackoverflowClient stackoverflowClient;
     private final ObjectMapper objectMapper;
 
@@ -48,7 +49,7 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
         List<ChangeInfo> allContent = new ArrayList<>();
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-            jsonNode.get("items").forEach(item -> {
+            jsonNode.get(ITEMS).forEach(item -> {
                 String ownerName = item.get("owner").get("display_name").asText();
                 String preview = truncatePreview(item.get("body").asText());
                 OffsetDateTime creationDate =
@@ -56,9 +57,15 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
                 allContent.add(new ChangeInfo(description, title, ownerName, creationDate, preview));
             });
             return allContent;
-        } catch (Exception e) {
+        } catch (JsonProcessingException e) {
             log.atError().addKeyValue("link", url).setMessage(JSON_ERROR).log();
-            throw new HttpMessageNotReadableException("Ошибка при разборе JSON-ответа по URL " + url);
+            throw new HttpMessageNotReadableException("Ошибка парсинга JSON по URL " + url, e);
+        } catch (NullPointerException e) {
+            log.atError()
+                    .addKeyValue("link", url)
+                    .setMessage("Некорректная структура JSON")
+                    .log();
+            throw new HttpMessageNotReadableException("Некорректная структура JSON-ответа", e);
         }
     }
 
@@ -67,7 +74,7 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
         String content = stackoverflowClient.getQuestion(questionInfo.site, questionInfo.questionId);
         try {
             JsonNode jsonNode = objectMapper.readTree(content);
-            return jsonNode.get("items").get(0).get("title").asText();
+            return jsonNode.get(ITEMS).get(0).get("title").asText();
         } catch (HttpMessageNotReadableException | JsonProcessingException e) {
             log.atError()
                     .addKeyValue("link", link.toString())
@@ -102,7 +109,7 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
 
         try {
             JsonNode jsonNode = objectMapper.readTree(questionAnswers);
-            jsonNode.get("items").forEach(item -> {
+            jsonNode.get(ITEMS).forEach(item -> {
                 String answerId = item.get("answer_id").asText();
                 String questionAnswerCommits =
                         stackoverflowClient.getQuestionAnswerCommits(questionInfo.site, questionInfo.questionId);

@@ -86,7 +86,8 @@ public class JdbcLinkRepository implements LinkRepository {
 
     @Override
     public Page<Link> findAllPaginated(Pageable pageable) {
-        int total = jdbcTemplate.queryForObject(COUNT_SQL, Integer.class);
+        Integer totalCount = jdbcTemplate.queryForObject(COUNT_SQL, Integer.class);
+        int total = totalCount != null ? totalCount : 0;
         List<Link> content =
                 jdbcTemplate.query(SELECT_PAGINATED, rowMapper, pageable.getPageSize(), pageable.getOffset());
         return new PageImpl<>(content, pageable, total);
