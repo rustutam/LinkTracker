@@ -1,23 +1,22 @@
 package backend.academy.scrapper.repository.api;
 
+import static backend.academy.scrapper.ClientsResponses.githubApiResponseJsonString;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.client.GithubClient;
 import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.ids.LinkId;
+import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-
-import java.net.URI;
-import java.time.OffsetDateTime;
-import java.util.List;
-
-import static backend.academy.scrapper.ClientsResponses.githubApiResponseJsonString;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
 
 @SpringBootTest
 @ActiveProfiles("test")
