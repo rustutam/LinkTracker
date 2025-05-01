@@ -153,26 +153,24 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment {
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findAllPaginatedWithPaginationTest() {
         // Arrange
+        URI uri1 = URI.create("https://github.com/java-rustutam/semester1");
+        URI uri2 = URI.create("https://github.com/java-rustutam/semester2");
+        URI uri3 = URI.create("https://github.com/java-rustutam/semester3");
+        URI uri4 = URI.create("https://github.com/java-rustutam/semester4");
+        URI uri5 = URI.create("https://github.com/java-rustutam/semester5");
+        URI uri6 = URI.create("https://github.com/java-rustutam/semester6");
+
+        Link link1 = linkRepository.findByUri(uri1).orElseThrow();
+        Link link2 = linkRepository.findByUri(uri2).orElseThrow();
+        Link link3 = linkRepository.findByUri(uri3).orElseThrow();
+        Link link4 = linkRepository.findByUri(uri4).orElseThrow();
+        Link link5 = linkRepository.findByUri(uri5).orElseThrow();
+        Link link6 = linkRepository.findByUri(uri6).orElseThrow();
+
         int pageSize = 2;
         Pageable firstPageable = PageRequest.of(0, pageSize);
         Pageable secondPageable = PageRequest.of(1, pageSize);
         Pageable thirdPageable = PageRequest.of(2, pageSize);
-
-        List<URI> firstExpectedUris = List.of(
-            URI.create("https://github.com/java-rustutam/semester1"),
-            URI.create("https://github.com/java-rustutam/semester2")
-        );
-
-        List<URI> secondExpectedUris = List.of(
-            URI.create("https://github.com/java-rustutam/semester3"),
-            URI.create("https://github.com/java-rustutam/semester4")
-        );
-
-        List<URI> thirdExpectedUris = List.of(
-            URI.create("https://github.com/java-rustutam/semester5"),
-            URI.create("https://github.com/java-rustutam/semester6")
-        );
-
 
         // Act
         Page<Link> firstPage = linkRepository.findAllPaginated(firstPageable);
@@ -180,9 +178,17 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment {
         Page<Link> thirdPage = linkRepository.findAllPaginated(thirdPageable);
 
         // Assert
-        assertEquals(firstExpectedUris, firstPage.getContent().stream().map(Link::uri).toList());
-        assertEquals(secondExpectedUris, secondPage.getContent().stream().map(Link::uri).toList());
-        assertEquals(thirdExpectedUris, thirdPage.getContent().stream().map(Link::uri).toList());
+        assertThat(firstPage.getContent())
+            .usingRecursiveComparison(config)
+            .isEqualTo(List.of(link1, link2));
+
+        assertThat(secondPage.getContent())
+            .usingRecursiveComparison(config)
+            .isEqualTo(List.of(link3, link4));
+
+        assertThat(thirdPage.getContent())
+            .usingRecursiveComparison(config)
+            .isEqualTo(List.of(link5, link6));
     }
 
 

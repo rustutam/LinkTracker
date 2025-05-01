@@ -3,10 +3,12 @@ package backend.academy.scrapper.models.domain;
 import java.time.OffsetDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 
 @Builder
 @AllArgsConstructor
+@EqualsAndHashCode
 @Getter
 public class ChangeInfo {
     private String description;

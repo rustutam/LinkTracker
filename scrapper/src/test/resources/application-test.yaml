@@ -1,9 +1,9 @@
 app:
   scheduler:
-    interval: 10s
-  batch-size: 1000
+    interval: 1000000s
+  batch-size: 2
   github:
-    token: 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
+    token: test-token-git
     base-uri: https://api.github.com
   stackoverflow:
     key: test-key
@@ -11,7 +11,7 @@ app:
     base-uri: https://api.stackexchange.com/2.3
   tg-bot:
     base-uri: http://localhost:8080
-  access-type: SQL
+  access-type: ORM
 
 spring:
   application:

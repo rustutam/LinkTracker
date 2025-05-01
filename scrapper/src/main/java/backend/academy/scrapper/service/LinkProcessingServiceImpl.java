@@ -27,25 +27,23 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
     @Override
     public void processLinks() {
         int pageNumber = 0;
-        while (true) {
+        Page<Link> page;
+        do {
             Pageable pageable = PageRequest.of(pageNumber, scrapperConfig.batchSize());
-            Page<Link> page = linkRepository.findAllPaginated(pageable);
+            page = linkRepository.findAllPaginated(pageable);
 
-            if (!page.hasNext()) {
-                log.atInfo()
-                    .setMessage("Завершение обработки ссылок")
-                    .log();
-                return;
-
-            }
             log.atInfo()
                 .setMessage("Обработка страницы " + pageNumber + ". Количество ссылок: " + page.getNumberOfElements())
                 .log();
 
-            // Обрабатываем каждую ссылку на текущей странице
             page.getContent().forEach(this::processLink);
+
             pageNumber++;
-        }
+        } while (page.hasNext());
+
+        log.atInfo()
+            .setMessage("Завершение обработки ссылок")
+            .log();
     }
 
     /**
