@@ -1,11 +1,6 @@
 package backend.academy.scrapper.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
+import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.TestModelFactory;
 import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
@@ -24,9 +19,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class SenderNotificationServiceImplTest {
+class SenderNotificationServiceImplTest extends IntegrationEnvironment {
 
     @MockitoBean
     private SubscriptionRepository subscriptionRepository;
@@ -42,11 +42,11 @@ class SenderNotificationServiceImplTest {
     void notifySender_ShouldSendNotification_WhenLinksUpdated() {
         // Arrange
         List<ChangeInfo> changeInfoList = List.of(new ChangeInfo(
-                "Новый PR",
-                "Добавление нового поля в бд",
-                "rust",
-                OffsetDateTime.now(),
-                "Добавил поле в доменную модель "));
+            "Новый PR",
+            "Добавление нового поля в бд",
+            "rust",
+            OffsetDateTime.now(),
+            "Добавил поле в доменную модель "));
 
         String expectedDescription = changeInfoList.getFirst().toString();
 
