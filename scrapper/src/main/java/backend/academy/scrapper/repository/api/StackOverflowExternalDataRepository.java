@@ -8,11 +8,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,6 +20,7 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
+@SuppressWarnings("StringSplitter")
 public class StackOverflowExternalDataRepository extends ExternalDataRepository {
     private static final String QUESTION_ANSWERS_DESCRIPTION = "Новый ответ на вопрос";
     private static final String QUESTION_COMMENTS_DESCRIPTION = "Новые комментарии к вопросу";
@@ -47,25 +47,37 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
 
     private List<ChangeInfo> parseContentList(String description, String jsonResponse, String url, String title) {
         List<ChangeInfo> allContent = new ArrayList<>();
+
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonResponse);
-            jsonNode.get(ITEMS).forEach(item -> {
-                String ownerName = item.get("owner").get("display_name").asText();
-                String preview = truncatePreview(item.get("body").asText());
-                OffsetDateTime creationDate =
-                        OffsetDateTime.parse(item.get("creation_date").asText());
-                allContent.add(new ChangeInfo(description, title, ownerName, creationDate, preview));
-            });
+
+            Optional.ofNullable(jsonNode.get(ITEMS))
+                    .ifPresent(items -> items.forEach(item -> {
+                        String ownerName = Optional.ofNullable(item.get("owner"))
+                                .map(owner -> owner.get("display_name"))
+                                .map(JsonNode::asText)
+                                .orElseThrow(() ->
+                                        new HttpMessageNotReadableException("Отсутствует поле owner.display_name"));
+
+                        String preview = Optional.ofNullable(item.get("body"))
+                                .map(JsonNode::asText)
+                                .map(this::truncatePreview)
+                                .orElseThrow(() -> new HttpMessageNotReadableException("Отсутствует поле body"));
+
+                        OffsetDateTime creationDate = Optional.ofNullable(item.get("creation_date"))
+                                .map(JsonNode::asText)
+                                .map(OffsetDateTime::parse)
+                                .orElseThrow(() -> new HttpMessageNotReadableException(
+                                        "Отсутствует или неверный формат creation_date"));
+
+                        allContent.add(new ChangeInfo(description, title, ownerName, creationDate, preview));
+                    }));
+
             return allContent;
+
         } catch (JsonProcessingException e) {
             log.atError().addKeyValue("link", url).setMessage(JSON_ERROR).log();
             throw new HttpMessageNotReadableException("Ошибка парсинга JSON по URL " + url, e);
-        } catch (NullPointerException e) {
-            log.atError()
-                    .addKeyValue("link", url)
-                    .setMessage("Некорректная структура JSON")
-                    .log();
-            throw new HttpMessageNotReadableException("Некорректная структура JSON-ответа", e);
         }
     }
 
@@ -110,7 +122,6 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
         try {
             JsonNode jsonNode = objectMapper.readTree(questionAnswers);
             jsonNode.get(ITEMS).forEach(item -> {
-                String answerId = item.get("answer_id").asText();
                 String questionAnswerCommits =
                         stackoverflowClient.getQuestionAnswerCommits(questionInfo.site, questionInfo.questionId);
                 content.addAll(
@@ -131,10 +142,6 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
         }
 
         return content;
-    }
-
-    private OffsetDateTime getOffsetDateTime(Integer lastActivityDateInSeconds) {
-        return OffsetDateTime.ofInstant(Instant.ofEpochSecond(lastActivityDateInSeconds), ZoneOffset.UTC);
     }
 
     @Override

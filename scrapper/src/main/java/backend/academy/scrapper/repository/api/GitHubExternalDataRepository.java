@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 @Repository
 @RequiredArgsConstructor
+@SuppressWarnings("StringSplitter")
 public class GitHubExternalDataRepository extends ExternalDataRepository {
     private static final String PR_ISSUE_DESCRIPTION = "Новый PR/Issue";
 
