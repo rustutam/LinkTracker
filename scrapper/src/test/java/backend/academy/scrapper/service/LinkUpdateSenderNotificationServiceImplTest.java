@@ -1,21 +1,13 @@
 package backend.academy.scrapper.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.TestModelFactory;
 import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.LinkChangeStatus;
-import backend.academy.scrapper.models.domain.LinkUpdateNotification;
 import backend.academy.scrapper.models.domain.Subscription;
-import backend.academy.scrapper.models.domain.ids.LinkId;
 import backend.academy.scrapper.repository.database.SubscriptionRepository;
-import backend.academy.scrapper.sender.Sender;
-import java.net.URI;
+import backend.academy.scrapper.sender.LinkUpdateSender;
+import dto.LinkUpdate;
 import java.time.OffsetDateTime;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -25,15 +17,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @SpringBootTest
-class SenderNotificationServiceImplTest extends IntegrationEnvironment {
+class LinkUpdateSenderNotificationServiceImplTest extends IntegrationEnvironment {
 
     @MockitoBean
     private SubscriptionRepository subscriptionRepository;
 
     @MockitoSpyBean
-    private Sender sender;
+    private LinkUpdateSender linkUpdateSender;
 
     @Autowired
     private SenderNotificationServiceImpl senderNotificationService;
@@ -53,27 +50,28 @@ class SenderNotificationServiceImplTest extends IntegrationEnvironment {
 
         Subscription subscription = TestModelFactory.createSubscription();
 
-        LinkId expectedLinkId = subscription.link().linkId();
-        URI expectedUri = subscription.link().uri();
+        Long expectedLinkId = subscription.link().linkId().id();
+        String expectedUri = subscription.link().uri().toString();
         LinkChangeStatus linkChangeStatus = new LinkChangeStatus(subscription.link(), true, changeInfoList);
+        List<Long> expectedChatIds = List.of(subscription.user().chatId().id());
 
         List<Subscription> subscriptions = List.of(subscription);
 
         when(subscriptionRepository.findByLink(any())).thenReturn(subscriptions);
-        doNothing().when(sender).send(any(LinkUpdateNotification.class));
 
+        doNothing().when(linkUpdateSender).pushLinkUpdate(any(LinkUpdate.class));
         // Act
         senderNotificationService.notifySender(linkChangeStatus);
 
         // Assert
-        ArgumentCaptor<LinkUpdateNotification> captor = ArgumentCaptor.forClass(LinkUpdateNotification.class);
-        verify(sender).send(captor.capture());
+        ArgumentCaptor<LinkUpdate> captor = ArgumentCaptor.forClass(LinkUpdate.class);
+        verify(linkUpdateSender).pushLinkUpdate(captor.capture());
 
-        LinkUpdateNotification sent = captor.getValue();
+        LinkUpdate sent = captor.getValue();
 
-        assertEquals(sent.linkId(), expectedLinkId);
-        assertEquals(sent.uri(), expectedUri);
-        assertEquals(sent.chatIds(), List.of(subscription.user().chatId()));
+        assertEquals(sent.id(), expectedLinkId);
+        assertEquals(sent.url(), expectedUri);
+        assertEquals(sent.tgChatIds(), expectedChatIds);
         assertEquals(sent.description(), expectedDescription);
     }
 }
