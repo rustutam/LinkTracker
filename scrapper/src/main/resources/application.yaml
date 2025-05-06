@@ -12,6 +12,7 @@ app:
   tg-bot:
     base-uri: http://localhost:8080
   access-type: SQL
+  message-transport: HTTP
 
 spring:
   application:
