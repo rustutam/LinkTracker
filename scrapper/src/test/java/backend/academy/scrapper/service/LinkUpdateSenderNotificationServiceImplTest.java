@@ -59,13 +59,13 @@ class LinkUpdateSenderNotificationServiceImplTest extends IntegrationEnvironment
 
         when(subscriptionRepository.findByLink(any())).thenReturn(subscriptions);
 
-        doNothing().when(linkUpdateSender).pushLinkUpdate(any(LinkUpdate.class));
+        doNothing().when(linkUpdateSender).sendUpdates(any(LinkUpdate.class));
         // Act
         senderNotificationService.notifySender(linkChangeStatus);
 
         // Assert
         ArgumentCaptor<LinkUpdate> captor = ArgumentCaptor.forClass(LinkUpdate.class);
-        verify(linkUpdateSender).pushLinkUpdate(captor.capture());
+        verify(linkUpdateSender).sendUpdates(captor.capture());
 
         LinkUpdate sent = captor.getValue();
 

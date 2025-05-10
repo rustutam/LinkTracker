@@ -15,11 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @DisplayName("Тест команды /start")
 @SpringBootTest
 public class StartCommandTests extends BaseConfigure {
+    @MockitoBean
+    KafkaAdmin kafkaAdmin;
+
     @MockitoBean
     private TelegramBot telegramBot;
 

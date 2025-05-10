@@ -12,6 +12,13 @@ app:
   tg-bot:
     base-uri: http://localhost:8080
   access-type: ORM
+  message-transport: Kafka
+
+  kafka:
+    bootstrapServers: localhost:29091, localhost:29092, localhost:29093
+    topics:
+      link-updates: scrapper.link-updates
+      dead-letter: scrapper.link-updates-dlq
 
 spring:
   application:

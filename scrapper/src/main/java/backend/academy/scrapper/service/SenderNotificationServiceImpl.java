@@ -24,7 +24,7 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
         }
 
         LinkUpdate linkUpdate = createLinkUpdate(linkChangeStatus, chatIds);
-        linkUpdateSender.pushLinkUpdate(linkUpdate);
+        linkUpdateSender.sendUpdates(linkUpdate);
     }
 
     private List<Long> findSubscribersChatIds(Link link) {
