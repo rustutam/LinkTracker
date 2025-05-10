@@ -1,7 +1,8 @@
 package backend.academy.scrapper.sender;
 
+import backend.academy.scrapper.exceptions.ApiErrorResponseException;
 import dto.LinkUpdate;
 
 public interface LinkUpdateSender {
-    void pushLinkUpdate(LinkUpdate linkUpdate);
+    void sendUpdates(LinkUpdate linkUpdate) throws ApiErrorResponseException;
 }
