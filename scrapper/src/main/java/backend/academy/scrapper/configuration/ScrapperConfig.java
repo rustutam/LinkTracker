@@ -1,5 +1,6 @@
 package backend.academy.scrapper.configuration;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
@@ -13,7 +14,9 @@ public record ScrapperConfig(
         @NotNull Integer batchSize,
         GitHubConfig github,
         StackOverflowConfig stackOverflow,
-        TgBotConfig tgBot) {
+        TgBotConfig tgBot,
+        KafkaConfig kafka
+) {
     public record Scheduler(@NotNull Duration interval) {}
 
     public record GitHubConfig(@NotEmpty String baseUri, @NotEmpty String token) {}
@@ -21,4 +24,13 @@ public record ScrapperConfig(
     public record StackOverflowConfig(@NotEmpty String baseUri, @NotEmpty String key, @NotEmpty String accessToken) {}
 
     public record TgBotConfig(@NotEmpty String baseUri) {}
+
+    public record KafkaConfig(
+        @NotBlank String bootstrapServers,
+        @NotNull Topics topics) {
+
+        public record Topics(
+            @NotBlank String linkUpdates,
+            @NotBlank String deadLetter) {}
+    }
 }
