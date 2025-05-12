@@ -1,4 +1,4 @@
-package backend.academy.bot.kafkaErrorHandlers;
+package backend.academy.bot.api.kafka;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

@@ -1,4 +1,4 @@
-package backend.academy.bot.configuration;
+package backend.academy.bot.config;
 
 import jakarta.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -9,5 +9,5 @@ public record KafkaConfig(LinkUpdatesTopicProperties linkUpdates) {
             @NotEmpty String topic,
             @NotEmpty boolean failOnProcessing,
             @NotEmpty String consumerGroup,
-            @NotEmpty Integer concurrency) {}
+            @NotEmpty Integer concurency) {}
 }

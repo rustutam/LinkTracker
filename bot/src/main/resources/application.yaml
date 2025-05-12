@@ -1,13 +1,13 @@
 app:
-  telegram-token: ${TELEGRAM_TOKEN}  # env variable
-  base-url: http://localhost:8081
+  telegram-token: ${TELEGRAM_TOKEN} # env variable
+  scrapper-host: http://localhost:8081
 
 kafka:
   link-updates:
     topic: link-update
     fail-on-processing: false
     consumer-group: default-group
-    concurrency: 1
+    concurency: 1
 
 spring:
   application:

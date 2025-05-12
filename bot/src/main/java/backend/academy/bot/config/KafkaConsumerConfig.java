@@ -1,5 +1,7 @@
-package backend.academy.bot.configuration;
+package backend.academy.bot.config;
 
+import java.util.Map;
+import java.util.function.Consumer;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.RoundRobinAssignor;
@@ -20,8 +22,6 @@ import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.util.backoff.FixedBackOff;
-import java.util.Map;
-import java.util.function.Consumer;
 
 @Configuration
 @RequiredArgsConstructor
@@ -41,7 +41,7 @@ public class KafkaConsumerConfig {
         factory.getContainerProperties().setAckMode(ContainerProperties.AckMode.MANUAL);
         factory.setCommonErrorHandler(errorHandler);
         factory.setAutoStartup(true);
-        factory.setConcurrency(config.linkUpdates().concurrency());
+        factory.setConcurrency(config.linkUpdates().concurency());
         return factory;
     }
 
