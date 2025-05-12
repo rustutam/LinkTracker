@@ -22,4 +22,6 @@ public interface LinkRepository {
     Link save(URI uri);
 
     Page<Link> findAllPaginated(Pageable pageable);
+
+    List<Link> findOldestLinks(int limit);
 }

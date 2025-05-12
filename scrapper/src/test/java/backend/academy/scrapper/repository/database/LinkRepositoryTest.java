@@ -180,4 +180,22 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment {
 
         assertThat(thirdPage.getContent()).usingRecursiveComparison(config).isEqualTo(List.of(link5, link6));
     }
+
+    @Test
+    @Sql(scripts = "/sql/insert_links.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
+    @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void findOldestLinksTest(){
+        // Arrange
+        URI uri1 = URI.create("https://github.com/java-rustutam/semester1");
+        URI uri2 = URI.create("https://github.com/java-rustutam/semester2");
+
+        Link link1 = linkRepository.findByUri(uri1).orElseThrow();
+        Link link2 = linkRepository.findByUri(uri2).orElseThrow();
+
+        // Act
+        List<Link> oldestLinks = linkRepository.findOldestLinks(2);
+
+        // Assert
+        assertThat(oldestLinks).usingRecursiveComparison(config).isEqualTo(List.of(link1, link2));
+    }
 }
