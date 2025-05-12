@@ -30,7 +30,7 @@ services:
       - --password=postgres
       - update
     volumes:
-      - ./migrations:/changesets
+      - ./migrations:/liquibase/changelog
     networks:
       - backend
 
@@ -81,11 +81,18 @@ services:
       - ./kui/config.yml:/etc/kafkaui/config.yaml
       - ./kui/config.yml:/etc/kafkaui/dynamic_config.yaml
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis-server
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - ./redis-data:/data
+
 volumes:
   psql: { }
-  kafka1: { }
-  kafka2: { }
-  kafka3: { }
 
 networks:
   backend: { }

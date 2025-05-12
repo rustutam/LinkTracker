@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class LinkUpdaterScheduler {
     private final LinkProcessingService linkProcessingService;
 
-    @Scheduled(fixedDelayString = "${app.fixedRate}")
+    @Scheduled(fixedDelayString = "#{schedulerIntervalMs}")
     public void update() {
         log.atInfo().setMessage("Запуск планировщика обновления ссылок").log();
         linkProcessingService.processLinks();

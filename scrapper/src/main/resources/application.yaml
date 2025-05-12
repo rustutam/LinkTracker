@@ -17,7 +17,7 @@ app:
     base-uri: http://localhost:8080
 
   access-type: SQL
-  message-transport: HTTP
+  message-transport: Kafka
 
 kafka:
   link-updates:
@@ -55,3 +55,10 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui
+
+logging:
+  file:
+    name: scrapper-log.json
+  structured:
+    format:
+      file: ecs

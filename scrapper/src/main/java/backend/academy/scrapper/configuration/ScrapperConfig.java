@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Bean;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
@@ -15,7 +16,8 @@ public record ScrapperConfig(
         GitHubConfig github,
         StackOverflowConfig stackOverflow,
         TgBotConfig tgBot,
-        KafkaConfig kafka
+        KafkaConfig kafka,
+        @Bean String messageTransport
 ) {
     public record Scheduler(@NotNull Duration interval) {}
 
