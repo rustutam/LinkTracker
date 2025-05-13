@@ -6,10 +6,9 @@ import backend.academy.scrapper.models.domain.LinkChangeStatus;
 import backend.academy.scrapper.repository.database.LinkRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -25,24 +24,9 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
      * обнаружено – уведомляет пользователя через SenderNotificationService.
      */
     @Override
-    public void processLinks() {
-        int pageNumber = 0;
-        Page<Link> page;
-        do {
-            Pageable pageable = PageRequest.of(pageNumber, scrapperConfig.batchSize());
-            page = linkRepository.findAllPaginated(pageable);
-
-            log.atInfo()
-                    .setMessage(
-                            "Обработка страницы " + pageNumber + ". Количество ссылок: " + page.getNumberOfElements())
-                    .log();
-
-            page.getContent().forEach(this::processLink);
-
-            pageNumber++;
-        } while (page.hasNext());
-
-        log.atInfo().setMessage("Завершение обработки ссылок").log();
+    public void processLinks(Integer limit) {
+        List<Link> oldestLinks = linkRepository.findOldestLinks(limit);
+        oldestLinks.forEach(this::processLink);
     }
 
     /**

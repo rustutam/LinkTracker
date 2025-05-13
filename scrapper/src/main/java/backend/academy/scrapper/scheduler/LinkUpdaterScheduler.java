@@ -10,11 +10,13 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LinkUpdaterScheduler {
+    private static final Integer LIMIT = 500;
     private final LinkProcessingService linkProcessingService;
 
     @Scheduled(fixedDelayString = "#{schedulerIntervalMs}")
     public void update() {
         log.atInfo().setMessage("Запуск планировщика обновления ссылок").log();
-        linkProcessingService.processLinks();
+        linkProcessingService.processLinks(LIMIT);
+        log.atInfo().setMessage("Завершение обработки ссылок").log();
     }
 }

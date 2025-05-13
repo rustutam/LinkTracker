@@ -1,5 +1,5 @@
 package backend.academy.scrapper.service;
 
 public interface LinkProcessingService {
-    void processLinks();
+    void processLinks(Integer limit);
 }
