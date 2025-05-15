@@ -1,35 +1,35 @@
-//package backend.academy.scrapper.sender;
+// package backend.academy.scrapper.sender;
 //
-//import backend.academy.scrapper.scheduler.LinkUpdaterScheduler;
-//import dto.LinkUpdate;
-//import org.apache.kafka.clients.producer.ProducerConfig;
-//import org.apache.kafka.common.serialization.StringSerializer;
-//import org.junit.jupiter.api.DisplayName;
-//import org.junit.jupiter.api.Test;
-//import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.context.SpringBootTest;
-//import org.springframework.kafka.core.ConsumerFactory;
-//import org.springframework.kafka.core.DefaultKafkaProducerFactory;
-//import org.springframework.kafka.core.KafkaTemplate;
-//import org.springframework.test.annotation.DirtiesContext;
-//import org.springframework.test.context.DynamicPropertyRegistry;
-//import org.springframework.test.context.DynamicPropertySource;
-//import org.springframework.test.context.TestPropertySource;
-//import org.springframework.test.context.bean.override.mockito.MockitoBean;
-//import org.testcontainers.junit.jupiter.Container;
-//import org.testcontainers.junit.jupiter.Testcontainers;
-//import org.testcontainers.kafka.ConfluentKafkaContainer;
-//import java.util.List;
-//import java.util.Map;
-//import static org.junit.jupiter.api.Assertions.assertEquals;
-//import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS;
+// import backend.academy.scrapper.scheduler.LinkUpdaterScheduler;
+// import dto.LinkUpdate;
+// import org.apache.kafka.clients.producer.ProducerConfig;
+// import org.apache.kafka.common.serialization.StringSerializer;
+// import org.junit.jupiter.api.DisplayName;
+// import org.junit.jupiter.api.Test;
+// import org.springframework.beans.factory.annotation.Autowired;
+// import org.springframework.boot.test.context.SpringBootTest;
+// import org.springframework.kafka.core.ConsumerFactory;
+// import org.springframework.kafka.core.DefaultKafkaProducerFactory;
+// import org.springframework.kafka.core.KafkaTemplate;
+// import org.springframework.test.annotation.DirtiesContext;
+// import org.springframework.test.context.DynamicPropertyRegistry;
+// import org.springframework.test.context.DynamicPropertySource;
+// import org.springframework.test.context.TestPropertySource;
+// import org.springframework.test.context.bean.override.mockito.MockitoBean;
+// import org.testcontainers.junit.jupiter.Container;
+// import org.testcontainers.junit.jupiter.Testcontainers;
+// import org.testcontainers.kafka.ConfluentKafkaContainer;
+// import java.util.List;
+// import java.util.Map;
+// import static org.junit.jupiter.api.Assertions.assertEquals;
+// import static org.springframework.test.annotation.DirtiesContext.ClassMode.AFTER_CLASS;
 //
-//@SpringBootTest
-//@TestPropertySource(properties = "app.message-transport=Kafka")
-//@Testcontainers
+// @SpringBootTest
+// @TestPropertySource(properties = "app.message-transport=Kafka")
+// @Testcontainers
 //// close consumers and producers after test
-//@DirtiesContext(classMode = AFTER_CLASS)
-//class BotKafkaSenderTest {
+// @DirtiesContext(classMode = AFTER_CLASS)
+// class BotKafkaSenderTest {
 //
 //    @Container
 //    protected static final ConfluentKafkaContainer kafka = new ConfluentKafkaContainer("confluentinc/cp-kafka:7.4.0");
@@ -99,4 +99,4 @@
 ////        assertEquals(linkUpdate, receivedMessage);
 ////    }
 //
-//}
+// }

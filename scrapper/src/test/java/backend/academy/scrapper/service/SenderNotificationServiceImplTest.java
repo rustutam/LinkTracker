@@ -1,5 +1,12 @@
 package backend.academy.scrapper.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+
 import backend.academy.scrapper.models.domain.UpdatedLink;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.LinkId;
@@ -11,13 +18,6 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-
 
 class SenderNotificationServiceImplTest {
 
@@ -36,11 +36,11 @@ class SenderNotificationServiceImplTest {
     void notifySender_shouldSendUpdateAndDelete() {
         // given
         UpdatedLink updatedLink = UpdatedLink.builder()
-            .id(new LinkId(1L))
-            .uri(URI.create("https://example.com"))
-            .description("Test update")
-            .chatIds(List.of(new ChatId(100L), new ChatId(200L)))
-            .build();
+                .id(new LinkId(1L))
+                .uri(URI.create("https://example.com"))
+                .description("Test update")
+                .chatIds(List.of(new ChatId(100L), new ChatId(200L)))
+                .build();
 
         // when
         senderNotificationService.notifySender(updatedLink);
@@ -61,14 +61,13 @@ class SenderNotificationServiceImplTest {
     void notifySender_shouldLogErrorAndNotDelete_ifSenderFails() {
         // given
         UpdatedLink updatedLink = UpdatedLink.builder()
-            .id(new LinkId(2L))
-            .uri(URI.create("https://example.com/fail"))
-            .description("Failing update")
-            .chatIds(List.of(new ChatId(300L)))
-            .build();
+                .id(new LinkId(2L))
+                .uri(URI.create("https://example.com/fail"))
+                .description("Failing update")
+                .chatIds(List.of(new ChatId(300L)))
+                .build();
 
-        doThrow(new RuntimeException("Sender failure")).when(linkUpdateSender)
-            .sendUpdates(any(LinkUpdate.class));
+        doThrow(new RuntimeException("Sender failure")).when(linkUpdateSender).sendUpdates(any(LinkUpdate.class));
 
         // when
         senderNotificationService.notifySender(updatedLink);
@@ -76,6 +75,5 @@ class SenderNotificationServiceImplTest {
         // then
         verify(linkUpdateSender).sendUpdates(any(LinkUpdate.class));
         verify(linkUpdateRepository, never()).deleteById(any());
-
     }
 }

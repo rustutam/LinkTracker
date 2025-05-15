@@ -1,5 +1,9 @@
 package backend.academy.bot;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+
 import backend.academy.bot.api.kafka.UpdatesMessageConsumer;
 import backend.academy.bot.api.services.UpdatesService;
 import backend.academy.bot.config.KafkaConsumerConfig;
@@ -15,9 +19,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @EmbeddedKafka(

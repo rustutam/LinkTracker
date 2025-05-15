@@ -1,13 +1,11 @@
 package backend.academy.scrapper.repository.database.jdbc.mapper;
 
-import backend.academy.scrapper.models.domain.Link;
 import backend.academy.scrapper.models.domain.UpdatedLink;
 import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.LinkId;
 import java.net.URI;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import org.springframework.jdbc.core.RowMapper;
@@ -23,15 +21,14 @@ public class UpdatedLinkRowMapper implements RowMapper<UpdatedLink> {
     @Override
     public UpdatedLink mapRow(ResultSet rs, int rowNum) throws SQLException {
         List<ChatId> chatIds = Arrays.stream(rs.getString(COLUMN_CHAT_ID).split(","))
-            .map(String::trim)           // убираем пробелы, если есть
-            .map(s -> new ChatId(Long.parseLong(s)))      // парсим в ChatId
-            .toList();
+                .map(String::trim) // убираем пробелы, если есть
+                .map(s -> new ChatId(Long.parseLong(s))) // парсим в ChatId
+                .toList();
 
         return new UpdatedLink(
-            new LinkId(rs.getLong(COLUMN_LINK_ID)),
-            URI.create(rs.getString(COLUMN_URI)),
-            rs.getString(COLUMN_DESCRIPTION),
-            chatIds
-        );
+                new LinkId(rs.getLong(COLUMN_LINK_ID)),
+                URI.create(rs.getString(COLUMN_URI)),
+                rs.getString(COLUMN_DESCRIPTION),
+                chatIds);
     }
 }

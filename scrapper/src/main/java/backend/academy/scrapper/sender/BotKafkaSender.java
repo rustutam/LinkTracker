@@ -1,6 +1,5 @@
 package backend.academy.scrapper.sender;
 
-
 import backend.academy.scrapper.configuration.KafkaConfig;
 import backend.academy.scrapper.exceptions.ApiErrorResponseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,8 +27,8 @@ public class BotKafkaSender implements LinkUpdateSender {
         var data = objectMapper.writeValueAsString(linkUpdate);
         defaulKafkaTemplate.send(topicProperties.topic(), linkUpdate.id(), data);
         log.atInfo()
-            .addKeyValue("link", linkUpdate.url())
-            .setMessage("Отправка обновления по Kafka")
-            .log();
+                .addKeyValue("link", linkUpdate.url())
+                .setMessage("Отправка обновления по Kafka")
+                .log();
     }
 }

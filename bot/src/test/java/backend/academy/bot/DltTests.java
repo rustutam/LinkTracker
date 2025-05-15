@@ -1,7 +1,11 @@
 package backend.academy.bot;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import backend.academy.bot.api.kafka.UpdatesMessageConsumer;
 import backend.academy.bot.config.KafkaConsumerConfig;
+import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.common.serialization.LongDeserializer;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -15,11 +19,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.kafka.test.utils.KafkaTestUtils;
-
-import java.util.Map;
-import java.util.concurrent.ExecutionException;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @EmbeddedKafka(

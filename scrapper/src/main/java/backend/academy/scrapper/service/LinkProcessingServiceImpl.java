@@ -27,10 +27,9 @@ public class LinkProcessingServiceImpl implements LinkProcessingService {
         updatedLinks.forEach(updatedLink -> {
             outboxPersistenceService.process(updatedLink, updateStartTime);
             log.atInfo()
-                .addKeyValue("link", updatedLink.uri().toString())
-                .setMessage("Найдено обновление для ссылки")
-                .log();
+                    .addKeyValue("link", updatedLink.uri().toString())
+                    .setMessage("Найдено обновление для ссылки")
+                    .log();
         });
-
     }
 }

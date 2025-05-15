@@ -1,5 +1,9 @@
 package backend.academy.bot;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import backend.academy.bot.api.cache.KeyGenerator;
 import backend.academy.bot.api.cache.RedisCacheStorage;
 import backend.academy.bot.api.dto.ListLinksItem;
@@ -25,9 +29,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.testcontainers.containers.GenericContainer;
 import org.testcontainers.junit.jupiter.Testcontainers;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 @Testcontainers
 @SpringBootTest

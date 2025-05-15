@@ -96,10 +96,6 @@ public class JdbcLinkRepository implements LinkRepository {
     @Override
     public List<Link> findOldestLinks(int limit) {
         String sql = "SELECT * FROM scrapper.links ORDER BY last_modified_date ASC LIMIT ?";
-        return jdbcTemplate.query(
-            sql,
-            rowMapper,
-            limit
-        );
+        return jdbcTemplate.query(sql, rowMapper, limit);
     }
 }

@@ -2,7 +2,7 @@ package backend.academy.scrapper;
 
 public class ClientsResponses {
     public static final String githubApiResponseWithTwoIssues =
-        """
+            """
             [
               {
                 "url": "https://api.github.com/repos/rustutam/TestRepo/issues/8",

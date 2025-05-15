@@ -25,19 +25,18 @@ public class SenderNotificationServiceImpl implements SenderNotificationService 
             linkUpdateRepository.deleteById(updatedLink.id());
         } catch (Exception ex) {
             log.atError()
-                .addKeyValue("linkUpdateId", updatedLink.id().id())
-                .addKeyValue("link", updatedLink.uri())
-                .setMessage("Ошибка отправки уведомления в sender: " + ex.getMessage())
-                .log();
+                    .addKeyValue("linkUpdateId", updatedLink.id().id())
+                    .addKeyValue("link", updatedLink.uri())
+                    .setMessage("Ошибка отправки уведомления в sender: " + ex.getMessage())
+                    .log();
         }
     }
 
     private LinkUpdate map(UpdatedLink updatedLink) {
         return new LinkUpdate(
-            updatedLink.id().id(),
-            updatedLink.uri().toString(),
-            updatedLink.description(),
-            updatedLink.chatIds().stream().map(ChatId::id).toList()
-        );
+                updatedLink.id().id(),
+                updatedLink.uri().toString(),
+                updatedLink.description(),
+                updatedLink.chatIds().stream().map(ChatId::id).toList());
     }
 }

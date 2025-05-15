@@ -11,9 +11,7 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(prefix = "app", name = "message-transport", havingValue = "Http")
 public class HttpSenderConfig {
     @Bean
-    public LinkUpdateSender httpUpdateSender(
-        ScrapperConfig scrapperConfig
-    ) {
+    public LinkUpdateSender httpUpdateSender(ScrapperConfig scrapperConfig) {
         return new BotHttpSender(scrapperConfig);
     }
 }

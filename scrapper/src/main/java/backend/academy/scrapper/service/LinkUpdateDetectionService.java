@@ -22,21 +22,21 @@ public class LinkUpdateDetectionService {
 
     public List<UpdatedLink> getUpdatedLinks(List<Link> links) {
         return links.stream()
-            .map(link -> {
-                try {
-                    return Optional.of(updateCheckService.detectChanges(link));
-                } catch (Exception ex) {
-                    log.atError()
-                        .addKeyValue("link", link.uri().toString())
-                        .setMessage("Ошибка при получении обновлений.\n" + ex.getMessage())
-                        .log();
-                    return Optional.<LinkChangeStatus>empty();
-                }
-            })
-            .flatMap(Optional::stream)
-            .filter(LinkChangeStatus::hasChanges)
-            .flatMap(l -> mapToUpdatedLinks(l).stream())
-            .toList();
+                .map(link -> {
+                    try {
+                        return Optional.of(updateCheckService.detectChanges(link));
+                    } catch (Exception ex) {
+                        log.atError()
+                                .addKeyValue("link", link.uri().toString())
+                                .setMessage("Ошибка при получении обновлений.\n" + ex.getMessage())
+                                .log();
+                        return Optional.<LinkChangeStatus>empty();
+                    }
+                })
+                .flatMap(Optional::stream)
+                .filter(LinkChangeStatus::hasChanges)
+                .flatMap(l -> mapToUpdatedLinks(l).stream())
+                .toList();
     }
 
     private List<UpdatedLink> mapToUpdatedLinks(LinkChangeStatus linkChangeStatus) {
@@ -46,18 +46,18 @@ public class LinkUpdateDetectionService {
         List<ChatId> chatIds = getChatIdsSubscribedToLink(link);
 
         return linkChangeStatus.changeInfoList().stream()
-            .map(changeInfo -> UpdatedLink.builder()
-                .id(linkId)
-                .uri(uri)
-                .description(changeInfo.toString())
-                .chatIds(chatIds)
-                .build())
-            .toList();
+                .map(changeInfo -> UpdatedLink.builder()
+                        .id(linkId)
+                        .uri(uri)
+                        .description(changeInfo.toString())
+                        .chatIds(chatIds)
+                        .build())
+                .toList();
     }
 
     private List<ChatId> getChatIdsSubscribedToLink(Link link) {
         return subscriptionRepository.findByLink(link).stream()
-            .map(subscription -> subscription.user().chatId())
-            .toList();
+                .map(subscription -> subscription.user().chatId())
+                .toList();
     }
 }

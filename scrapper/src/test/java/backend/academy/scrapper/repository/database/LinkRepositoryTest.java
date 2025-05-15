@@ -184,7 +184,7 @@ public abstract class LinkRepositoryTest extends IntegrationEnvironment {
     @Test
     @Sql(scripts = "/sql/insert_links.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void findOldestLinksTest(){
+    void findOldestLinksTest() {
         // Arrange
         URI uri1 = URI.create("https://github.com/java-rustutam/semester1");
         URI uri2 = URI.create("https://github.com/java-rustutam/semester2");

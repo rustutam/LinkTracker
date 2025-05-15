@@ -17,8 +17,7 @@ public record ScrapperConfig(
         StackOverflowConfig stackOverflow,
         TgBotConfig tgBot,
         KafkaConfig kafka,
-        @Bean String messageTransport
-) {
+        @Bean String messageTransport) {
     public record Scheduler(@NotNull Duration checkUpdateInterval, @NotNull Duration sendUpdateInterval) {}
 
     public record GitHubConfig(@NotEmpty String baseUri, @NotEmpty String token) {}
@@ -27,12 +26,8 @@ public record ScrapperConfig(
 
     public record TgBotConfig(@NotEmpty String baseUri) {}
 
-    public record KafkaConfig(
-        @NotBlank String bootstrapServers,
-        @NotNull Topics topics) {
+    public record KafkaConfig(@NotBlank String bootstrapServers, @NotNull Topics topics) {
 
-        public record Topics(
-            @NotBlank String linkUpdates,
-            @NotBlank String deadLetter) {}
+        public record Topics(@NotBlank String linkUpdates, @NotBlank String deadLetter) {}
     }
 }

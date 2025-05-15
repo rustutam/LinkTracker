@@ -27,8 +27,8 @@ public class JpaLinkUpdateRepository implements LinkUpdateRepository {
     @Override
     public UpdatedLink save(UpdatedLink updatedLink) {
         String chatIdsAsText = updatedLink.chatIds().stream()
-            .map(chatId -> chatId.id().toString())
-            .collect(Collectors.joining(","));
+                .map(chatId -> chatId.id().toString())
+                .collect(Collectors.joining(","));
 
         UpdatedLinkEntity updatedLinkEntity = new UpdatedLinkEntity();
         updatedLinkEntity.linkId(updatedLink.id().id());
