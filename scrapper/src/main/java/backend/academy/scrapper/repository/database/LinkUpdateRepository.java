@@ -5,7 +5,7 @@ import backend.academy.scrapper.models.domain.ids.LinkId;
 import java.util.List;
 
 public interface LinkUpdateRepository {
-    // получать не все а только батчи;
+
     List<UpdatedLink> findAll();
 
     UpdatedLink save(UpdatedLink updatedLink);
