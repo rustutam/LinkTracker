@@ -35,4 +35,9 @@ public class RegexCheck {
         Matcher githubMatcher = githubPattern.matcher(url);
         return githubMatcher.find();
     }
+
+    public boolean isStackOverflow(String url) {
+        Matcher stackOverflowMatcher = stackOverflowPattern.matcher(url);
+        return stackOverflowMatcher.find();
+    }
 }

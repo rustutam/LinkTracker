@@ -1,31 +1,38 @@
 package backend.academy.scrapper.service;
 
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
-import backend.academy.scrapper.repository.database.LinksRepository;
+import backend.academy.scrapper.exceptions.NotExistUserException;
+import backend.academy.scrapper.models.domain.ids.ChatId;
+import backend.academy.scrapper.repository.database.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChatServiceImpl implements ChatService {
-    private final LinksRepository linksRepository;
+    private final UserRepository userRepository;
 
     @Override
-    public void register(long chatId) {
-
-        if (linksRepository.isRegistered(chatId)) {
+    public void register(ChatId chatId) {
+        try {
+            userRepository.save(chatId);
+        } catch (DoubleRegistrationException e) {
+            log.atError()
+                    .addKeyValue("chatId", chatId)
+                    .setMessage("Пользователь с таким chatId уже зарегистрирован")
+                    .log();
             throw new DoubleRegistrationException();
         }
-
-        linksRepository.register(chatId);
     }
 
     @Override
-    public void unRegister(long chatId) {
-        if (!linksRepository.isRegistered(chatId)) {
-            throw new NotExistTgChatException();
+    public void unRegister(ChatId chatId) {
+        try {
+            userRepository.deleteByChatId(chatId);
+        } catch (NotExistUserException e) {
+            throw new NotExistUserException();
         }
-        linksRepository.unRegister(chatId);
     }
 }

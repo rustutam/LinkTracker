@@ -1,62 +1,74 @@
 package backend.academy.scrapper.controller;
 
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import backend.academy.scrapper.handler.ChatHandler;
+import backend.academy.scrapper.IntegrationEnvironment;
+import backend.academy.scrapper.models.domain.ids.ChatId;
+import backend.academy.scrapper.repository.database.jdbc.JdbcUserRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest(ChatController.class)
+@SpringBootTest
 @AutoConfigureMockMvc
-class ChatControllerTest {
+class ChatControllerTest extends IntegrationEnvironment {
 
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
-    private ChatHandler chatHandler;
+    @Autowired
+    private JdbcUserRepository userRepository;
 
     @Test
+    @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void tgChatIdPost_ValidId_ReturnsOk() throws Exception {
-        Long chatId = 1L;
+        ChatId chatId = new ChatId(123L);
 
-        mockMvc.perform(post("/tg-chat/{id}", chatId)).andExpect(status().isOk());
+        mockMvc.perform(post("/tg-chat/{id}", chatId.id())).andExpect(status().isOk());
 
-        verify(chatHandler, times(1)).register(chatId);
+        assertTrue(userRepository.findByChatId(chatId).isPresent());
     }
 
     @Test
-    void tgChatIdPost_InvalidId_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(post("/tg-chat/{id}", "invalid")).andExpect(status().isBadRequest());
+    @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void doubleRegistrationTest() throws Exception {
+        ChatId chatId = new ChatId(123L);
 
-        verifyNoInteractions(chatHandler);
+        // Первая регистрация
+        mockMvc.perform(post("/tg-chat/{id}", chatId.id())).andExpect(status().isOk());
+
+        // Вторая регистрация, должна вернуться 406 ответ
+        mockMvc.perform(post("/tg-chat/{id}", chatId.id())).andExpect(status().isNotAcceptable());
     }
 
     @Test
+    @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void tgChatIdDelete_ValidId_ReturnsOk() throws Exception {
-        Long chatId = 1L;
+        ChatId chatId = new ChatId(123L);
 
-        mockMvc.perform(delete("/tg-chat/{id}", chatId)).andExpect(status().isOk());
+        // Регистрация
+        mockMvc.perform(post("/tg-chat/{id}", chatId.id())).andExpect(status().isOk());
 
-        verify(chatHandler, times(1)).unregister(chatId);
+        // Удаление
+        mockMvc.perform(delete("/tg-chat/{id}", chatId.id())).andExpect(status().isOk());
+
+        assertTrue(userRepository.findByChatId(chatId).isEmpty());
     }
 
     @Test
-    void tgChatIdDelete_InvalidId_ReturnsBadRequest() throws Exception {
-        mockMvc.perform(delete("/tg-chat/{id}", "invalid")).andExpect(status().isBadRequest());
+    @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
+    void whenChatDeleteWithUnauthorizedUserThenReturnUnauthorized() throws Exception {
+        ChatId chatId = new ChatId(123L);
 
-        verifyNoInteractions(chatHandler);
+        // Удаление не зарегистрированного чата, должно вернуть 401
+        mockMvc.perform(delete("/tg-chat/{id}", chatId.id())).andExpect(status().isUnauthorized());
+
+        assertTrue(userRepository.findByChatId(chatId).isEmpty());
     }
 }

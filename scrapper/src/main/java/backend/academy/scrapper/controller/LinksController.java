@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class LinksController implements Controller {
+public class LinksController {
     private final LinkHandler linkHandler;
 
     @GetMapping("/links")

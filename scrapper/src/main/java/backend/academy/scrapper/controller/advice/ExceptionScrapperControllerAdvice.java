@@ -4,7 +4,7 @@ import backend.academy.scrapper.exceptions.AlreadyTrackLinkException;
 import backend.academy.scrapper.exceptions.DoubleRegistrationException;
 import backend.academy.scrapper.exceptions.InvalidLinkException;
 import backend.academy.scrapper.exceptions.NotExistLinkException;
-import backend.academy.scrapper.exceptions.NotExistTgChatException;
+import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.exceptions.NotTrackLinkException;
 import dto.response.ApiErrorResponse;
 import java.util.Arrays;
@@ -54,13 +54,13 @@ public class ExceptionScrapperControllerAdvice {
                         .build());
     }
 
-    @ExceptionHandler(NotExistTgChatException.class)
-    public ResponseEntity<ApiErrorResponse> exceptionNotExistChat(NotExistTgChatException e) {
+    @ExceptionHandler(NotExistUserException.class)
+    public ResponseEntity<ApiErrorResponse> exceptionNotExistChat(NotExistUserException e) {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                 .body(ApiErrorResponse.builder()
                         .description(CHAT_NOT_REGISTER_DESCRIPTION)
                         .code(UNAUTHORIZED_HTTP_CODE)
-                        .exceptionName(NotExistTgChatException.class.getName())
+                        .exceptionName(NotExistUserException.class.getName())
                         .exceptionMessage(CHAT_NOT_REGISTER_DESCRIPTION)
                         .stacktrace(Arrays.stream(e.getStackTrace())
                                 .map(StackTraceElement::toString)

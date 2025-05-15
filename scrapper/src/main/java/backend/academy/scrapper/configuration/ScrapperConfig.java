@@ -4,19 +4,21 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.Duration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-@ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
+@ConfigurationProperties(prefix = "app")
 public record ScrapperConfig(
-        @Bean @NotNull Scheduler scheduler,
-        @NotEmpty String githubToken,
-        @NotEmpty String githubUri,
-        StackOverflowCredentials stackOverflow,
-        @NotEmpty String stackOverflowUri,
-        @NotEmpty String baseUri) {
-    public record StackOverflowCredentials(@NotEmpty String key, @NotEmpty String accessToken) {}
-
+        @NotNull Scheduler scheduler,
+        @NotNull Integer batchSize,
+        GitHubConfig github,
+        StackOverflowConfig stackOverflow,
+        TgBotConfig tgBot) {
     public record Scheduler(@NotNull Duration interval) {}
+
+    public record GitHubConfig(@NotEmpty String baseUri, @NotEmpty String token) {}
+
+    public record StackOverflowConfig(@NotEmpty String baseUri, @NotEmpty String key, @NotEmpty String accessToken) {}
+
+    public record TgBotConfig(@NotEmpty String baseUri) {}
 }

@@ -5,6 +5,8 @@ import java.util.List;
 
 /** ListLinksResponse */
 public record ListLinksResponse(@Valid List<@Valid LinkResponse> links, Integer size) {
+    // TODO убрать это
+
     @Override
     public String toString() {
         if (size == 0) {
