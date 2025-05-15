@@ -19,7 +19,7 @@ public record ScrapperConfig(
         KafkaConfig kafka,
         @Bean String messageTransport
 ) {
-    public record Scheduler(@NotNull Duration interval) {}
+    public record Scheduler(@NotNull Duration checkUpdateInterval, @NotNull Duration sendUpdateInterval) {}
 
     public record GitHubConfig(@NotEmpty String baseUri, @NotEmpty String token) {}
 
