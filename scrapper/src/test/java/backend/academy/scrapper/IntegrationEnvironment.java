@@ -1,6 +1,5 @@
 package backend.academy.scrapper;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -12,11 +11,9 @@ import liquibase.database.core.PostgresDatabase;
 import liquibase.database.jvm.JdbcConnection;
 import liquibase.resource.DirectoryResourceAccessor;
 import org.junit.jupiter.api.BeforeAll;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.test.web.servlet.MockMvc;
 import org.testcontainers.containers.PostgreSQLContainer;
 
 @AutoConfigureMockMvc
@@ -28,12 +25,6 @@ public abstract class IntegrationEnvironment {
         postgres = new PostgreSQLContainer<>("postgres:17");
         postgres.start();
     }
-
-    @Autowired
-    protected MockMvc mockMvc;
-
-    @Autowired
-    protected ObjectMapper objectMapper;
 
     @DynamicPropertySource
     static void configureProperties(DynamicPropertyRegistry registry) {

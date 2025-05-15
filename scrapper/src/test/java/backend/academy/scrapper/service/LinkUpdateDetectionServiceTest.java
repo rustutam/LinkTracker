@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import backend.academy.scrapper.ClientsResponses;
+import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.TestModelFactory;
 import backend.academy.scrapper.TestUtils;
 import backend.academy.scrapper.client.GithubClient;
@@ -23,11 +24,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Profile;
 
 @SpringBootTest
-@Profile("test")
-class LinkUpdateDetectionServiceTest {
+class LinkUpdateDetectionServiceTest extends IntegrationEnvironment {
 
     @Autowired
     LinkUpdateDetectionService linkUpdateDetectionService;
