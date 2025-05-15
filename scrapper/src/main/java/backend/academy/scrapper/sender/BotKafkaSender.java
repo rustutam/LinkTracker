@@ -27,5 +27,9 @@ public class BotKafkaSender implements LinkUpdateSender {
     public void sendUpdates(LinkUpdate linkUpdate) throws ApiErrorResponseException {
         var data = objectMapper.writeValueAsString(linkUpdate);
         defaulKafkaTemplate.send(topicProperties.topic(), linkUpdate.id(), data);
+        log.atInfo()
+            .addKeyValue("link", linkUpdate.url())
+            .setMessage("Отправка обновления по Kafka")
+            .log();
     }
 }

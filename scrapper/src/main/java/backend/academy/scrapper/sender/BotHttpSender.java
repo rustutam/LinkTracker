@@ -28,7 +28,6 @@ public class BotHttpSender implements LinkUpdateSender {
         value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
         justification = "Когда я ловлю ошибку, она не null")
     public void sendUpdates(LinkUpdate linkUpdate) throws ApiErrorResponseException {
-        log.info("sending an update {}", linkUpdate);
         try {
             restClient
                 .post()
@@ -36,6 +35,11 @@ public class BotHttpSender implements LinkUpdateSender {
                 .body(linkUpdate)
                 .retrieve()
                 .toBodilessEntity();
+
+            log.atInfo()
+                .addKeyValue("link", linkUpdate.url())
+                .setMessage("Отправка обновления по HTTP")
+                .log();
         } catch (HttpClientErrorException e) {
             throw e.getResponseBodyAs(ApiErrorResponseException.class);
         }
