@@ -1,6 +1,7 @@
 app:
   scheduler:
-    interval: 10s
+    check-update-interval: 20s
+    send-update-interval: 99999s
 
   batch-size: 1000
 

@@ -1,96 +1,82 @@
 package backend.academy.scrapper.service;
 
+import backend.academy.scrapper.models.domain.Link;
+import backend.academy.scrapper.models.domain.UpdatedLink;
+import backend.academy.scrapper.models.domain.ids.ChatId;
+import backend.academy.scrapper.models.domain.ids.LinkId;
+import backend.academy.scrapper.repository.database.LinkRepository;
+import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.List;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import backend.academy.scrapper.IntegrationEnvironment;
-import backend.academy.scrapper.models.domain.ChangeInfo;
-import backend.academy.scrapper.models.domain.Link;
-import backend.academy.scrapper.models.domain.LinkChangeStatus;
-import backend.academy.scrapper.repository.database.LinkRepository;
-import backend.academy.scrapper.scheduler.LinkUpdaterScheduler;
-import java.util.List;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.jdbc.Sql;
 
-@SpringBootTest
-@ActiveProfiles("test")
-class LinkProcessingServiceImplTest extends IntegrationEnvironment {
+class LinkProcessingServiceImplTest {
 
-    @Autowired
-    private LinkProcessingService service;
-
-    @Autowired
     private LinkRepository linkRepository;
+    private OutboxPersistenceService outboxPersistenceService;
+    private LinkUpdateDetectionService linkUpdateDetectionService;
 
-    @MockitoBean
-    private UpdateCheckService updateCheckService;
+    private LinkProcessingServiceImpl linkProcessingService;
 
-    @MockitoBean
-    private SenderNotificationService senderNotificationService;
+    @BeforeEach
+    void setUp() {
+        linkRepository = mock(LinkRepository.class);
+        outboxPersistenceService = mock(OutboxPersistenceService.class);
+        linkUpdateDetectionService = mock(LinkUpdateDetectionService.class);
 
-    @MockitoBean
-    private LinkUpdaterScheduler linkUpdaterScheduler;
-
-    @Test
-    void processLinks_noPages_shouldStopWithoutProcessing() {
-        service.processLinks();
-
-        // Проверяем, что поиск был сделан один раз, а дальше exit
-        verifyNoInteractions(updateCheckService, senderNotificationService);
+        linkProcessingService = new LinkProcessingServiceImpl(
+            linkRepository,
+            outboxPersistenceService,
+            linkUpdateDetectionService
+        );
     }
 
     @Test
-    @Sql(scripts = "/sql/insert_links.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
-    @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
-    void ProcessLinksTest() {
-        // Arrange
-        List<Link> links = linkRepository.findAll();
+    void processLinks_shouldProcessDetectedUpdates() {
+        // given
+        OffsetDateTime startTime = OffsetDateTime.now();
+        int limit = 1;
 
-        LinkChangeStatus st0 = getLinkChangeStatusWithChange(links.getFirst());
-        LinkChangeStatus st1 = getLinkChangeStatusWithoutChange(links.get(1));
-        LinkChangeStatus st2 = getLinkChangeStatusWithChange(links.get(2));
-        LinkChangeStatus st3 = getLinkChangeStatusWithChange(links.get(3));
-        LinkChangeStatus st4 = getLinkChangeStatusWithChange(links.get(4));
-        LinkChangeStatus st5 = getLinkChangeStatusWithoutChange(links.get(5));
+        LinkId linkId = new LinkId(1L);
+        Link link = new Link(linkId, URI.create("https://example.com"), OffsetDateTime.now(), OffsetDateTime.now());
 
-        when(updateCheckService.detectChanges(links.getFirst())).thenReturn(st0);
-        when(updateCheckService.detectChanges(links.get(1))).thenReturn(st1);
-        when(updateCheckService.detectChanges(links.get(2))).thenReturn(st2);
-        when(updateCheckService.detectChanges(links.get(3))).thenReturn(st3);
-        when(updateCheckService.detectChanges(links.get(4))).thenReturn(st4);
-        when(updateCheckService.detectChanges(links.get(5))).thenReturn(st5);
-        //        doNothing().when(senderNotificationService).notifySender(any(LinkChangeStatus.class));
+        UpdatedLink updatedLink = UpdatedLink.builder()
+            .id(linkId)
+            .uri(link.uri())
+            .description("Обновление найдено")
+            .chatIds(List.of(new ChatId(100L)))
+            .build();
 
-        // Act
-        service.processLinks();
+        when(linkRepository.findOldestLinks(limit)).thenReturn(List.of(link));
+        when(linkUpdateDetectionService.getUpdatedLinks(List.of(link))).thenReturn(List.of(updatedLink));
 
-        // Assert
-        verify(senderNotificationService).notifySender(st0);
-        verify(senderNotificationService, never()).notifySender(st1);
-        verify(senderNotificationService).notifySender(st2);
-        verify(senderNotificationService).notifySender(st3);
-        verify(senderNotificationService).notifySender(st4);
-        verify(senderNotificationService, never()).notifySender(st5);
+        // when
+        linkProcessingService.processLinks(limit, startTime);
+
+        // then
+        verify(linkRepository).findOldestLinks(limit);
+        verify(linkUpdateDetectionService).getUpdatedLinks(List.of(link));
+        verify(outboxPersistenceService).process(updatedLink, startTime);
     }
 
-    private LinkChangeStatus getLinkChangeStatusWithChange(Link link) {
-        List<ChangeInfo> changeInfoList = List.of(new ChangeInfo(
-                "Новый PR" + link.linkId().id(),
-                "Добавление нового поля в бд. Время" + link.lastUpdateTime().toString(),
-                "rust",
-                link.createdAt(),
-                "Добавил поле в доменную модель в " + link.uri().toString()));
-        return new LinkChangeStatus(link, true, changeInfoList);
-    }
+    @Test
+    void processLinks_shouldHandleNoLinks() {
+        // given
+        when(linkRepository.findOldestLinks(10)).thenReturn(List.of());
 
-    private LinkChangeStatus getLinkChangeStatusWithoutChange(Link link) {
-        return new LinkChangeStatus(link, false, List.of());
+        // when
+        linkProcessingService.processLinks(10, OffsetDateTime.now());
+
+        // then
+        verify(linkRepository).findOldestLinks(10);
+        verify(linkUpdateDetectionService).getUpdatedLinks(any());
+        verify(outboxPersistenceService, never()).process(any(), any());
     }
 }

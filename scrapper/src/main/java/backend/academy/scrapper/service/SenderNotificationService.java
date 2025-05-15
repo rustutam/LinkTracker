@@ -1,7 +1,7 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.models.domain.LinkChangeStatus;
+import backend.academy.scrapper.models.domain.UpdatedLink;
 
 public interface SenderNotificationService {
-    void notifySender(LinkChangeStatus linkChangeStatus);
+    void notifySender(UpdatedLink updatedLink);
 }

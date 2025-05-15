@@ -1,50 +1,43 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.models.domain.Link;
-import backend.academy.scrapper.models.domain.LinkChangeStatus;
-import backend.academy.scrapper.repository.database.SubscriptionRepository;
+import backend.academy.scrapper.models.domain.UpdatedLink;
+import backend.academy.scrapper.models.domain.ids.ChatId;
+import backend.academy.scrapper.repository.database.LinkUpdateRepository;
 import backend.academy.scrapper.sender.LinkUpdateSender;
 import dto.LinkUpdate;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SenderNotificationServiceImpl implements SenderNotificationService {
-    private final SubscriptionRepository subscriptionRepository;
     private final LinkUpdateSender linkUpdateSender;
+    private final LinkUpdateRepository linkUpdateRepository;
 
     @Override
-    public void notifySender(LinkChangeStatus linkChangeStatus) {
-        List<Long> chatIds = findSubscribersChatIds(linkChangeStatus.link());
-        if (chatIds.isEmpty()) {
-            return;
+    @Transactional
+    public void notifySender(UpdatedLink updatedLink) {
+        try {
+            linkUpdateSender.sendUpdates(map(updatedLink));
+            linkUpdateRepository.deleteById(updatedLink.id());
+        } catch (Exception ex) {
+            log.atError()
+                .addKeyValue("linkUpdateId", updatedLink.id().id())
+                .addKeyValue("link", updatedLink.uri())
+                .setMessage("Ошибка отправки уведомления в sender: " + ex.getMessage())
+                .log();
         }
-
-        LinkUpdate linkUpdate = createLinkUpdate(linkChangeStatus, chatIds);
-        linkUpdateSender.sendUpdates(linkUpdate);
     }
 
-    private List<Long> findSubscribersChatIds(Link link) {
-        return subscriptionRepository.findByLink(link).stream()
-            .map(subscription -> subscription.user().chatId().id())
-            .toList();
-    }
-
-    private LinkUpdate createLinkUpdate(LinkChangeStatus linkChangeStatus, List<Long> chatIds) {
-        String description = linkChangeStatus.changeInfoList().stream()
-            .map(Object::toString)
-            .collect(Collectors.joining("\n\n"));
-
+    private LinkUpdate map(UpdatedLink updatedLink) {
         return new LinkUpdate(
-            linkChangeStatus.link().linkId().id(),
-            linkChangeStatus.link().uri().toString(),
-            description,
-            chatIds
+            updatedLink.id().id(),
+            updatedLink.uri().toString(),
+            updatedLink.description(),
+            updatedLink.chatIds().stream().map(ChatId::id).toList()
         );
     }
-
-
 }

@@ -1,60 +1,36 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.configuration.ScrapperConfig;
 import backend.academy.scrapper.models.domain.Link;
-import backend.academy.scrapper.models.domain.LinkChangeStatus;
+import backend.academy.scrapper.models.domain.UpdatedLink;
 import backend.academy.scrapper.repository.database.LinkRepository;
+import java.time.OffsetDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class LinkProcessingServiceImpl implements LinkProcessingService {
     private final LinkRepository linkRepository;
-    private final SenderNotificationService senderNotificationService;
-    private final UpdateCheckService updateCheckService;
-    private final ScrapperConfig scrapperConfig;
+    private final OutboxPersistenceService outboxPersistenceService;
+    private final LinkUpdateDetectionService linkUpdateDetectionService;
 
-    /**
-     * Метод обрабатывает ссылки из базы данных пакетами (страницами) и проверяет наличие обновлений. Если обновление
-     * обнаружено – уведомляет пользователя через SenderNotificationService.
-     */
     @Override
-    public void processLinks(Integer limit) {
+    public void processLinks(Integer limit, OffsetDateTime updateStartTime) {
+
         List<Link> oldestLinks = linkRepository.findOldestLinks(limit);
-        oldestLinks.forEach(this::processLink);
-    }
 
-    /**
-     * Обрабатывает отдельную ссылку: проверяет наличие обновлений и уведомляет пользователя при необходимости.
-     *
-     * @param link объект ссылки, полученный из базы данных
-     */
-    private void processLink(Link link) {
-        try {
-            // Вызываем сервис для проверки обновлений по URL ссылки
-            LinkChangeStatus linkChangeStatus = updateCheckService.detectChanges(link);
+        List<UpdatedLink> updatedLinks = linkUpdateDetectionService.getUpdatedLinks(oldestLinks);
 
-            // Если получена информация об обновлении, уведомляем пользователя
-            if (linkChangeStatus.hasChanges()) {
-                senderNotificationService.notifySender(linkChangeStatus);
-                linkRepository.updateLastUpdateTime(
-                        linkChangeStatus.link().linkId(),
-                        linkChangeStatus.link().lastUpdateTime());
-                log.atInfo()
-                        .addKeyValue("Найдено обновление для ссылки", link.uri().toString())
-                        .setMessage("Отправка уведомления")
-                        .log();
-            }
-        } catch (Exception ex) {
-            log.atError()
-                    .addKeyValue("Ошибка при обработке ссылки", link.uri().toString())
-                    .setMessage(ex.getMessage())
-                    .log();
-        }
+        updatedLinks.forEach(updatedLink -> {
+            outboxPersistenceService.process(updatedLink, updateStartTime);
+            log.atInfo()
+                .addKeyValue("link", updatedLink.uri().toString())
+                .setMessage("Найдено обновление для ссылки")
+                .log();
+        });
+
     }
 }
