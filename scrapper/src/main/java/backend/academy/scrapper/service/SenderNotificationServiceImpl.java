@@ -1,36 +1,42 @@
 package backend.academy.scrapper.service;
 
-import backend.academy.scrapper.models.domain.LinkChangeStatus;
-import backend.academy.scrapper.models.domain.LinkUpdateNotification;
+import backend.academy.scrapper.models.domain.UpdatedLink;
 import backend.academy.scrapper.models.domain.ids.ChatId;
-import backend.academy.scrapper.models.domain.ids.LinkId;
-import backend.academy.scrapper.repository.database.SubscriptionRepository;
-import backend.academy.scrapper.sender.Sender;
-import java.util.List;
-import java.util.stream.Collectors;
+import backend.academy.scrapper.repository.database.LinkUpdateRepository;
+import backend.academy.scrapper.sender.LinkUpdateSender;
+import dto.LinkUpdate;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class SenderNotificationServiceImpl implements SenderNotificationService {
-    private final SubscriptionRepository subscriptionRepository;
-    private final Sender sender;
+    private final LinkUpdateSender linkUpdateSender;
+    private final LinkUpdateRepository linkUpdateRepository;
 
     @Override
-    public void notifySender(LinkChangeStatus linkChangeStatus) {
-        String description =
-                linkChangeStatus.changeInfoList().stream().map(Object::toString).collect(Collectors.joining("\n\n"));
+    @Transactional
+    public void notifySender(UpdatedLink updatedLink) {
+        try {
+            linkUpdateSender.sendUpdates(map(updatedLink));
+            linkUpdateRepository.deleteById(updatedLink.id());
+        } catch (Exception ex) {
+            log.atError()
+                    .addKeyValue("linkUpdateId", updatedLink.id().id())
+                    .addKeyValue("link", updatedLink.uri())
+                    .setMessage("Ошибка отправки уведомления в sender: " + ex.getMessage())
+                    .log();
+        }
+    }
 
-        LinkId linkId = linkChangeStatus.link().linkId();
-
-        List<ChatId> chatIds = subscriptionRepository.findByLink(linkChangeStatus.link()).stream()
-                .map(subscription -> subscription.user().chatId())
-                .toList();
-
-        LinkUpdateNotification linkUpdateNotification =
-                new LinkUpdateNotification(linkId, linkChangeStatus.link().uri(), description, chatIds);
-
-        sender.send(linkUpdateNotification);
+    private LinkUpdate map(UpdatedLink updatedLink) {
+        return new LinkUpdate(
+                updatedLink.id().id(),
+                updatedLink.uri().toString(),
+                updatedLink.description(),
+                updatedLink.chatIds().stream().map(ChatId::id).toList());
     }
 }

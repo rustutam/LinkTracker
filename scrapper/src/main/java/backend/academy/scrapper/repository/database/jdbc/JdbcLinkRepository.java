@@ -92,4 +92,10 @@ public class JdbcLinkRepository implements LinkRepository {
                 jdbcTemplate.query(SELECT_PAGINATED, rowMapper, pageable.getPageSize(), pageable.getOffset());
         return new PageImpl<>(content, pageable, total);
     }
+
+    @Override
+    public List<Link> findOldestLinks(int limit) {
+        String sql = "SELECT * FROM scrapper.links ORDER BY last_modified_date ASC LIMIT ?";
+        return jdbcTemplate.query(sql, rowMapper, limit);
+    }
 }

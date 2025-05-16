@@ -9,8 +9,13 @@ import org.springframework.context.annotation.Configuration;
 public class SchedulerConfig {
     private final ScrapperConfig scrapperConfig;
 
-    @Bean("schedulerIntervalMs")
-    public long schedulerIntervalMs() {
-        return scrapperConfig.scheduler().interval().toMillis();
+    @Bean
+    public long checkUpdateIntervalMs() {
+        return scrapperConfig.scheduler().checkUpdateInterval().toMillis();
+    }
+
+    @Bean
+    public long sendUpdateIntervalMs() {
+        return scrapperConfig.scheduler().sendUpdateInterval().toMillis();
     }
 }

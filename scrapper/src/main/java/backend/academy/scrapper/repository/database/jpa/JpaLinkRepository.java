@@ -14,7 +14,9 @@ import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -58,5 +60,11 @@ public class JpaLinkRepository implements LinkRepository {
     @Override
     public Page<Link> findAllPaginated(Pageable pageable) {
         return linkRepo.findAll(pageable).map(mapper::toDomain);
+    }
+
+    @Override
+    public List<Link> findOldestLinks(int limit) {
+        Pageable limit500 = PageRequest.of(0, limit, Sort.by("lastModifiedDate").ascending());
+        return linkRepo.findOldestLinks(limit500).stream().map(mapper::toDomain).toList();
     }
 }
