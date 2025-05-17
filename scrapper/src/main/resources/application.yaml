@@ -63,7 +63,38 @@ logging:
 
 resilience4j.ratelimiter:
   instances:
-    getHotelsVRateLimiter:
+    rateLimiter:
       limitForPeriod: 3
       timeout-duration: 0s
       limitRefreshPeriod: 5s
+
+resilience4j.retry:
+  instances:
+    github:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+      ignoreExceptions:
+        -
+    so:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+    bot:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+
+resilience4j.circuitbreaker:
+  instances:
+    cb1:
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 1
+      slidingWindowSize: 1
+      failureRateThreshold: 100
+      waitDurationInOpenState: 1s
+      permittedNumberOfCallsInHalfOpenState: 1
+

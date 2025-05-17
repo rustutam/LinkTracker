@@ -1,7 +1,7 @@
 app:
   telegram-token: ${TELEGRAM_TOKEN} # env variable
   scrapper-host: http://localhost:8081
-  http-timeout: 3000
+  http-timeout: 1000
 
 kafka:
   link-updates:
@@ -58,18 +58,13 @@ resilience4j.circuitbreaker:
 
 resilience4j.retry:
   instances:
-    registerUser:
+    retryRules:
       maxAttempts: 3
-      waitDuration: 300
-    trackLink:
-      maxAttempts: 3
-      waitDuration: 300
-    unTrackLink:
-      maxAttempts: 3
-      waitDuration: 300
-    list:
-      maxAttempts: 3
-      waitDuration: 300
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+      ignoreExceptions:
+        - backend.academy.bot.api.dto.ApiErrorResponse
 
 resilience4j.ratelimiter:
   instances:
@@ -77,3 +72,11 @@ resilience4j.ratelimiter:
       limitForPeriod: 3
       timeout-duration: 0s
       limitRefreshPeriod: 5s
+
+logging:
+  level:
+    io.github.resilience4j.retry: DEBUG
+    io.github.resilience4j.circuitbreaker: DEBUG
+    io.github.resilience4j.bulkhead: DEBUG
+    io.github.resilience4j.timelimiter: DEBUG
+    io.github.resilience4j.ratelimiter: DEBUG
