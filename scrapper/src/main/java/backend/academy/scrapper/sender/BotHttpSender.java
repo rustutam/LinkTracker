@@ -1,20 +1,24 @@
 package backend.academy.scrapper.sender;
 
 import backend.academy.scrapper.configuration.ScrapperConfig;
+import backend.academy.scrapper.configuration.clients.BotConfig;
 import backend.academy.scrapper.exceptions.ApiErrorResponseException;
 import dto.LinkUpdate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 @Slf4j
+@Service
+@ConditionalOnProperty(prefix = "app", name = "message-transport", havingValue = "Http")
 public class BotHttpSender implements LinkUpdateSender {
     private final RestClient restClient;
 
-    public BotHttpSender(ScrapperConfig scrapperConfig) {
-        this.restClient =
-                RestClient.builder().baseUrl(scrapperConfig.tgBot().baseUri()).build();
+    public BotHttpSender(BotConfig botConfig) {
+        restClient = botConfig.botRestClient();
     }
 
     @Override

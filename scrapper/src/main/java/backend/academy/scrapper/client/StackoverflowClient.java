@@ -1,7 +1,6 @@
 package backend.academy.scrapper.client;
 
-import backend.academy.scrapper.configuration.ScrapperConfig;
-import backend.academy.scrapper.configuration.ScrapperConfig.StackOverflowConfig;
+import backend.academy.scrapper.configuration.clients.StackOverflowConfig;
 import backend.academy.scrapper.exceptions.QuestionNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -11,16 +10,18 @@ import org.springframework.web.client.RestClientResponseException;
 @Component
 @Slf4j
 public class StackoverflowClient {
-    private final RestClient restClient;
-    private final StackOverflowConfig stackOverflowConfig;
     private static final String WITH_BODY = "withbody";
     private static final String REQUEST_ERROR = "Ошибка при запросе";
 
-    public StackoverflowClient(ScrapperConfig scrapperConfig) {
-        restClient = RestClient.builder()
-                .baseUrl(scrapperConfig.stackOverflow().baseUri())
-                .build();
-        this.stackOverflowConfig = scrapperConfig.stackOverflow();
+    private final RestClient restClient;
+    private final String key;
+    private final String token;
+
+
+    public StackoverflowClient(StackOverflowConfig stackOverflowConfig) {
+        restClient = stackOverflowConfig.stRestClient();
+        key = stackOverflowConfig.key();
+        token = stackOverflowConfig.accessToken();
     }
 
     public String getQuestionComments(String site, String questionId) {
@@ -44,7 +45,7 @@ public class StackoverflowClient {
     }
 
     private String performRequest(String url) {
-        url += "&key=" + stackOverflowConfig.key() + "&access_token=" + stackOverflowConfig.accessToken() + "&filter="
+        url += "&key=" + key + "&access_token=" + token + "&filter="
                 + WITH_BODY;
 
         try {
