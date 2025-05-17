@@ -11,5 +11,5 @@ import org.springframework.validation.annotation.Validated;
 public record ScrapperConfig(
         @NotNull Integer batchSize,
         @Bean String messageTransport,
-        @NotEmpty Integer httpTimeout) {
+        @NotNull Integer httpTimeout) {
 }

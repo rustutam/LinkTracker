@@ -2,21 +2,18 @@ app:
   scheduler:
     check-update-interval: 20s
     send-update-interval: 99999s
-
-  batch-size: 1000
-
   github:
     token: ${GITHUB_TOKEN} # env variable
     base-uri: https://api.github.com
-
   stackoverflow:
     key: ${SO_TOKEN_KEY}
     access-token: ${SO_ACCESS_TOKEN}
     base-uri: https://api.stackexchange.com/2.3
-
-  tg-bot:
+  bot:
     base-uri: http://localhost:8080
 
+  http-timeout: 3000
+  batch-size: 1000
   access-type: SQL
   message-transport: Kafka
 

@@ -1,7 +1,7 @@
 app:
   scheduler:
     check-update-interval: 20s
-    send-update-interval: 99999s
+    send-update-interval: 2s
   github:
     token: ${GITHUB_TOKEN} # env variable
     base-uri: https://api.github.com
