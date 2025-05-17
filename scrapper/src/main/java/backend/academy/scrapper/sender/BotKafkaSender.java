@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.message-transport", havingValue = "Kafka")
 public class BotKafkaSender implements LinkUpdateSender {
     private final KafkaTemplate defaulKafkaTemplate;
 

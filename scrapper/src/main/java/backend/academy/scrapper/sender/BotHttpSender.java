@@ -16,7 +16,6 @@ import org.springframework.web.client.RestClient;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@ConditionalOnProperty(prefix = "app", name = "message-transport", havingValue = "Http")
 public class BotHttpSender implements LinkUpdateSender {
     private final BotClient botClient;
 
