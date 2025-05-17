@@ -65,7 +65,7 @@ resilience4j.ratelimiter:
   instances:
     rateLimiter:
       limitForPeriod: 3
-      timeout-duration: 0s
+      timeout-duration: 1s
       limitRefreshPeriod: 5s
 
 resilience4j.retry:

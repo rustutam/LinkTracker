@@ -68,9 +68,9 @@ resilience4j.retry:
 
 resilience4j.ratelimiter:
   instances:
-    getHotelsVRateLimiter:
+    rateLimiter:
       limitForPeriod: 3
-      timeout-duration: 0s
+      timeout-duration: 1s
       limitRefreshPeriod: 5s
 
 logging:
