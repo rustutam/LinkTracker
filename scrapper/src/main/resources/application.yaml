@@ -63,3 +63,10 @@ logging:
   structured:
     format:
       file: ecs
+
+resilience4j.ratelimiter:
+  instances:
+    getHotelsVRateLimiter:
+      limitForPeriod: 3
+      timeout-duration: 0s
+      limitRefreshPeriod: 5s

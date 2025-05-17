@@ -44,3 +44,35 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui
+
+resilience4j.circuitbreaker:
+  instances:
+    cb1:
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 1
+      slidingWindowSize: 1
+      failureRateThreshold: 100
+      waitDurationInOpenState: 1s
+      permittedNumberOfCallsInHalfOpenState: 1
+
+resilience4j.retry:
+  instances:
+    registerUser:
+      maxAttempts: 3
+      waitDuration: 300
+    trackLink:
+      maxAttempts: 3
+      waitDuration: 300
+    unTrackLink:
+      maxAttempts: 3
+      waitDuration: 300
+    list:
+      maxAttempts: 3
+      waitDuration: 300
+
+resilience4j.ratelimiter:
+  instances:
+    getHotelsVRateLimiter:
+      limitForPeriod: 3
+      timeout-duration: 0s
+      limitRefreshPeriod: 5s
