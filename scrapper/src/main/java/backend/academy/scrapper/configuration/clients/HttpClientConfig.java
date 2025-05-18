@@ -1,6 +1,9 @@
 package backend.academy.scrapper.configuration.clients;
 
 import backend.academy.scrapper.configuration.ScrapperConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClients;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -10,10 +13,13 @@ public class HttpClientConfig {
 
     @Bean
     public HttpComponentsClientHttpRequestFactory httpRequestFactory(ScrapperConfig scrapperConfig) {
-        HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
-        factory.setConnectTimeout(scrapperConfig.httpTimeout());
-        factory.setReadTimeout(scrapperConfig.httpTimeout());
-        factory.setConnectionRequestTimeout(scrapperConfig.httpTimeout());
-        return factory;
+        CloseableHttpClient httpClient = HttpClients.custom()
+            .setDefaultRequestConfig(org.apache.hc.client5.http.config.RequestConfig.custom()
+                .setConnectTimeout(Timeout.ofMilliseconds(scrapperConfig.httpTimeout())) // Устанавливаем connectTimeout
+                .setResponseTimeout(Timeout.ofMilliseconds(scrapperConfig.httpTimeout())) // Устанавливаем readTimeout
+                .build())
+            .build();
+
+        return new HttpComponentsClientHttpRequestFactory(httpClient);
     }
 }

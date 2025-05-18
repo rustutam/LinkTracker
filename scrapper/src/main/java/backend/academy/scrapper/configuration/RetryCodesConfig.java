@@ -26,7 +26,7 @@ public record RetryCodesConfig(@NotEmpty List<String> instances, @NotEmpty List<
                                 return true;
                             }
                             if (throwable instanceof HttpServerErrorException) {
-                                int code = Integer.parseInt(throwable.getMessage());
+                                int code = ((HttpServerErrorException) throwable).getStatusCode().value();
                                 return config.codes().contains(code);
                             }
                             return false;

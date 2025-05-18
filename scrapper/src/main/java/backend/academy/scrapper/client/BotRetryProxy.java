@@ -7,14 +7,12 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Service
-//@ConditionalOnProperty(prefix = "app", name = "message-transport", havingValue = "Http")
 public class BotRetryProxy {
     private final RestClient restClient;
 
