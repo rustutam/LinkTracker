@@ -1,6 +1,7 @@
 package backend.academy.scrapper;
 
 import backend.academy.scrapper.configuration.KafkaConfig;
+import backend.academy.scrapper.configuration.RetryCodesConfig;
 import backend.academy.scrapper.configuration.SchedulerConfig;
 import backend.academy.scrapper.configuration.ScrapperConfig;
 import backend.academy.scrapper.configuration.clients.BotConfig;
@@ -20,6 +21,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
     BotConfig.class,
     SchedulerConfig.class,
     KafkaConfig.class,
+    RetryCodesConfig.class,
 })
 public class ScrapperApplication {
     public static void main(String[] args) {

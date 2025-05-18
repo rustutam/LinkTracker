@@ -68,6 +68,15 @@ resilience4j.ratelimiter:
       timeout-duration: 1s
       limitRefreshPeriod: 5s
 
+retry-codes:
+  instances:
+    - github
+    - so
+    - bot
+  codes:
+    - 500
+    - 429
+
 resilience4j.retry:
   instances:
     github:

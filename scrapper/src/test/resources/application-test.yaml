@@ -53,3 +53,58 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui
+
+resilience4j.ratelimiter:
+  instances:
+    rateLimiter:
+      limitForPeriod: 2
+      timeout-duration: 10s
+      limitRefreshPeriod: 50s
+
+retry-codes:
+  instances:
+    - github
+    - so
+    - bot
+  codes:
+    - 500
+    - 429
+
+resilience4j.retry:
+  instances:
+    github:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+      ignoreExceptions:
+        - backend.academy.scrapper.exceptions.ApiGitHubErrorResponse
+    so:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+      ignoreExceptions:
+        - backend.academy.scrapper.exceptions.ApiStackOverflowErrorResponse
+    bot:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+      ignoreExceptions:
+        - backend.academy.scrapper.exceptions.ApiErrorResponseException
+    resistantLinkTracker:
+      maxAttempts: 1
+      ignoreExceptions:
+        - backend.academy.scrapper.exceptions.ApiErrorResponseException
+
+resilience4j.circuitbreaker:
+  instances:
+    cb1:
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 1
+      slidingWindowSize: 1
+      failureRateThreshold: 100
+      waitDurationInOpenState: 1s
+      permittedNumberOfCallsInHalfOpenState: 1
+

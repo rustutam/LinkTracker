@@ -46,6 +46,15 @@ springdoc:
     enabled: true
     path: /swagger-ui
 
+retry-codes:
+  instances:
+    - github
+    - so
+    - bot
+  codes:
+    - 500
+    - 429
+
 resilience4j.circuitbreaker:
   instances:
     cb1:
@@ -80,3 +89,4 @@ logging:
     io.github.resilience4j.bulkhead: DEBUG
     io.github.resilience4j.timelimiter: DEBUG
     io.github.resilience4j.ratelimiter: DEBUG
+

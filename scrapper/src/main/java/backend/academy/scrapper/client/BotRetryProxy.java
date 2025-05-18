@@ -14,7 +14,7 @@ import org.springframework.web.client.RestClient;
 
 @Slf4j
 @Service
-@ConditionalOnProperty(prefix = "app", name = "message-transport", havingValue = "Http")
+//@ConditionalOnProperty(prefix = "app", name = "message-transport", havingValue = "Http")
 public class BotRetryProxy {
     private final RestClient restClient;
 
