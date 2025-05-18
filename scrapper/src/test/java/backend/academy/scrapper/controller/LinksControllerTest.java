@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
@@ -54,6 +55,7 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenGetLinksThenReturnLinks() throws Exception {
@@ -68,6 +70,7 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenGetLinkForUserWithoutLinksThenReturnEmptyList() throws Exception {
@@ -79,12 +82,14 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     void whenGetLinksWithUnauthorizedUserThenReturnUnauthorized() throws Exception {
 
         mockMvc.perform(get("/links").header("Tg-Chat-Id", "1000")).andExpect(status().isUnauthorized());
     }
 
     @Test
+    @DirtiesContext
     @Sql(scripts = "/sql/insert_users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenAddLinksThenReturnLinkResponse() throws Exception {
@@ -116,6 +121,7 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     void whenAddLinksWithInvalidLinkThenReturnBadRequest() throws Exception {
         mockMvc.perform(
                         post("/links")
@@ -133,6 +139,7 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     void whenAddLinksForUnauthorizedUserThenReturnUnauthorized() throws Exception {
         mockMvc.perform(
                         post("/links")
@@ -150,6 +157,7 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenAddLinksAndLinkAlreadyTrackThenReturnPreconditionFailed() throws Exception {
@@ -169,6 +177,7 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     void whenDeleteLinksForUnauthorizedUserThenReturnUnauthorized() throws Exception {
         mockMvc.perform(
                         delete("/links")
@@ -184,6 +193,7 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenDeleteLinksAndLinkNotExistThenReturnForbidden() throws Exception {
@@ -201,6 +211,7 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenDeleteLinksAndUserNotTrackLinkThenReturnForbidden() throws Exception {
@@ -218,6 +229,7 @@ class LinksControllerTest extends IntegrationEnvironment {
     }
 
     @Test
+    @DirtiesContext
     @Sql(scripts = "/sql/test_subscriptions.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Sql(scripts = "/sql/clearDB.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void whenDeleteLinksThenReturnLinkResponse() throws Exception {
