@@ -21,8 +21,8 @@ public class BotRetryProxy {
     }
 
     @SuppressFBWarnings(
-        value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
-        justification = "Когда я ловлю ошибку, она не null")
+            value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+            justification = "Когда я ловлю ошибку, она не null")
     @Retry(name = "bot")
     @CircuitBreaker(name = "cb1")
     public void sendUpdates(LinkUpdate linkUpdate) throws ApiErrorResponseException {
@@ -30,9 +30,9 @@ public class BotRetryProxy {
             restClient.post().uri("/updates").body(linkUpdate).retrieve().toBodilessEntity();
 
             log.atInfo()
-                .addKeyValue("link", linkUpdate.url())
-                .setMessage("Отправка обновления по HTTP")
-                .log();
+                    .addKeyValue("link", linkUpdate.url())
+                    .setMessage("Отправка обновления по HTTP")
+                    .log();
         } catch (HttpClientErrorException e) {
             throw e.getResponseBodyAs(ApiErrorResponseException.class);
         }

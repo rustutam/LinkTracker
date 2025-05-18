@@ -8,14 +8,11 @@ import org.springframework.web.client.RestClient;
 
 @Validated
 @ConfigurationProperties(prefix = "app.bot")
-public record BotConfig(
-    @NotEmpty String baseUri,
-    HttpComponentsClientHttpRequestFactory httpRequestFactory
-) {
+public record BotConfig(@NotEmpty String baseUri, HttpComponentsClientHttpRequestFactory httpRequestFactory) {
     public RestClient botRestClient() {
         return RestClient.builder()
-            .baseUrl(baseUri)
-            .requestFactory(httpRequestFactory)
-            .build();
+                .baseUrl(baseUri)
+                .requestFactory(httpRequestFactory)
+                .build();
     }
 }

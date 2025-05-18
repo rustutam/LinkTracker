@@ -19,7 +19,6 @@ public class StackoverflowRetryProxy {
     private final String key;
     private final String token;
 
-
     public StackoverflowRetryProxy(StackOverflowConfig stackOverflowConfig) {
         restClient = stackOverflowConfig.stRestClient();
         key = stackOverflowConfig.key();
@@ -54,10 +53,8 @@ public class StackoverflowRetryProxy {
         return performRequest(content);
     }
 
-
     private String performRequest(String url) {
-        url += "&key=" + key + "&access_token=" + token + "&filter="
-            + WITH_BODY;
+        url += "&key=" + key + "&access_token=" + token + "&filter=" + WITH_BODY;
 
         try {
             return restClient.get().uri(url).retrieve().body(String.class);
@@ -66,5 +63,4 @@ public class StackoverflowRetryProxy {
             throw new QuestionNotFoundException("Ошибка при запросе: " + url);
         }
     }
-
 }

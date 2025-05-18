@@ -26,12 +26,12 @@ public class GithubRetryProxy {
     public String issuesRequest(String owner, String repository) {
         try {
             return restClient
-                .get()
-                .uri("repos/{owner}/{repo}/issues", owner, repository)
-                .header("Accept", "application/vnd.github+json")
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .body(String.class);
+                    .get()
+                    .uri("repos/{owner}/{repo}/issues", owner, repository)
+                    .header("Accept", "application/vnd.github+json")
+                    .header("Authorization", "Bearer " + token)
+                    .retrieve()
+                    .body(String.class);
         } catch (RestClientResponseException e) {
             log.atError().setMessage("Не удалось найти репозиторий").log();
             throw new RepositoryNotFoundException("Репозиторий не найден");
@@ -42,9 +42,9 @@ public class GithubRetryProxy {
     @CircuitBreaker(name = "cb1")
     public RepositoryDto repoRequest(String owner, String repository) {
         return restClient
-            .get()
-            .uri("repos/{owner}/{repo}", owner, repository)
-            .retrieve()
-            .body(RepositoryDto.class);
+                .get()
+                .uri("repos/{owner}/{repo}", owner, repository)
+                .retrieve()
+                .body(RepositoryDto.class);
     }
 }

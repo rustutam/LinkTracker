@@ -8,10 +8,7 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix = "app.scheduler")
-public record SchedulerConfig(
-    @NotNull Duration checkUpdateInterval,
-    @NotNull Duration sendUpdateInterval
-) {
+public record SchedulerConfig(@NotNull Duration checkUpdateInterval, @NotNull Duration sendUpdateInterval) {
 
     @Bean
     public long checkUpdateIntervalMs() {

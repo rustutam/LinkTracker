@@ -1,5 +1,12 @@
 package backend.academy.scrapper;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.timeout;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
+
 import backend.academy.scrapper.sender.BotHttpSender;
 import backend.academy.scrapper.sender.BotKafkaSender;
 import backend.academy.scrapper.sender.ResistantProxy;
@@ -12,12 +19,6 @@ import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.timeout;
-import static org.mockito.Mockito.verify;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 @SpringBootTest
 @EnableAspectJAutoProxy(proxyTargetClass = true)
@@ -31,7 +32,6 @@ class FallbackTest {
 
     @MockitoBean
     public BotKafkaSender kafkaMock = mock(BotKafkaSender.class);
-
 
     @Test
     void fallback() {

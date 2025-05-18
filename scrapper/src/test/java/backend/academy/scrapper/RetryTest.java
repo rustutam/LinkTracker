@@ -1,5 +1,14 @@
 package backend.academy.scrapper;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.client.WireMock.verify;
+import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import backend.academy.scrapper.client.BotRetryProxy;
 import backend.academy.scrapper.scheduler.CheckUpdateScheduler;
 import backend.academy.scrapper.scheduler.SendUpdateScheduler;
@@ -15,15 +24,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 
 @SpringBootTest
 @EnableAspectJAutoProxy(proxyTargetClass = true)
@@ -33,9 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class RetryTest {
     @MockitoBean
     CheckUpdateScheduler checkUpdateScheduler;
+
     @MockitoBean
     SendUpdateScheduler sendUpdateScheduler;
-
 
     @Autowired
     private BotRetryProxy botRetryProxy;
@@ -45,29 +45,28 @@ class RetryTest {
         WireMock.reset();
 
         stubFor(post(urlEqualTo("/updates"))
-            .inScenario("Retry Scenario")
-            .whenScenarioStateIs(STARTED)
-            .willReturn(aResponse().withStatus(500))
-            .willSetStateTo("Second Attempt"));
+                .inScenario("Retry Scenario")
+                .whenScenarioStateIs(STARTED)
+                .willReturn(aResponse().withStatus(500))
+                .willSetStateTo("Second Attempt"));
 
         stubFor(post(urlEqualTo("/updates"))
-            .inScenario("Retry Scenario")
-            .whenScenarioStateIs("Second Attempt")
-            .willReturn(aResponse().withStatus(500))
-            .willSetStateTo("Third Attempt"));
+                .inScenario("Retry Scenario")
+                .whenScenarioStateIs("Second Attempt")
+                .willReturn(aResponse().withStatus(500))
+                .willSetStateTo("Third Attempt"));
 
         stubFor(post(urlEqualTo("/updates"))
-            .inScenario("Retry Scenario")
-            .whenScenarioStateIs("Third Attempt")
-            .willReturn(aResponse().withStatus(500))
-            .willSetStateTo("Done"));
+                .inScenario("Retry Scenario")
+                .whenScenarioStateIs("Third Attempt")
+                .willReturn(aResponse().withStatus(500))
+                .willSetStateTo("Done"));
 
         stubFor(post(urlEqualTo("/updates"))
-            .inScenario("Retry Scenario")
-            .whenScenarioStateIs("Done")
-            .willReturn(aResponse().withStatus(200))); // не должен быть вызван
+                .inScenario("Retry Scenario")
+                .whenScenarioStateIs("Done")
+                .willReturn(aResponse().withStatus(200))); // не должен быть вызван
     }
-
 
     @Test
     void testRetryThreeAttempts() {

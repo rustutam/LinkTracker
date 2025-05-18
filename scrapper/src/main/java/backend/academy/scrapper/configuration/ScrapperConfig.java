@@ -7,8 +7,4 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @ConfigurationProperties(prefix = "app")
-public record ScrapperConfig(
-        @NotNull Integer batchSize,
-        @Bean String messageTransport,
-        Integer httpTimeout) {
-}
+public record ScrapperConfig(@NotNull Integer batchSize, @Bean String messageTransport, Integer httpTimeout) {}

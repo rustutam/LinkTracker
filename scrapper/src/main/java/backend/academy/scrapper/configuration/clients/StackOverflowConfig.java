@@ -9,15 +9,14 @@ import org.springframework.web.client.RestClient;
 @Validated
 @ConfigurationProperties(prefix = "app.stackoverflow")
 public record StackOverflowConfig(
-    @NotEmpty String baseUri,
-    @NotEmpty String key,
-    @NotEmpty String accessToken,
-    HttpComponentsClientHttpRequestFactory httpRequestFactory
-) {
+        @NotEmpty String baseUri,
+        @NotEmpty String key,
+        @NotEmpty String accessToken,
+        HttpComponentsClientHttpRequestFactory httpRequestFactory) {
     public RestClient stRestClient() {
         return RestClient.builder()
-            .baseUrl(baseUri)
-            .requestFactory(httpRequestFactory)
-            .build();
+                .baseUrl(baseUri)
+                .requestFactory(httpRequestFactory)
+                .build();
     }
 }

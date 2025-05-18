@@ -13,8 +13,7 @@ public class ResistantProxy {
     private final BotHttpSender http;
 
     @Retry(name = "resistantLinkTracker", fallbackMethod = "sendUpdatesKafka")
-    public void sendUpdates(LinkUpdate linkUpdate)
-            throws ApiErrorResponseException {
+    public void sendUpdates(LinkUpdate linkUpdate) throws ApiErrorResponseException {
         http.sendUpdates(linkUpdate);
     }
 
