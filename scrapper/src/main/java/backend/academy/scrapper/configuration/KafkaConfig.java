@@ -8,7 +8,6 @@ import org.springframework.kafka.annotation.EnableKafka;
 
 @EnableKafka
 @ConfigurationProperties(prefix = "kafka")
-@ConditionalOnProperty(name = "app.message-transport", havingValue = "Kafka")
 public record KafkaConfig(@Bean LinkUpdatesTopicProperties linkUpdates) {
     public record LinkUpdatesTopicProperties(
             @NotEmpty String topic, @NotEmpty int partitions, @NotEmpty short replicas) {}

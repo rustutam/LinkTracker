@@ -16,7 +16,7 @@ app:
 
   batch-size: 1000
   access-type: SQL
-  message-transport: Kafka
+  message-transport: Http
   http-timeout: 3000
 
 kafka:

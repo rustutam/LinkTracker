@@ -18,7 +18,6 @@ import org.springframework.kafka.core.KafkaTemplate;
 
 @Configuration
 @RequiredArgsConstructor
-@ConditionalOnProperty(name = "app.message-transport", havingValue = "Kafka")
 public class KafkaProducerConfig {
 
     private final KafkaProperties properties;

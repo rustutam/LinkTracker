@@ -20,9 +20,6 @@ public class BotRetryProxy {
         restClient = botConfig.botRestClient();
     }
 
-    @SuppressFBWarnings(
-            value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
-            justification = "Когда я ловлю ошибку, она не null")
     @Retry(name = "bot")
     @CircuitBreaker(name = "cb1")
     public void sendUpdates(LinkUpdate linkUpdate) throws ApiBotErrorResponseException {
