@@ -15,10 +15,10 @@ import org.springframework.web.bind.annotation.*;
 public class UpdatesController {
     private final UpdatesService updatesService;
 
-//    @RateLimiter(name = "rateLimiter")
+    @RateLimiter(name = "rateLimiter")
     @PostMapping("/updates")
     public ResponseEntity<Void> handleUpdates(@RequestBody LinkUpdate update) {
-//        updatesService.notifySubscribers(update);
+        updatesService.notifySubscribers(update);
         return ResponseEntity.ok().build();
     }
 }
