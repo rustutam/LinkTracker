@@ -47,36 +47,35 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonResponse).get(ITEMS);
 
-            jsonNode.forEach(
-                content -> {
-                    ChangeInfo changeInfo = ChangeInfo.builder()
+            jsonNode.forEach(content -> {
+                ChangeInfo changeInfo = ChangeInfo.builder()
                         .description(description)
                         .title(title)
                         .username(content.get("user").get("display_name").asText())
-                        .creationTime(
-                            OffsetDateTime.parse(content.get("creation_date").asText()))
+                        .creationTime(OffsetDateTime.parse(
+                                content.get("creation_date").asText()))
                         .preview(truncatePreview(content.get("body").asText()))
                         .build();
 
-                    allContent.add(changeInfo);
-                }
-            );
+                allContent.add(changeInfo);
+            });
             return allContent;
         } catch (JsonProcessingException e) {
             log.atError()
-                .addKeyValue("link", url)
-                .setMessage("Ошибка при обработке stackoverflow контента")
-                .setCause(e)
-                .log();
+                    .addKeyValue("link", url)
+                    .setMessage("Ошибка при обработке stackoverflow контента")
+                    .setCause(e)
+                    .log();
             return List.of();
         }
     }
 
     private String getTitle(URI link) {
         QuestionInfo questionInfo = getQuestionInfo(link);
-        return stackoverflowClient.getQuestion(questionInfo.site, questionInfo.questionId)
-            .map(response -> parseTitle(response, link))
-            .orElse("-");
+        return stackoverflowClient
+                .getQuestion(questionInfo.site, questionInfo.questionId)
+                .map(response -> parseTitle(response, link))
+                .orElse("-");
     }
 
     private String parseTitle(String response, URI link) {
@@ -85,10 +84,10 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
             return jsonNode.get(ITEMS).get(0).get("title").asText();
         } catch (JsonProcessingException e) {
             log.atError()
-                .addKeyValue("link", link)
-                .setMessage("Ошибка при получении stackoverflow title")
-                .setCause(e)
-                .log();
+                    .addKeyValue("link", link)
+                    .setMessage("Ошибка при получении stackoverflow title")
+                    .setCause(e)
+                    .log();
 
             return "-";
         }
@@ -96,29 +95,30 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
 
     private List<ChangeInfo> getComments(URI link, String title) {
         QuestionInfo questionInfo = getQuestionInfo(link);
-        return stackoverflowClient.getQuestionComments(questionInfo.site, questionInfo.questionId)
-            .map(response -> parseContentList(
-                QUESTION_COMMENTS_DESCRIPTION, response, link.toString(), title))
-            .orElse(List.of());
+        return stackoverflowClient
+                .getQuestionComments(questionInfo.site, questionInfo.questionId)
+                .map(response -> parseContentList(QUESTION_COMMENTS_DESCRIPTION, response, link.toString(), title))
+                .orElse(List.of());
     }
 
     private List<ChangeInfo> getAnswers(URI link, String title) {
         QuestionInfo questionInfo = getQuestionInfo(link);
-        return stackoverflowClient.getQuestionAnswers(questionInfo.site, questionInfo.questionId)
-            .map(response -> parseContentList(
-                QUESTION_ANSWERS_DESCRIPTION, response, link.toString(), title))
-            .orElse(List.of());
+        return stackoverflowClient
+                .getQuestionAnswers(questionInfo.site, questionInfo.questionId)
+                .map(response -> parseContentList(QUESTION_ANSWERS_DESCRIPTION, response, link.toString(), title))
+                .orElse(List.of());
     }
 
     private List<ChangeInfo> getAnswerComments(URI link, String title) {
         QuestionInfo questionInfo = getQuestionInfo(link);
-        return stackoverflowClient.getQuestionAnswers(questionInfo.site, questionInfo.questionId)
-            .map(response -> parseAnswerComments(questionInfo, response, link, title))
-            .orElse(List.of());
+        return stackoverflowClient
+                .getQuestionAnswers(questionInfo.site, questionInfo.questionId)
+                .map(response -> parseAnswerComments(questionInfo, response, link, title))
+                .orElse(List.of());
     }
 
-    private List<ChangeInfo> parseAnswerComments(QuestionInfo questionInfo, String jsonResponse, URI link, String title) {
-        List<ChangeInfo> content = new ArrayList<>();
+    private List<ChangeInfo> parseAnswerComments(
+            QuestionInfo questionInfo, String jsonResponse, URI link, String title) {
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonResponse).get(ITEMS);
 
@@ -127,23 +127,20 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
             }
 
             return StreamSupport.stream(jsonNode.spliterator(), false)
-                .map(item -> stackoverflowClient
-                    .getQuestionAnswerCommits(questionInfo.site, questionInfo.questionId))
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                // Парсим список ChangeInfo из каждого JSON‑ответа и «расплющиваем» результат
-                .flatMap(response -> parseContentList(
-                    ANSWER_COMMENTS_DESCRIPTION,
-                    response,
-                    link.toString(),
-                    title).stream())
-                .collect(Collectors.toList());
+                    .map(item ->
+                            stackoverflowClient.getQuestionAnswerCommits(questionInfo.site, questionInfo.questionId))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    // Парсим список ChangeInfo из каждого JSON‑ответа и «расплющиваем» результат
+                    .flatMap(response ->
+                            parseContentList(ANSWER_COMMENTS_DESCRIPTION, response, link.toString(), title).stream())
+                    .collect(Collectors.toList());
         } catch (JsonProcessingException e) {
             log.atError()
-                .addKeyValue("link", link.toString())
-                .setMessage("Ошибка при обработке stackoverflow контента")
-                .setCause(e)
-                .log();
+                    .addKeyValue("link", link.toString())
+                    .setMessage("Ошибка при обработке stackoverflow контента")
+                    .setCause(e)
+                    .log();
             return List.of();
         }
     }
@@ -159,6 +156,5 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
         return new QuestionInfo(host, parts[2]);
     }
 
-    private record QuestionInfo(String site, String questionId) {
-    }
+    private record QuestionInfo(String site, String questionId) {}
 }

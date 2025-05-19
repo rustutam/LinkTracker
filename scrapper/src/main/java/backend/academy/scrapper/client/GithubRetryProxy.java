@@ -28,23 +28,22 @@ public class GithubRetryProxy {
     public String issuesRequest(String owner, String repository) throws ApiGitHubErrorResponseException {
         try {
             return restClient
-                .get()
-                .uri("repos/{owner}/{repo}/issues?per_page={}", owner, repository, pageSize)
-                .header("Accept", "application/vnd.github+json")
-                .header("Authorization", "Bearer " + token)
-                .retrieve()
-                .body(String.class);
+                    .get()
+                    .uri("repos/{owner}/{repo}/issues?per_page={}", owner, repository, pageSize)
+                    .header("Accept", "application/vnd.github+json")
+                    .header("Authorization", "Bearer " + token)
+                    .retrieve()
+                    .body(String.class);
 
         } catch (HttpClientErrorException e) {
             logHttpClientError(e, owner, repository);
 
             throw new ApiGitHubErrorResponseException(
-                GITHUB_API_CLIENT_ERROR_RESPONSE_MESSAGE,
-                e.getStatusCode(),
-                e.getStatusText(),
-                e.getMessage(),
-                e.getStackTrace()
-            );
+                    GITHUB_API_CLIENT_ERROR_RESPONSE_MESSAGE,
+                    e.getStatusCode(),
+                    e.getStatusText(),
+                    e.getMessage(),
+                    e.getStackTrace());
         }
     }
 
@@ -53,31 +52,30 @@ public class GithubRetryProxy {
     public String repoRequest(String owner, String repository) {
         try {
             return restClient
-                .get()
-                .uri("repos/{owner}/{repo}", owner, repository)
-                .retrieve()
-                .body(String.class);
+                    .get()
+                    .uri("repos/{owner}/{repo}", owner, repository)
+                    .retrieve()
+                    .body(String.class);
         } catch (HttpClientErrorException e) {
 
             logHttpClientError(e, owner, repository);
 
             throw new ApiGitHubErrorResponseException(
-                GITHUB_API_CLIENT_ERROR_RESPONSE_MESSAGE,
-                e.getStatusCode(),
-                e.getStatusText(),
-                e.getMessage(),
-                e.getStackTrace()
-            );
+                    GITHUB_API_CLIENT_ERROR_RESPONSE_MESSAGE,
+                    e.getStatusCode(),
+                    e.getStatusText(),
+                    e.getMessage(),
+                    e.getStackTrace());
         }
     }
 
     private void logHttpClientError(HttpClientErrorException e, String owner, String repository) {
         log.atError()
-            .setMessage(GITHUB_API_CLIENT_ERROR_RESPONSE_MESSAGE)
-            .addKeyValue("owner", owner)
-            .addKeyValue("repository name", repository)
-            .addKeyValue("statusCode", e.getStatusCode().value())
-            .addKeyValue("statusText", e.getStatusText())
-            .log();
+                .setMessage(GITHUB_API_CLIENT_ERROR_RESPONSE_MESSAGE)
+                .addKeyValue("owner", owner)
+                .addKeyValue("repository name", repository)
+                .addKeyValue("statusCode", e.getStatusCode().value())
+                .addKeyValue("statusText", e.getStatusText())
+                .log();
     }
 }

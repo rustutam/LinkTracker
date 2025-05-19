@@ -1,11 +1,19 @@
 package backend.academy.scrapper.client;
 
+import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
+import static com.github.tomakehurst.wiremock.client.WireMock.post;
+import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
+import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
+import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
+import static org.junit.jupiter.api.Assertions.*;
+
 import backend.academy.scrapper.exceptions.ApiBotErrorResponseException;
 import backend.academy.scrapper.scheduler.CheckUpdateScheduler;
 import backend.academy.scrapper.scheduler.SendUpdateScheduler;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import dto.LinkUpdate;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -14,15 +22,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import java.util.List;
-import static com.github.tomakehurst.wiremock.client.WireMock.aResponse;
-import static com.github.tomakehurst.wiremock.client.WireMock.post;
-import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.stubFor;
-import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
-import static com.github.tomakehurst.wiremock.client.WireMock.verify;
-import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @EnableAspectJAutoProxy(proxyTargetClass = true)
@@ -44,10 +43,10 @@ class BotRetryProxyTest {
         WireMock.reset();
 
         stubFor(post(urlEqualTo("/updates"))
-            .inScenario("Retry Scenario")
-            .whenScenarioStateIs(STARTED)
-            .willReturn(aResponse().withStatus(400))
-            .willSetStateTo("Second Attempt"));
+                .inScenario("Retry Scenario")
+                .whenScenarioStateIs(STARTED)
+                .willReturn(aResponse().withStatus(400))
+                .willSetStateTo("Second Attempt"));
     }
 
     @Test
@@ -57,4 +56,3 @@ class BotRetryProxyTest {
         assertThrows(ApiBotErrorResponseException.class, () -> botRetryProxy.sendUpdates(update));
     }
 }
-

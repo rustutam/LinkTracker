@@ -1,7 +1,6 @@
 package backend.academy.scrapper.repository.api;
 
 import backend.academy.scrapper.client.GithubClient;
-import backend.academy.scrapper.exceptions.ApiGitHubErrorResponseException;
 import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.Link;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -11,10 +10,8 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
@@ -30,9 +27,10 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
     @Override
     public List<ChangeInfo> getChangeInfoByLink(Link link) {
         RepoInfo repoInfo = getRepoInfo(link.uri());
-        return githubClient.issuesRequest(repoInfo.owner, repoInfo.repo)
-            .map(response -> parseIssues(link, response))
-            .orElse(List.of());
+        return githubClient
+                .issuesRequest(repoInfo.owner, repoInfo.repo)
+                .map(response -> parseIssues(link, response))
+                .orElse(List.of());
     }
 
     private List<ChangeInfo> parseIssues(Link link, String response) {

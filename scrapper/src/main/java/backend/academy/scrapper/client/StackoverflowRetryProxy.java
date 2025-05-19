@@ -62,19 +62,18 @@ public class StackoverflowRetryProxy {
             return restClient.get().uri(url).retrieve().body(String.class);
         } catch (HttpClientErrorException e) {
             log.atError()
-                .setMessage(SO_API_CLIENT_ERROR_RESPONSE_MESSAGE)
-                .addKeyValue("link", url)
-                .addKeyValue("statusCode", e.getStatusCode().value())
-                .addKeyValue("statusText", e.getStatusText())
-                .log();
+                    .setMessage(SO_API_CLIENT_ERROR_RESPONSE_MESSAGE)
+                    .addKeyValue("link", url)
+                    .addKeyValue("statusCode", e.getStatusCode().value())
+                    .addKeyValue("statusText", e.getStatusText())
+                    .log();
 
             throw new ApiStackOverflowErrorResponseException(
-                SO_API_CLIENT_ERROR_RESPONSE_MESSAGE,
-                e.getStatusCode(),
-                e.getStatusText(),
-                e.getMessage(),
-                e.getStackTrace()
-            );
+                    SO_API_CLIENT_ERROR_RESPONSE_MESSAGE,
+                    e.getStatusCode(),
+                    e.getStatusText(),
+                    e.getMessage(),
+                    e.getStackTrace());
         }
     }
 }

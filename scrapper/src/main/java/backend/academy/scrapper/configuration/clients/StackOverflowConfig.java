@@ -15,8 +15,7 @@ public record StackOverflowConfig(
         @NotEmpty String key,
         @NotEmpty String accessToken,
         @NotNull @Min(1) Integer pageSize,
-        HttpComponentsClientHttpRequestFactory httpRequestFactory
-) {
+        HttpComponentsClientHttpRequestFactory httpRequestFactory) {
     public RestClient stRestClient() {
         return RestClient.builder()
                 .baseUrl(baseUri)
