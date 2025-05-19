@@ -7,6 +7,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED;
 import static org.junit.jupiter.api.Assertions.*;
 
+import backend.academy.scrapper.IntegrationEnvironment;
 import backend.academy.scrapper.exceptions.ApiBotErrorResponseException;
 import backend.academy.scrapper.scheduler.CheckUpdateScheduler;
 import backend.academy.scrapper.scheduler.SendUpdateScheduler;
@@ -16,7 +17,6 @@ import dto.LinkUpdate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
@@ -26,9 +26,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest
 @EnableAspectJAutoProxy(proxyTargetClass = true)
 @ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@WireMockTest(httpPort = 8080)
-class BotRetryProxyTest {
+@WireMockTest(httpPort = 9999)
+class BotRetryProxyTest extends IntegrationEnvironment {
     @MockitoBean
     CheckUpdateScheduler checkUpdateScheduler;
 

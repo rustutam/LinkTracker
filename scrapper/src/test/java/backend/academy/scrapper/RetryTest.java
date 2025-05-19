@@ -18,19 +18,18 @@ import dto.LinkUpdate;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.HttpServerErrorException;
 
 @SpringBootTest
-@EnableAspectJAutoProxy(proxyTargetClass = true)
 @ActiveProfiles("test")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@WireMockTest(httpPort = 8080)
-class RetryTest {
+@EnableAspectJAutoProxy(proxyTargetClass = true)
+@WireMockTest(httpPort = 9999)
+class RetryTest extends IntegrationEnvironment {
     @MockitoBean
     CheckUpdateScheduler checkUpdateScheduler;
 
@@ -72,7 +71,7 @@ class RetryTest {
     void testRetryThreeAttempts() {
         LinkUpdate update = new LinkUpdate(1L, "https://test", "desc", List.of(123L));
 
-        assertThrows(Exception.class, () -> botRetryProxy.sendUpdates(update));
+        assertThrows(HttpServerErrorException.class, () -> botRetryProxy.sendUpdates(update));
         verify(3, postRequestedFor(urlEqualTo("/updates")));
     }
 }

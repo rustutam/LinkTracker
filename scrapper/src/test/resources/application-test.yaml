@@ -3,16 +3,16 @@ app:
     check-update-interval: 20s
     send-update-interval: 99999s
   github:
-    token: ${GITHUB_TOKEN} # env variable
+    token: github_token
     base-uri: https://api.github.com
     page-size: 100
   stackoverflow:
-    key: ${SO_TOKEN_KEY}
-    access-token: ${SO_ACCESS_TOKEN}
+    key: so_key
+    access-token: so_token
     base-uri: https://api.stackexchange.com/2.3
     page-size: 100
   bot:
-    base-uri: http://localhost:8080
+    base-uri: http://localhost:9999
 
   http-timeout: 3000
   batch-size: 1000
