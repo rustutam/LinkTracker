@@ -1,17 +1,30 @@
 app:
   scheduler:
-    interval: 10s
+    check-update-interval: 20s
+    send-update-interval: 99999s
+
   batch-size: 1000
+
   github:
     token: ${GITHUB_TOKEN} # env variable
     base-uri: https://api.github.com
+
   stackoverflow:
     key: ${SO_TOKEN_KEY}
     access-token: ${SO_ACCESS_TOKEN}
     base-uri: https://api.stackexchange.com/2.3
+
   tg-bot:
     base-uri: http://localhost:8080
+
   access-type: SQL
+  message-transport: Kafka
+
+kafka:
+  link-updates:
+    topic: link-update
+    partitions: 1
+    replicas: 1
 
 spring:
   application:
@@ -26,6 +39,15 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  kafka:
+    bootstrap-servers: localhost:19092
+    producer.properties:
+      acks: 1
+      batch.size: 1024
+      linger.ms: 10000
+    cloud.zookeeper:
+      config.enabled: false
+      connect-string: localhost:2181
 
 server:
   port: 8081
@@ -34,3 +56,10 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui
+
+logging:
+  file:
+    name: scrapper-log.json
+  structured:
+    format:
+      file: ecs

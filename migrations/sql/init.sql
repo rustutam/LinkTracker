@@ -1,7 +1,7 @@
 CREATE SCHEMA IF NOT EXISTS scrapper;
 
 -- Пользователи
-CREATE TABLE scrapper.users
+CREATE TABLE IF NOT EXISTS scrapper.users
 (
     id         BIGSERIAL PRIMARY KEY,
     chat_id    BIGINT NOT NULL UNIQUE,
@@ -9,7 +9,7 @@ CREATE TABLE scrapper.users
 );
 
 -- Ссылки
-CREATE TABLE scrapper.links
+CREATE TABLE IF NOT EXISTS scrapper.links
 (
     id                 BIGSERIAL PRIMARY KEY,
     uri                TEXT NOT NULL UNIQUE,
@@ -18,7 +18,7 @@ CREATE TABLE scrapper.links
 );
 
 -- Подписки. Таблица для связывания пользователей и ссылок
-CREATE TABLE scrapper.subscriptions
+CREATE TABLE IF NOT EXISTS scrapper.subscriptions
 (
     id         BIGSERIAL PRIMARY KEY,
     user_id    BIGINT NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE scrapper.subscriptions
 );
 
 -- Теги
-CREATE TABLE scrapper.tags
+CREATE TABLE IF NOT EXISTS scrapper.tags
 (
     id         BIGSERIAL PRIMARY KEY,
     tag        TEXT NOT NULL UNIQUE,
@@ -40,7 +40,7 @@ CREATE TABLE scrapper.tags
 );
 
 -- Фильтры
-CREATE TABLE scrapper.filters
+CREATE TABLE IF NOT EXISTS scrapper.filters
 (
     id         BIGSERIAL PRIMARY KEY,
     filter     TEXT NOT NULL UNIQUE,
@@ -48,7 +48,7 @@ CREATE TABLE scrapper.filters
 );
 
 --Таблица связи подписок и тегов
-CREATE TABLE scrapper.subscription_tags
+CREATE TABLE IF NOT EXISTS scrapper.subscription_tags
 (
     subscription_id BIGINT NOT NULL,
     tag_id          BIGINT NOT NULL,
@@ -58,7 +58,7 @@ CREATE TABLE scrapper.subscription_tags
 );
 
 --Таблица связи подписок и фильтров
-CREATE TABLE scrapper.subscription_filters
+CREATE TABLE IF NOT EXISTS scrapper.subscription_filters
 (
     subscription_id BIGINT NOT NULL,
     filter_id       BIGINT NOT NULL,

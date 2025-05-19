@@ -1,6 +1,13 @@
 app:
-  telegram-token: ${TELEGRAM_TOKEN}  # env variable
-  base-url: http://localhost:8081
+  telegram-token: ${TELEGRAM_TOKEN} # env variable
+  scrapper-host: http://localhost:8081
+
+kafka:
+  link-updates:
+    topic: link-update
+    fail-on-processing: false
+    consumer-group: default-group
+    concurency: 1
 
 spring:
   application:
@@ -11,6 +18,24 @@ spring:
     hibernate:
       ddl-auto: validate
     open-in-view: false
+  kafka:
+    bootstrap-servers: localhost:19092
+    consumer.properties:
+      enable.auto.commit: false
+      auto.offset.reset: earliest
+      isolation.level: read_committed
+      fetch:
+        min.bytes: 1024
+        max.bytes: 1048576
+        max.wait.ms: 10000
+      max:
+        poll:
+          interval.ms: 10000
+          records: 10
+    cloud:
+      zookeeper:
+        config.enabled: false
+        connect-string: localhost:2181
 
 server:
   port: 8080

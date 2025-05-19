@@ -9,8 +9,8 @@ services:
       POSTGRES_DB: scrapper
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-#    volumes:
-#      - pgdata:/var/lib/postgresql/data
+    volumes:
+      - psql:/var/lib/postgresql/data
     ports:
       - "5432:5432"
     networks:
@@ -22,7 +22,7 @@ services:
     depends_on:
       - db
     command:
-      - --searchPath=/changesets
+      - --search-path=/liquibase/changelog
       - --changelog-file=changelog-master.xml
       - --driver=org.postgresql.Driver
       - --url=jdbc:postgresql://db:5432/scrapper
@@ -30,9 +30,69 @@ services:
       - --password=postgres
       - update
     volumes:
-      - ./migrations:/changesets
+      - ./migrations:/liquibase/changelog
     networks:
       - backend
 
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    hostname: zookeeper
+    container_name: zookeeper
+    ports:
+      - "2181:2181"
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    hostname: kafka
+    container_name: kafka-1
+    ports:
+      - "19092:19092"
+    environment:
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka-1:9092,DOCKER://localhost:19092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,DOCKER:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_BROKER_ID: 1
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_MIN_IN_SYNC_REPLICAS: 1
+    depends_on:
+      - zookeeper
+
+  kafka-init:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - kafka-1
+    entrypoint: [ "/bin/sh", "-c" ]
+    command: |
+      "echo 'Waiting for Kafka to be available...' &&
+      kafka-topics --bootstrap-server kafka:9092 --create --topic link-update --partitions 1 --replication-factor 1 --if-not-exists &&
+      kafka-topics --bootstrap-server kafka:9092 --create --topic link-update-dlt --partitions 2 --replication-factor 1 --if-not-exists"
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    ports:
+      - "8082:8080"
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+    volumes:
+      - ./kui/config.yml:/etc/kafkaui/config.yaml
+      - ./kui/config.yml:/etc/kafkaui/dynamic_config.yaml
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis-server
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 20 1 --loglevel warning
+    volumes:
+      - ./redis-data:/data
+
+volumes:
+  psql: { }
+
 networks:
-  backend:
+  backend: { }

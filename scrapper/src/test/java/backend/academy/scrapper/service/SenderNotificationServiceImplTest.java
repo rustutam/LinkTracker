@@ -2,78 +2,78 @@ package backend.academy.scrapper.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
-import backend.academy.scrapper.IntegrationEnvironment;
-import backend.academy.scrapper.TestModelFactory;
-import backend.academy.scrapper.models.domain.ChangeInfo;
-import backend.academy.scrapper.models.domain.LinkChangeStatus;
-import backend.academy.scrapper.models.domain.LinkUpdateNotification;
-import backend.academy.scrapper.models.domain.Subscription;
+import backend.academy.scrapper.models.domain.UpdatedLink;
+import backend.academy.scrapper.models.domain.ids.ChatId;
 import backend.academy.scrapper.models.domain.ids.LinkId;
-import backend.academy.scrapper.repository.database.SubscriptionRepository;
-import backend.academy.scrapper.sender.Sender;
+import backend.academy.scrapper.repository.database.LinkUpdateRepository;
+import backend.academy.scrapper.sender.LinkUpdateSender;
+import dto.LinkUpdate;
 import java.net.URI;
-import java.time.OffsetDateTime;
 import java.util.List;
-import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.context.bean.override.mockito.MockitoSpyBean;
 
-@SpringBootTest
-class SenderNotificationServiceImplTest extends IntegrationEnvironment {
+class SenderNotificationServiceImplTest {
 
-    @MockitoBean
-    private SubscriptionRepository subscriptionRepository;
-
-    @MockitoSpyBean
-    private Sender sender;
-
-    @Autowired
+    private LinkUpdateSender linkUpdateSender;
+    private LinkUpdateRepository linkUpdateRepository;
     private SenderNotificationServiceImpl senderNotificationService;
 
+    @BeforeEach
+    void setUp() {
+        linkUpdateSender = mock(LinkUpdateSender.class);
+        linkUpdateRepository = mock(LinkUpdateRepository.class);
+        senderNotificationService = new SenderNotificationServiceImpl(linkUpdateSender, linkUpdateRepository);
+    }
+
     @Test
-    @DisplayName("Должен отправлять уведомления, если ссылки были обновлены")
-    void notifySender_ShouldSendNotification_WhenLinksUpdated() {
-        // Arrange
-        List<ChangeInfo> changeInfoList = List.of(new ChangeInfo(
-                "Новый PR",
-                "Добавление нового поля в бд",
-                "rust",
-                OffsetDateTime.now(),
-                "Добавил поле в доменную модель "));
+    void notifySender_shouldSendUpdateAndDelete() {
+        // given
+        UpdatedLink updatedLink = UpdatedLink.builder()
+                .id(new LinkId(1L))
+                .uri(URI.create("https://example.com"))
+                .description("Test update")
+                .chatIds(List.of(new ChatId(100L), new ChatId(200L)))
+                .build();
 
-        String expectedDescription = changeInfoList.getFirst().toString();
+        // when
+        senderNotificationService.notifySender(updatedLink);
 
-        Subscription subscription = TestModelFactory.createSubscription();
+        // then
+        ArgumentCaptor<LinkUpdate> captor = ArgumentCaptor.forClass(LinkUpdate.class);
+        verify(linkUpdateSender).sendUpdates(captor.capture());
+        verify(linkUpdateRepository).deleteById(updatedLink.id());
 
-        LinkId expectedLinkId = subscription.link().linkId();
-        URI expectedUri = subscription.link().uri();
-        LinkChangeStatus linkChangeStatus = new LinkChangeStatus(subscription.link(), true, changeInfoList);
+        LinkUpdate sent = captor.getValue();
+        assertEquals(sent.id(), 1L);
+        assertEquals(sent.url(), "https://example.com");
+        assertEquals(sent.description(), "Test update");
+        assertEquals(sent.tgChatIds(), List.of(100L, 200L));
+    }
 
-        List<Subscription> subscriptions = List.of(subscription);
+    @Test
+    void notifySender_shouldLogErrorAndNotDelete_ifSenderFails() {
+        // given
+        UpdatedLink updatedLink = UpdatedLink.builder()
+                .id(new LinkId(2L))
+                .uri(URI.create("https://example.com/fail"))
+                .description("Failing update")
+                .chatIds(List.of(new ChatId(300L)))
+                .build();
 
-        when(subscriptionRepository.findByLink(any())).thenReturn(subscriptions);
-        doNothing().when(sender).send(any(LinkUpdateNotification.class));
+        doThrow(new RuntimeException("Sender failure")).when(linkUpdateSender).sendUpdates(any(LinkUpdate.class));
 
-        // Act
-        senderNotificationService.notifySender(linkChangeStatus);
+        // when
+        senderNotificationService.notifySender(updatedLink);
 
-        // Assert
-        ArgumentCaptor<LinkUpdateNotification> captor = ArgumentCaptor.forClass(LinkUpdateNotification.class);
-        verify(sender).send(captor.capture());
-
-        LinkUpdateNotification sent = captor.getValue();
-
-        assertEquals(sent.linkId(), expectedLinkId);
-        assertEquals(sent.uri(), expectedUri);
-        assertEquals(sent.chatIds(), List.of(subscription.user().chatId()));
-        assertEquals(sent.description(), expectedDescription);
+        // then
+        verify(linkUpdateSender).sendUpdates(any(LinkUpdate.class));
+        verify(linkUpdateRepository, never()).deleteById(any());
     }
 }
