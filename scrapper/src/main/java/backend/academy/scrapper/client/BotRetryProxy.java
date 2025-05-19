@@ -1,7 +1,7 @@
 package backend.academy.scrapper.client;
 
 import backend.academy.scrapper.configuration.clients.BotConfig;
-import backend.academy.scrapper.exceptions.ApiErrorResponseException;
+import backend.academy.scrapper.exceptions.ApiBotErrorResponseException;
 import dto.LinkUpdate;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -25,7 +25,7 @@ public class BotRetryProxy {
             justification = "Когда я ловлю ошибку, она не null")
     @Retry(name = "bot")
     @CircuitBreaker(name = "cb1")
-    public void sendUpdates(LinkUpdate linkUpdate) throws ApiErrorResponseException {
+    public void sendUpdates(LinkUpdate linkUpdate) throws ApiBotErrorResponseException {
         try {
             restClient.post().uri("/updates").body(linkUpdate).retrieve().toBodilessEntity();
 
@@ -34,7 +34,20 @@ public class BotRetryProxy {
                     .setMessage("Отправка обновления по HTTP")
                     .log();
         } catch (HttpClientErrorException e) {
-            throw e.getResponseBodyAs(ApiErrorResponseException.class);
+            log.atError()
+                .setMessage("Ошибка получения ответа от API бота")
+                .addKeyValue("link", linkUpdate.url())
+                .addKeyValue("statusCode", e.getStatusCode().value())
+                .addKeyValue("statusText", e.getStatusText())
+                .log();
+
+            throw  new ApiBotErrorResponseException(
+                "Ошибка получения ответа от API бота",
+                e.getStatusCode(),
+                e.getStatusText(),
+                e.getMessage(),
+                e.getStackTrace()
+            );
         }
     }
 }

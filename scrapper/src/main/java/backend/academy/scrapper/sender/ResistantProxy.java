@@ -1,6 +1,6 @@
 package backend.academy.scrapper.sender;
 
-import backend.academy.scrapper.exceptions.ApiErrorResponseException;
+import backend.academy.scrapper.exceptions.ApiBotErrorResponseException;
 import dto.LinkUpdate;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ public class ResistantProxy {
     private final BotHttpSender http;
 
     @Retry(name = "resistantLinkTracker", fallbackMethod = "sendUpdatesKafka")
-    public void sendUpdates(LinkUpdate linkUpdate) throws ApiErrorResponseException {
+    public void sendUpdates(LinkUpdate linkUpdate) throws ApiBotErrorResponseException {
         http.sendUpdates(linkUpdate);
     }
 

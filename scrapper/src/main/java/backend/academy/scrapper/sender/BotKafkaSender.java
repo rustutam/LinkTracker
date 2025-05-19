@@ -1,7 +1,7 @@
 package backend.academy.scrapper.sender;
 
 import backend.academy.scrapper.configuration.KafkaConfig;
-import backend.academy.scrapper.exceptions.ApiErrorResponseException;
+import backend.academy.scrapper.exceptions.ApiBotErrorResponseException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dto.LinkUpdate;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +21,7 @@ public class BotKafkaSender implements LinkUpdateSender {
 
     @Override
     @SneakyThrows
-    public void sendUpdates(LinkUpdate linkUpdate) throws ApiErrorResponseException {
+    public void sendUpdates(LinkUpdate linkUpdate) throws ApiBotErrorResponseException {
         var data = objectMapper.writeValueAsString(linkUpdate);
         defaulKafkaTemplate.send(topicProperties.topic(), linkUpdate.id(), data);
         log.atInfo()

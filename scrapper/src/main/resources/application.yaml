@@ -5,10 +5,12 @@ app:
   github:
     token: ${GITHUB_TOKEN} # env variable
     base-uri: https://api.github.com
+    page-size: 100
   stackoverflow:
     key: ${SO_TOKEN_KEY}
     access-token: ${SO_ACCESS_TOKEN}
     base-uri: https://api.stackexchange.com/2.3
+    page-size: 100
   bot:
     base-uri: http://localhost:8080
 
@@ -85,25 +87,25 @@ resilience4j.retry:
       exponential-backoff-multiplier: 2
       enable-exponential-backoff: true
       ignoreExceptions:
-        - backend.academy.scrapper.exceptions.ApiGitHubErrorResponse
+        - backend.academy.scrapper.exceptions.ApiGitHubErrorResponseException
     so:
       maxAttempts: 3
       waitDuration: 1000
       exponential-backoff-multiplier: 2
       enable-exponential-backoff: true
       ignoreExceptions:
-        - backend.academy.scrapper.exceptions.ApiStackOverflowErrorResponse
+        - backend.academy.scrapper.exceptions.ApiStackOverflowErrorResponseException
     bot:
       maxAttempts: 3
       waitDuration: 1000
       exponential-backoff-multiplier: 2
       enable-exponential-backoff: true
       ignoreExceptions:
-        - backend.academy.scrapper.exceptions.ApiErrorResponseException
+        - backend.academy.scrapper.exceptions.ApiBotErrorResponseException
     resistantLinkTracker:
       maxAttempts: 1
       ignoreExceptions:
-        - backend.academy.scrapper.exceptions.ApiErrorResponseException
+        - backend.academy.scrapper.exceptions.ApiBotErrorResponseException
 
 resilience4j.circuitbreaker:
   instances:

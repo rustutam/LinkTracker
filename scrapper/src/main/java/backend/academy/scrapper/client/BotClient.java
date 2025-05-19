@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-// @ConditionalOnProperty(prefix = "app", name = "message-transport", havingValue = "Http")
 public class BotClient {
     private final BotRetryProxy proxy;
 

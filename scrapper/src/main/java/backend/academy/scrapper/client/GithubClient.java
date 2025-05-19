@@ -1,9 +1,10 @@
 package backend.academy.scrapper.client;
 
-import backend.academy.scrapper.models.external.github.RepositoryDto;
+import backend.academy.scrapper.exceptions.ApiGitHubErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -11,11 +12,19 @@ import org.springframework.stereotype.Component;
 public class GithubClient {
     private final GithubRetryProxy proxy;
 
-    public String issuesRequest(String owner, String repository) {
-        return proxy.issuesRequest(owner, repository);
+    public Optional<String> issuesRequest(String owner, String repository) {
+        try {
+            return Optional.of(proxy.issuesRequest(owner, repository));
+        } catch (ApiGitHubErrorResponseException e) {
+            return Optional.empty();
+        }
     }
 
-    public RepositoryDto repoRequest(String owner, String repository) {
-        return proxy.repoRequest(owner, repository);
+    public Optional<String> repoRequest(String owner, String repository) {
+        try {
+            return Optional.of(proxy.repoRequest(owner, repository));
+        } catch (ApiGitHubErrorResponseException e) {
+            return Optional.empty();
+        }
     }
 }

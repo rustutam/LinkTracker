@@ -12,6 +12,7 @@ import backend.academy.scrapper.models.domain.ids.LinkId;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -31,7 +32,7 @@ class GitHubExternalDataRepositoryTest extends IntegrationEnvironment {
     @Test
     void whenCallGetChangeInfoByLinkThenReturnListWithLinkUpdates() {
 
-        when(githubClient.issuesRequest("rustutam", "TestRepo")).thenReturn(githubApiResponseJsonString);
+        when(githubClient.issuesRequest("rustutam", "TestRepo")).thenReturn(Optional.of(githubApiResponseJsonString));
 
         Link link = new Link(
                 new LinkId(1L),

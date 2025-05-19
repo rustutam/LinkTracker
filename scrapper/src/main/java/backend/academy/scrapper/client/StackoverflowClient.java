@@ -1,8 +1,10 @@
 package backend.academy.scrapper.client;
 
+import backend.academy.scrapper.exceptions.ApiStackOverflowErrorResponseException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -10,20 +12,36 @@ import org.springframework.stereotype.Component;
 public class StackoverflowClient {
     private final StackoverflowRetryProxy proxy;
 
-    public String getQuestionComments(String site, String questionId) {
-        return proxy.getQuestionComments(site, questionId);
+    public Optional<String> getQuestionComments(String site, String questionId) {
+        try {
+            return Optional.of(proxy.getQuestionComments(site, questionId));
+        } catch (ApiStackOverflowErrorResponseException ex) {
+            return Optional.empty();
+        }
     }
 
-    public String getQuestion(String site, String questionId) {
-        return proxy.getQuestion(site, questionId);
+    public Optional<String> getQuestion(String site, String questionId) {
+        try {
+            return Optional.of(proxy.getQuestion(site, questionId));
+        } catch (ApiStackOverflowErrorResponseException ex) {
+            return Optional.empty();
+        }
     }
 
-    public String getQuestionAnswers(String site, String questionId) {
-        return proxy.getQuestionAnswers(site, questionId);
+    public Optional<String> getQuestionAnswers(String site, String questionId) {
+        try {
+            return Optional.of(proxy.getQuestionAnswers(site, questionId));
+        } catch (ApiStackOverflowErrorResponseException ex) {
+            return Optional.empty();
+        }
     }
 
-    public String getQuestionAnswerCommits(String site, String answerId) {
-        return proxy.getQuestionAnswerCommits(site, answerId);
+    public Optional<String> getQuestionAnswerCommits(String site, String answerId) {
+        try {
+            return Optional.of(proxy.getQuestionAnswerCommits(site, answerId));
+        } catch (ApiStackOverflowErrorResponseException ex) {
+            return Optional.empty();
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 package backend.academy.scrapper.repository.api;
 
 import backend.academy.scrapper.client.GithubClient;
+import backend.academy.scrapper.exceptions.ApiGitHubErrorResponseException;
 import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.Link;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -10,6 +11,7 @@ import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -27,13 +29,16 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
 
     @Override
     public List<ChangeInfo> getChangeInfoByLink(Link link) {
-        // TODO написано на скорую руку, переделать
-        List<ChangeInfo> allContent = new ArrayList<>();
         RepoInfo repoInfo = getRepoInfo(link.uri());
-        String responce = githubClient.issuesRequest(repoInfo.owner, repoInfo.repo);
+        return githubClient.issuesRequest(repoInfo.owner, repoInfo.repo)
+            .map(response -> parseIssues(link, response))
+            .orElse(List.of());
+    }
 
+    private List<ChangeInfo> parseIssues(Link link, String response) {
+        List<ChangeInfo> allContent = new ArrayList<>();
         try {
-            JsonNode jsonResponse = objectMapper.readTree(responce);
+            JsonNode jsonResponse = objectMapper.readTree(response);
 
             jsonResponse.forEach(content -> {
                 ChangeInfo changeInfo = ChangeInfo.builder()
@@ -48,12 +53,13 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
                 allContent.add(changeInfo);
             });
             return allContent;
-        } catch (HttpMessageNotReadableException | JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             log.atError()
                     .addKeyValue("link", link.uri().toString())
-                    .setMessage("Ошибка при получении github контента")
+                    .setMessage("Ошибка при обработке github контента")
+                    .setCause(e)
                     .log();
-            throw new HttpMessageNotReadableException("Не удаётся прочитать поле 'updated_at'");
+            return List.of();
         }
     }
     //    Для GitHub новый PR или Issue, сообщение включает:

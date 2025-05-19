@@ -1,6 +1,6 @@
 package backend.academy.scrapper.sender;
 
-import backend.academy.scrapper.exceptions.ApiErrorResponseException;
+import backend.academy.scrapper.exceptions.ApiBotErrorResponseException;
 import dto.LinkUpdate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
@@ -13,7 +13,7 @@ public class BotResistantSender implements LinkUpdateSender {
     private final ResistantProxy proxy;
 
     @Override
-    public void sendUpdates(LinkUpdate linkUpdate) throws ApiErrorResponseException {
+    public void sendUpdates(LinkUpdate linkUpdate) throws ApiBotErrorResponseException {
         proxy.sendUpdates(linkUpdate);
     }
 }
