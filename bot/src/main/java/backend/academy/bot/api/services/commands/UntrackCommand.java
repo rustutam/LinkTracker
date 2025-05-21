@@ -4,7 +4,7 @@ import backend.academy.bot.api.cache.CacheStorage;
 import backend.academy.bot.api.cache.KeyGenerator;
 import backend.academy.bot.api.dto.ApiErrorResponse;
 import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.api.tg.BotMessager;
+import backend.academy.bot.api.tg.BotSender;
 import backend.academy.bot.api.tg.FSM;
 import backend.academy.bot.api.tg.States;
 import backend.academy.bot.api.tg.TgCommand;
@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UntrackCommand implements Command {
     private final ApiScrapper scrapper;
-    private final BotMessager messager;
+    private final BotSender messager;
     private final CacheStorage cache;
     private final KeyGenerator keyGenerator;
 

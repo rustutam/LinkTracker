@@ -1,6 +1,6 @@
 package backend.academy.bot.api.services.commands;
 
-import backend.academy.bot.api.tg.BotMessager;
+import backend.academy.bot.api.tg.BotSender;
 import backend.academy.bot.api.tg.FSM;
 import backend.academy.bot.api.tg.States;
 import com.pengrad.telegrambot.model.Message;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class UnknownTextOrCommand implements Command {
-    private final BotMessager messager;
+    private final BotSender messager;
 
     @Override
     public int priority() {

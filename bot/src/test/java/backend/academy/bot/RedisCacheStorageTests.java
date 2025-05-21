@@ -12,7 +12,7 @@ import backend.academy.bot.api.services.commands.EnterFiltersCommand;
 import backend.academy.bot.api.services.commands.ListCommand;
 import backend.academy.bot.api.services.commands.UntrackCommand;
 import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.api.tg.BotMessager;
+import backend.academy.bot.api.tg.BotSender;
 import backend.academy.bot.api.tg.FSM;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
@@ -38,7 +38,7 @@ public class RedisCacheStorageTests {
     private final RedisCacheStorage cache;
 
     @MockitoBean
-    private BotMessager mockBotMessager;
+    private BotSender mockBotSender;
 
     @MockitoBean
     private ApiScrapper mockApiScrapper;
@@ -69,12 +69,12 @@ public class RedisCacheStorageTests {
     public void newCacheWhenListCommand() {
         when(mockMessage.chat()).thenReturn(mockChat);
         when(mockChat.id()).thenReturn(1L);
-        when(mockBotMessager.sendMessage(any(), any(), any())).thenReturn(true);
+        when(mockBotSender.sendMessage(any(), any(), any())).thenReturn(true);
         var arr = new ArrayList<ListLinksItem>();
         arr.add(new ListLinksItem(1L, "github.com", new ArrayList<>(), new ArrayList<>()));
         when(mockApiScrapper.getLinks(any())).thenReturn(new ListLinksResponse(arr.size(), arr));
         KeyGenerator generator = new KeyGenerator();
-        ListCommand cmd = new ListCommand(mockApiScrapper, mockBotMessager, cache, generator);
+        ListCommand cmd = new ListCommand(mockApiScrapper, mockBotSender, cache, generator);
         Map<Long, Map<String, String>> userData = new HashMap<>();
 
         cmd.execute(mockMessage, fsm, userData);
@@ -87,9 +87,9 @@ public class RedisCacheStorageTests {
         when(mockMessage.chat()).thenReturn(mockChat);
         when(mockMessage.text()).thenReturn("f1 f2");
         when(mockChat.id()).thenReturn(1L);
-        when(mockBotMessager.sendMessage(any(), any(), any())).thenReturn(true);
+        when(mockBotSender.sendMessage(any(), any(), any())).thenReturn(true);
         KeyGenerator generator = new KeyGenerator();
-        EnterFiltersCommand cmd = new EnterFiltersCommand(mockApiScrapper, mockBotMessager, cache, generator);
+        EnterFiltersCommand cmd = new EnterFiltersCommand(mockApiScrapper, mockBotSender, cache, generator);
         Map<Long, Map<String, String>> userData = new HashMap<>();
         userData.put(1L, new HashMap<>());
         userData.get(1L).put("url", "github.com");
@@ -105,9 +105,9 @@ public class RedisCacheStorageTests {
         when(mockMessage.chat()).thenReturn(mockChat);
         when(mockMessage.text()).thenReturn("TEXT TEXT");
         when(mockChat.id()).thenReturn(1L);
-        when(mockBotMessager.sendMessage(any(), any(), any())).thenReturn(true);
+        when(mockBotSender.sendMessage(any(), any(), any())).thenReturn(true);
         KeyGenerator generator = new KeyGenerator();
-        UntrackCommand cmd = new UntrackCommand(mockApiScrapper, mockBotMessager, cache, generator);
+        UntrackCommand cmd = new UntrackCommand(mockApiScrapper, mockBotSender, cache, generator);
         Map<Long, Map<String, String>> userData = new HashMap<>();
 
         cmd.execute(mockMessage, fsm, userData);

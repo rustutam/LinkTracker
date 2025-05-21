@@ -7,10 +7,10 @@ import com.pengrad.telegrambot.response.SendResponse;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TgBotMessager implements BotMessager {
+public class TgBotSender implements BotSender {
     private final TelegramBot bot;
 
-    public TgBotMessager(TelegramBot bot) {
+    public TgBotSender(TelegramBot bot) {
         this.bot = bot;
     }
 

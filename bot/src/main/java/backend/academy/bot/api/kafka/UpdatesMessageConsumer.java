@@ -1,7 +1,7 @@
 package backend.academy.bot.api.kafka;
 
 import backend.academy.bot.api.dto.LinkUpdate;
-import backend.academy.bot.api.services.UpdatesService;
+import backend.academy.bot.api.services.UpdateService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -16,13 +16,13 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UpdatesMessageConsumer {
 
-    private final UpdatesService updatesService;
+    private final UpdateService updateService;
     private final ObjectMapper objectMapper;
 
     @KafkaListener(containerFactory = "defaultConsumerFactory", topics = "${kafka.link-updates.topic}")
     public void consume(ConsumerRecord<Long, String> record, Acknowledgment acknowledgment)
             throws JsonProcessingException {
-        updatesService.notifySubscribers(objectMapper.readValue(record.value(), LinkUpdate.class));
+        updateService.sendUpdate(objectMapper.readValue(record.value(), LinkUpdate.class));
         acknowledgment.acknowledge();
     }
 }

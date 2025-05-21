@@ -8,7 +8,7 @@ import static org.mockito.Mockito.when;
 import backend.academy.bot.api.services.LinkTrackerHandlers;
 import backend.academy.bot.api.services.commands.Command;
 import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.api.tg.BotMessager;
+import backend.academy.bot.api.tg.BotSender;
 import backend.academy.bot.api.tg.FSM;
 import backend.academy.bot.api.tg.States;
 import com.pengrad.telegrambot.model.Chat;
@@ -25,7 +25,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @SpringBootTest
 public class BotHandlersTests {
     @MockitoBean
-    private BotMessager mockBotMessager;
+    private BotSender mockBotSender;
 
     @MockitoBean
     private ApiScrapper mockApiScrapper;
@@ -49,7 +49,7 @@ public class BotHandlersTests {
     @AfterEach
     public void cleanup() {
         fsm.setCurrentState(States.None);
-        reset(mockBotMessager);
+        reset(mockBotSender);
         reset(mockApiScrapper);
         reset(mockMessage);
         reset(mockChat);
@@ -59,12 +59,12 @@ public class BotHandlersTests {
     public void incorrectCommand() {
         when(mockMessage.chat()).thenReturn(mockChat);
         when(mockChat.id()).thenReturn(1L);
-        when(mockBotMessager.sendMessage(mockMessage.chat().id(), "_I do not know this command!_", ParseMode.Markdown))
+        when(mockBotSender.sendMessage(mockMessage.chat().id(), "_I do not know this command!_", ParseMode.Markdown))
                 .thenReturn(true);
 
         handler.handle(mockMessage, "unknown_command", fsm, null);
 
-        verify(mockBotMessager)
+        verify(mockBotSender)
                 .sendMessage(mockMessage.chat().id(), "_I do not know this command!_", ParseMode.Markdown);
     }
 }
