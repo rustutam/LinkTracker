@@ -1,7 +1,8 @@
 app:
   telegram-token: ${TELEGRAM_TOKEN} # env variable
-  scrapper-host: http://localhost:8081
   http-timeout: 1000
+  scrapper:
+    base-uri: http://localhost:8081
 
 kafka:
   link-updates:

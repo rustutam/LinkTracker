@@ -19,7 +19,7 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class UntrackCommand implements Command {
     private final ApiScrapper scrapper;
-    private final BotSender messager;
+    private final BotSender sender;
     private final CacheStorage cache;
     private final KeyGenerator keyGenerator;
 
@@ -37,13 +37,13 @@ public class UntrackCommand implements Command {
     public void execute(Message message, FSM fsm, Map<Long, Map<String, String>> userData) {
         String[] args = message.text().split(" ");
         if (args.length != 2) {
-            messager.sendMessage(message.chat().id(), "Args:\n/untrack <url>", ParseMode.Markdown);
+            sender.sendMessage(message.chat().id(), "Args:\n/untrack <url>", ParseMode.Markdown);
             return;
         }
         try {
             scrapper.unSubscribeToLink(message.chat().id(), args[1]);
         } catch (ApiErrorResponse ex) {
-            messager.sendMessage(
+            sender.sendMessage(
                     message.chat().id(), "_An error occured during request!_\n" + ex.description(), ParseMode.Markdown);
         }
         cache.delete(keyGenerator.listCommand(message));

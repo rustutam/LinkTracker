@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class ApiScrapperImpl implements ApiScrapper {
-    private final RetryProxy proxy;
+    private final ScrapperRetryProxy proxy;
 
     @Override
     public void registerChat(Long chatId) {
