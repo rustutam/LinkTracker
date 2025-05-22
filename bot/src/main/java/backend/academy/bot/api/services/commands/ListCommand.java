@@ -2,14 +2,14 @@ package backend.academy.bot.api.services.commands;
 
 import backend.academy.bot.api.cache.CacheStorage;
 import backend.academy.bot.api.cache.KeyGenerator;
-import backend.academy.bot.api.dto.ApiErrorResponse;
 import backend.academy.bot.api.dto.ListLinksItem;
 import backend.academy.bot.api.dto.ListLinksResponse;
 import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.api.tg.BotSender;
+import backend.academy.bot.sender.BotSender;
 import backend.academy.bot.api.tg.FSM;
-import backend.academy.bot.api.tg.States;
+import backend.academy.bot.api.tg.State;
 import backend.academy.bot.api.tg.TgCommand;
+import backend.academy.bot.exceptions.ApiScrapperErrorResponseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pengrad.telegrambot.model.Message;
@@ -39,7 +39,7 @@ public class ListCommand implements Command {
 
     @Override
     public void execute(Message message, FSM fsm, Map<Long, Map<String, String>> userData) {
-        fsm.setCurrentState(States.None);
+        fsm.setCurrentState(State.None);
 
         ListLinksResponse response = null;
         ObjectMapper objectMapper = new ObjectMapper();
@@ -55,7 +55,7 @@ public class ListCommand implements Command {
             try {
                 response = scrapper.getLinks(message.chat().id());
                 cache.store(key, objectMapper.writeValueAsString(response));
-            } catch (ApiErrorResponse ex) {
+            } catch (ApiScrapperErrorResponseException ex) {
                 messager.sendMessage(
                         message.chat().id(),
                         "_An error occured during request!_\n" + ex.description(),

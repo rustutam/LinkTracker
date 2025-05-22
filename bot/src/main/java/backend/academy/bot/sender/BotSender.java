@@ -1,4 +1,4 @@
-package backend.academy.bot.api.tg;
+package backend.academy.bot.sender;
 
 import com.pengrad.telegrambot.model.request.ParseMode;
 

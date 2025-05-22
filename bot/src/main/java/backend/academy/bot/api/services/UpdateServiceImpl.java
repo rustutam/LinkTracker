@@ -1,7 +1,7 @@
 package backend.academy.bot.api.services;
 
 import backend.academy.bot.api.dto.LinkUpdate;
-import backend.academy.bot.api.tg.BotSender;
+import backend.academy.bot.sender.BotSender;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

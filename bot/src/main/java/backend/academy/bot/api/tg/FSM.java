@@ -1,13 +1,13 @@
 package backend.academy.bot.api.tg;
 
 public class FSM {
-    private States currentState;
+    private State currentState;
 
-    public States getCurrentState() {
+    public State getCurrentState() {
         return currentState;
     }
 
-    public void setCurrentState(States newState) {
+    public void setCurrentState(State newState) {
         currentState = newState;
     }
 }

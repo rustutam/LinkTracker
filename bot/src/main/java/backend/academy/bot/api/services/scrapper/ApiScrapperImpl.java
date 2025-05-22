@@ -1,8 +1,8 @@
 package backend.academy.bot.api.services.scrapper;
 
-import backend.academy.bot.api.dto.ApiErrorResponse;
 import backend.academy.bot.api.dto.LinkResponse;
 import backend.academy.bot.api.dto.ListLinksResponse;
+import backend.academy.bot.exceptions.ApiScrapperErrorResponseException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.github.resilience4j.retry.annotation.Retry;
 import java.util.List;
@@ -20,39 +20,27 @@ public class ApiScrapperImpl implements ApiScrapper {
     }
 
     @Override
-    @SuppressFBWarnings(
-            value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
-            justification = "Я уверен, что когда я ловлю ошибку, она не является null")
     @Retry(name = "deleteChat")
-    public void deleteChat(Long chatId) throws ApiErrorResponse {
+    public void deleteChat(Long chatId) throws ApiScrapperErrorResponseException {
         proxy.deleteChat(chatId);
     }
 
     @Override
-    @SuppressFBWarnings(
-            value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
-            justification = "Я уверен, что когда я ловлю ошибку, она не является null")
     @Retry(name = "getLinks")
-    public ListLinksResponse getLinks(Long chatId) throws ApiErrorResponse {
+    public ListLinksResponse getLinks(Long chatId) throws ApiScrapperErrorResponseException {
         return proxy.getLinks(chatId);
     }
 
     @Override
-    @SuppressFBWarnings(
-            value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
-            justification = "Я уверен, что когда я ловлю ошибку, она не является null")
     @Retry(name = "subscribeToLink")
     public LinkResponse subscribeToLink(Long chatId, String link, List<String> tags, List<String> filters)
-            throws ApiErrorResponse {
+            throws ApiScrapperErrorResponseException {
         return proxy.subscribeToLink(chatId, link, tags, filters);
     }
 
     @Override
-    @SuppressFBWarnings(
-            value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
-            justification = "Я уверен, что когда я ловлю ошибку, она не является null")
     @Retry(name = "unSubscribeToLink")
-    public LinkResponse unSubscribeToLink(Long chatId, String link) throws ApiErrorResponse {
+    public LinkResponse unSubscribeToLink(Long chatId, String link) throws ApiScrapperErrorResponseException {
         return proxy.unSubscribeToLink(chatId, link);
     }
 }

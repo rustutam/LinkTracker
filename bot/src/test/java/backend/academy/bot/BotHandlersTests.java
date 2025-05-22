@@ -8,9 +8,9 @@ import static org.mockito.Mockito.when;
 import backend.academy.bot.api.services.LinkTrackerHandlers;
 import backend.academy.bot.api.services.commands.Command;
 import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.api.tg.BotSender;
+import backend.academy.bot.sender.BotSender;
 import backend.academy.bot.api.tg.FSM;
-import backend.academy.bot.api.tg.States;
+import backend.academy.bot.api.tg.State;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -48,7 +48,7 @@ public class BotHandlersTests {
 
     @AfterEach
     public void cleanup() {
-        fsm.setCurrentState(States.None);
+        fsm.setCurrentState(State.None);
         reset(mockBotSender);
         reset(mockApiScrapper);
         reset(mockMessage);

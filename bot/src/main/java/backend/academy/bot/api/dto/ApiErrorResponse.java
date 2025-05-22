@@ -1,16 +1,12 @@
 package backend.academy.bot.api.dto;
 
-import java.util.ArrayList;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import org.springframework.http.HttpStatusCode;
+import jakarta.validation.Valid;
+import java.util.List;
 
-@Getter
-@AllArgsConstructor
-public class ApiErrorResponse extends RuntimeException {
-    private final String description;
-    private final HttpStatusCode statusCode;
-    private final String statusText;
-    private final String exceptionMessage;
-    private final StackTraceElement[] stacktrace;
+public record ApiErrorResponse(
+    String description,
+    String code,
+    String exceptionName,
+    String exceptionMessage,
+    @Valid List<String> stacktrace) {
 }

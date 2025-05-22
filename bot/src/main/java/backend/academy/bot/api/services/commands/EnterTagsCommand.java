@@ -1,8 +1,8 @@
 package backend.academy.bot.api.services.commands;
 
-import backend.academy.bot.api.tg.BotSender;
+import backend.academy.bot.sender.BotSender;
 import backend.academy.bot.api.tg.FSM;
-import backend.academy.bot.api.tg.States;
+import backend.academy.bot.api.tg.State;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import java.util.Map;
@@ -21,7 +21,7 @@ public class EnterTagsCommand implements Command {
 
     @Override
     public boolean shouldBeExecuted(String command, FSM fsm) {
-        return fsm.getCurrentState() == States.EnterTags;
+        return fsm.getCurrentState() == State.EnterTags;
     }
 
     @Override
@@ -29,6 +29,6 @@ public class EnterTagsCommand implements Command {
         var chatId = message.chat().id();
         userData.get(chatId).put("tags", message.text());
         messager.sendMessage(message.chat().id(), "Enter filters:", ParseMode.Markdown);
-        fsm.setCurrentState(States.EnterFilters);
+        fsm.setCurrentState(State.EnterFilters);
     }
 }

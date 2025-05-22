@@ -1,6 +1,7 @@
 package backend.academy.bot.api.controllers;
 
 import backend.academy.bot.api.dto.ApiErrorResponse;
+import backend.academy.bot.exceptions.ApiScrapperErrorResponseException;
 import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +13,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @RestControllerAdvice
 public class ControllerAdvice extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(ApiErrorResponse.class)
+    @ExceptionHandler(ApiScrapperErrorResponseException.class)
     public ResponseEntity<ApiErrorResponse> handle(ApiErrorResponse error) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }

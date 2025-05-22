@@ -12,7 +12,7 @@ import backend.academy.bot.api.services.commands.EnterFiltersCommand;
 import backend.academy.bot.api.services.commands.ListCommand;
 import backend.academy.bot.api.services.commands.UntrackCommand;
 import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.api.tg.BotSender;
+import backend.academy.bot.sender.BotSender;
 import backend.academy.bot.api.tg.FSM;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;

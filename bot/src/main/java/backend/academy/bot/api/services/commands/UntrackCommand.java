@@ -2,12 +2,12 @@ package backend.academy.bot.api.services.commands;
 
 import backend.academy.bot.api.cache.CacheStorage;
 import backend.academy.bot.api.cache.KeyGenerator;
-import backend.academy.bot.api.dto.ApiErrorResponse;
 import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.api.tg.BotSender;
+import backend.academy.bot.sender.BotSender;
 import backend.academy.bot.api.tg.FSM;
-import backend.academy.bot.api.tg.States;
+import backend.academy.bot.api.tg.State;
 import backend.academy.bot.api.tg.TgCommand;
+import backend.academy.bot.exceptions.ApiScrapperErrorResponseException;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ParseMode;
 import java.util.Map;
@@ -42,11 +42,11 @@ public class UntrackCommand implements Command {
         }
         try {
             scrapper.unSubscribeToLink(message.chat().id(), args[1]);
-        } catch (ApiErrorResponse ex) {
+        } catch (ApiScrapperErrorResponseException ex) {
             sender.sendMessage(
                     message.chat().id(), "_An error occured during request!_\n" + ex.description(), ParseMode.Markdown);
         }
         cache.delete(keyGenerator.listCommand(message));
-        fsm.setCurrentState(States.None);
+        fsm.setCurrentState(State.None);
     }
 }

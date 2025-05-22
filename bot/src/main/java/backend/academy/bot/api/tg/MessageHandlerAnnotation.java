@@ -12,5 +12,5 @@ public @interface MessageHandlerAnnotation {
 
     TgCommand[] commands() default {};
 
-    States[] states() default {};
+    State[] states() default {};
 }

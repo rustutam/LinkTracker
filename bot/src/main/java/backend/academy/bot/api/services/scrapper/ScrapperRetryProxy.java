@@ -1,38 +1,27 @@
 package backend.academy.bot.api.services.scrapper;
 
 import backend.academy.bot.api.dto.AddLinkRequest;
-import backend.academy.bot.api.dto.ApiErrorResponse;
 import backend.academy.bot.api.dto.LinkResponse;
 import backend.academy.bot.api.dto.ListLinksResponse;
 import backend.academy.bot.api.dto.RemoveLinkRequest;
 import backend.academy.bot.config.clients.ScrapperConfig;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import backend.academy.bot.exceptions.ApiScrapperErrorResponseException;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
-import java.util.ArrayList;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponents;
-import org.springframework.web.util.UriComponentsBuilder;
 import static backend.academy.bot.utils.LogMessages.CHAT_ID;
 import static backend.academy.bot.utils.LogMessages.URL;
 
 @Slf4j
 @Service
 public class ScrapperRetryProxy {
-    private static final String TG_CHAT_ID_HEADER = "Tg-Chat-Id";
-    private static final String TG_CHAT_PATH = "/tg-chat";
-    private static final String LINKS_PATH = "/links";
     private final RestClient restClient;
 
     @Autowired
@@ -42,7 +31,7 @@ public class ScrapperRetryProxy {
 
     @Retry(name = "retryRules", fallbackMethod = "handleException")
     @CircuitBreaker(name = "cb1")
-    public void registerChat(Long chatId) throws ApiErrorResponse {
+    public void registerChat(Long chatId) throws ApiScrapperErrorResponseException {
         try {
             restClient.post().uri("/tg-chat/{id}", chatId).retrieve().toBodilessEntity();
         } catch (HttpClientErrorException e) {
@@ -53,7 +42,7 @@ public class ScrapperRetryProxy {
                 .addKeyValue("statusText", e.getStatusText())
                 .log();
 
-            throw new ApiErrorResponse(
+            throw new ApiScrapperErrorResponseException(
                 "Ошибка отправки запроса на регистрацию чата",
                 e.getStatusCode(),
                 e.getStatusText(),
@@ -64,7 +53,7 @@ public class ScrapperRetryProxy {
 
     @Retry(name = "retryRules", fallbackMethod = "handleException")
     @CircuitBreaker(name = "cb1")
-    public void deleteChat(Long chatId) throws ApiErrorResponse {
+    public void deleteChat(Long chatId) throws ApiScrapperErrorResponseException {
         try {
             restClient.delete().uri("/tg-chat/{id}", chatId).retrieve().toBodilessEntity();
         } catch (HttpClientErrorException e) {
@@ -75,7 +64,7 @@ public class ScrapperRetryProxy {
                 .addKeyValue("statusText", e.getStatusText())
                 .log();
 
-            throw new ApiErrorResponse(
+            throw new ApiScrapperErrorResponseException(
                 "Ошибка отправки запроса на удаление чата",
                 e.getStatusCode(),
                 e.getStatusText(),
@@ -86,7 +75,7 @@ public class ScrapperRetryProxy {
 
     @Retry(name = "retryRules", fallbackMethod = "handleException")
     @CircuitBreaker(name = "cb1")
-    public ListLinksResponse getLinks(Long chatId) throws ApiErrorResponse {
+    public ListLinksResponse getLinks(Long chatId) throws ApiScrapperErrorResponseException {
         try {
             return restClient
                 .get()
@@ -102,7 +91,7 @@ public class ScrapperRetryProxy {
                 .addKeyValue("statusText", e.getStatusText())
                 .log();
 
-            throw new ApiErrorResponse(
+            throw new ApiScrapperErrorResponseException(
                 "Ошибка отправки запроса на получение всех ссылок пользователя",
                 e.getStatusCode(),
                 e.getStatusText(),
@@ -114,7 +103,7 @@ public class ScrapperRetryProxy {
     @Retry(name = "retryRules", fallbackMethod = "handleException")
     @CircuitBreaker(name = "cb1")
     public LinkResponse subscribeToLink(Long chatId, String link, List<String> tags, List<String> filters)
-        throws ApiErrorResponse {
+        throws ApiScrapperErrorResponseException {
         AddLinkRequest requestToScrapper = new AddLinkRequest(link, tags, filters);
         try {
             return restClient
@@ -134,7 +123,7 @@ public class ScrapperRetryProxy {
                 .addKeyValue("statusText", e.getStatusText())
                 .log();
 
-            throw new ApiErrorResponse(
+            throw new ApiScrapperErrorResponseException(
                 "Ошибка отправки запроса на добавление подписки пользователю",
                 e.getStatusCode(),
                 e.getStatusText(),
@@ -145,7 +134,7 @@ public class ScrapperRetryProxy {
 
     @Retry(name = "retryRules", fallbackMethod = "handleException")
     @CircuitBreaker(name = "cb1")
-    public LinkResponse unSubscribeToLink(Long chatId, String link) throws ApiErrorResponse {
+    public LinkResponse unSubscribeToLink(Long chatId, String link) throws ApiScrapperErrorResponseException {
         RemoveLinkRequest requestToScrapper = new RemoveLinkRequest(link);
         try {
             return restClient
@@ -165,7 +154,7 @@ public class ScrapperRetryProxy {
                 .addKeyValue("statusText", e.getStatusText())
                 .log();
 
-            throw new ApiErrorResponse(
+            throw new ApiScrapperErrorResponseException(
                 "Ошибка отправки запроса на удаление подписки пользователя",
                 e.getStatusCode(),
                 e.getStatusText(),
@@ -175,7 +164,7 @@ public class ScrapperRetryProxy {
     }
 
     public void handleException(Long chatId, Throwable e) {
-        throw new ApiErrorResponse(
+        throw new ApiScrapperErrorResponseException(
             "Cannot connect to server",
             null,
             "",

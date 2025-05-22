@@ -1,8 +1,8 @@
 package backend.academy.bot.api.services.commands;
 
-import backend.academy.bot.api.tg.BotSender;
+import backend.academy.bot.sender.BotSender;
 import backend.academy.bot.api.tg.FSM;
-import backend.academy.bot.api.tg.States;
+import backend.academy.bot.api.tg.State;
 import backend.academy.bot.api.tg.TgCommand;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ParseMode;
@@ -38,6 +38,6 @@ public class TrackCommand implements Command {
         }
         messager.sendMessage(message.chat().id(), "Enter tags:", ParseMode.Markdown);
         userData.get(chatId).put("url", args[1]);
-        fsm.setCurrentState(States.EnterTags);
+        fsm.setCurrentState(State.EnterTags);
     }
 }
