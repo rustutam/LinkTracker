@@ -28,9 +28,9 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
     public List<ChangeInfo> getChangeInfoByLink(Link link) {
         RepoInfo repoInfo = getRepoInfo(link.uri());
         return githubClient
-                .issuesRequest(repoInfo.owner, repoInfo.repo)
-                .map(response -> parseIssues(link, response))
-                .orElse(List.of());
+            .issuesRequest(repoInfo.owner, repoInfo.repo)
+            .map(response -> parseIssues(link, response))
+            .orElse(List.of());
     }
 
     private List<ChangeInfo> parseIssues(Link link, String response) {
@@ -40,23 +40,23 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
 
             jsonResponse.forEach(content -> {
                 ChangeInfo changeInfo = ChangeInfo.builder()
-                        .description(PR_ISSUE_DESCRIPTION)
-                        .title(content.get("title").asText())
-                        .username(content.get("user").get("login").asText())
-                        .creationTime(
-                                OffsetDateTime.parse(content.get("created_at").asText()))
-                        .preview(truncatePreview(content.get("body").asText()))
-                        .build();
+                    .description(PR_ISSUE_DESCRIPTION)
+                    .title(content.get("title").asText())
+                    .username(content.get("user").get("login").asText())
+                    .creationTime(
+                        OffsetDateTime.parse(content.get("created_at").asText()))
+                    .preview(truncatePreview(content.get("body").asText()))
+                    .build();
 
                 allContent.add(changeInfo);
             });
             return allContent;
         } catch (JsonProcessingException e) {
             log.atError()
-                    .addKeyValue("link", link.uri().toString())
-                    .setMessage("Ошибка при обработке github контента")
-                    .setCause(e)
-                    .log();
+                .addKeyValue("link", link.uri().toString())
+                .setMessage("Ошибка при обработке github контента")
+                .setCause(e)
+                .log();
             return List.of();
         }
     }

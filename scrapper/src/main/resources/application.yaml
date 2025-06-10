@@ -116,3 +116,6 @@ resilience4j.circuitbreaker:
       failureRateThreshold: 100
       waitDurationInOpenState: 1s
       permittedNumberOfCallsInHalfOpenState: 1
+
+
+

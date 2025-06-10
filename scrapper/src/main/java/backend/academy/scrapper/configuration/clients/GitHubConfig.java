@@ -17,7 +17,6 @@ public record GitHubConfig(
         HttpComponentsClientHttpRequestFactory httpRequestFactory) {
 
     public RestClient gitHubRestClient() {
-
         return RestClient.builder()
                 .baseUrl(baseUri)
                 .requestFactory(httpRequestFactory)

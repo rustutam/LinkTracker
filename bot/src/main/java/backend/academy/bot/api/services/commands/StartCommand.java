@@ -1,43 +1,42 @@
 package backend.academy.bot.api.services.commands;
 
-import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.sender.BotSender;
-import backend.academy.bot.api.tg.FSM;
-import backend.academy.bot.api.tg.State;
-import backend.academy.bot.api.tg.TgCommand;
+import backend.academy.bot.api.tg.BotContext;
 import backend.academy.bot.exceptions.ApiScrapperErrorResponseException;
-import com.pengrad.telegrambot.model.Message;
+import backend.academy.bot.models.Update;
+import backend.academy.bot.sender.BotSender;
+import backend.academy.bot.sender.ScrapperSender;
 import com.pengrad.telegrambot.model.request.ParseMode;
-import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import static backend.academy.bot.utils.BotMessages.CHAT_REGISTERED;
+import static backend.academy.bot.utils.LogMessages.CHAT_ID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class StartCommand implements Command {
-    private final ApiScrapper scrapper;
-    private final BotSender messager;
+    private final ScrapperSender scrapperSender;
+    private final BotSender botSender;
 
     @Override
-    public int priority() {
-        return 0;
-    }
+    public void execute(Update update, BotContext context) {
+        Long chatId = update.chatId();
 
-    @Override
-    public boolean shouldBeExecuted(String command, FSM fsm) {
-        return Objects.equals(command, TgCommand.START.cmdName());
-    }
+        log.atInfo()
+            .addKeyValue(CHAT_ID, chatId)
+            .setMessage("Выполняется команда /start")
+            .log();
 
-    @Override
-    public void execute(Message message, FSM fsm, Map<Long, Map<String, String>> userData) {
-        messager.sendMessage(message.chat().id(), "_This is start command!_", ParseMode.Markdown);
-        fsm.setCurrentState(State.None);
         try {
-            scrapper.registerChat(message.chat().id());
+            scrapperSender.registerChat(chatId);
+            botSender.sendMessage(chatId, CHAT_REGISTERED, ParseMode.Markdown);
+            log.atInfo()
+                .addKeyValue(CHAT_ID, chatId)
+                .setMessage(CHAT_REGISTERED)
+                .log();
         } catch (ApiScrapperErrorResponseException ex) {
-            messager.sendMessage(
-                    message.chat().id(), "_An error occured during request!_\n" + ex.description(), ParseMode.Markdown);
+            botSender.sendMessage(chatId, ex.description(), ParseMode.Markdown);
         }
     }
 }

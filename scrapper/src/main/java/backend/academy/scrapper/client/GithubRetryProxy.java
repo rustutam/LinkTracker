@@ -25,7 +25,7 @@ public class GithubRetryProxy {
 
     @Retry(name = "github")
     @CircuitBreaker(name = "cb1")
-    public String issuesRequest(String owner, String repository) throws ApiGitHubErrorResponseException {
+    public String issuesRequest(String owner, String repository) {
         try {
             return restClient
                     .get()

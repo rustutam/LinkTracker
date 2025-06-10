@@ -31,14 +31,14 @@ public class BotRetryProxy {
                     .log();
         } catch (HttpClientErrorException e) {
             log.atError()
-                    .setMessage("Ошибка получения ответа от API бота")
+                    .setMessage("Ошибка отправки обновлений боту")
                     .addKeyValue("link", linkUpdate.url())
                     .addKeyValue("statusCode", e.getStatusCode().value())
                     .addKeyValue("statusText", e.getStatusText())
                     .log();
 
             throw new ApiBotErrorResponseException(
-                    "Ошибка получения ответа от API бота",
+                    "Ошибка отправки обновлений боту",
                     e.getStatusCode(),
                     e.getStatusText(),
                     e.getMessage(),

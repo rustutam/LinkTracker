@@ -142,11 +142,6 @@
         </dependency>
         <dependency>
             <groupId>backend.academy</groupId>
-            <artifactId>link-parser</artifactId>
-            <version>${revision}</version>
-        </dependency>
-        <dependency>
-            <groupId>backend.academy</groupId>
             <artifactId>general</artifactId>
             <version>${revision}</version>
         </dependency>

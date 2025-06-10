@@ -44,6 +44,13 @@ public class LinkUpdateDetectionService {
         URI uri = link.uri();
         LinkId linkId = link.linkId();
         List<ChatId> chatIds = getChatIdsSubscribedToLink(link);
+        if (chatIds.isEmpty()) {
+            log.atWarn()
+                    .addKeyValue("linkId", linkId)
+                    .setMessage("Нет подписчиков на ссылку")
+                    .log();
+            return List.of();
+        }
 
         return linkChangeStatus.changeInfoList().stream()
                 .map(changeInfo -> UpdatedLink.builder()

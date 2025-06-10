@@ -49,9 +49,7 @@ springdoc:
 
 retry-codes:
   instances:
-    - github
-    - so
-    - bot
+    - scrapper
   codes:
     - 500
     - 429
@@ -60,11 +58,12 @@ resilience4j.circuitbreaker:
   instances:
     cb1:
       slidingWindowType: COUNT_BASED
-      minimumNumberOfCalls: 1
-      slidingWindowSize: 1
-      failureRateThreshold: 100
-      waitDurationInOpenState: 1s
-      permittedNumberOfCallsInHalfOpenState: 1
+      minimumNumberOfCalls: 20
+      slidingWindowSize: 10
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10s
+      permittedNumberOfCallsInHalfOpenState: 5
+
 
 resilience4j.retry:
   instances:
@@ -74,7 +73,7 @@ resilience4j.retry:
       exponential-backoff-multiplier: 2
       enable-exponential-backoff: true
       ignoreExceptions:
-        - backend.academy.bot.api.dto.ApiErrorResponse
+        - backend.academy.bot.exceptions.ApiScrapperErrorResponseException
 
 resilience4j.ratelimiter:
   instances:

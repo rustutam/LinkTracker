@@ -1,6 +1,5 @@
 package backend.academy.scrapper.handler;
 
-import backend.academy.GeneralParseLink;
 import backend.academy.scrapper.exceptions.InvalidLinkException;
 import backend.academy.scrapper.models.domain.Filter;
 import backend.academy.scrapper.models.domain.LinkMetadata;
@@ -11,6 +10,7 @@ import dto.request.AddLinkRequest;
 import dto.request.RemoveLinkRequest;
 import dto.response.LinkResponse;
 import dto.response.ListLinksResponse;
+import general.RegexCheck;
 import java.net.URI;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -19,16 +19,14 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LinkHandlerImpl implements LinkHandler {
+    private final RegexCheck regexCheck;
     private final LinkService linkService;
 
     @Override
     public LinkResponse addLink(long chatId, AddLinkRequest addLinkRequest) {
-        // TODO разобраться как тут лучше валидироваь сслыку чтобы не пропусктаь плохие ссылки внутрь
-        if (new GeneralParseLink().start(addLinkRequest.link()) == null) {
+        if (!regexCheck.checkApi(addLinkRequest.link())) {
             throw new InvalidLinkException();
         }
-        //
-        //        LinkMetadata mappedLinkMetadata = mapAddLinkRequestToLinkMetadata(addLinkRequest);
 
         LinkMetadata linkMetadata = linkService.addLink(
                 new ChatId(chatId), URI.create(addLinkRequest.link()), addLinkRequest.tags(), addLinkRequest.filters());
@@ -53,18 +51,6 @@ public class LinkHandlerImpl implements LinkHandler {
 
         return new ListLinksResponse(linkResponses, linkResponses.size());
     }
-
-    //    private LinkMetadata mapAddLinkRequestToLinkMetadata(AddLinkRequest addLinkRequest){
-    //        Link link = Link.of(URI.create(addLinkRequest.link()));
-    //        List<Tag> tags = addLinkRequest.tags().stream().map(Tag::of).toList();
-    //        List<Filter> filters = addLinkRequest.filters().stream().map(Filter::of).toList();
-    //
-    //        return LinkMetadata.builder()
-    //            .link(link)
-    //            .tags(tags)
-    //            .filters(filters)
-    //            .build();
-    //    }
 
     private LinkResponse mapLinkMetadataToLinkResponse(LinkMetadata linkMetadata) {
         return new LinkResponse(

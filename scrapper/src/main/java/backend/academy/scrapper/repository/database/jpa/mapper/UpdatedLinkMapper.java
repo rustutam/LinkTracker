@@ -13,7 +13,6 @@ import org.springframework.stereotype.Component;
 public class UpdatedLinkMapper {
     public UpdatedLink toDomain(UpdatedLinkEntity entity) {
         List<ChatId> chatIds = Arrays.stream(entity.chatIds().split(","))
-                .map(String::trim) // убираем пробелы, если есть
                 .map(s -> new ChatId(Long.parseLong(s))) // парсим в ChatId
                 .toList();
 

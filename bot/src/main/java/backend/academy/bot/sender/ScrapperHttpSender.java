@@ -6,9 +6,11 @@ import backend.academy.bot.client.ScrapperClient;
 import backend.academy.bot.exceptions.ApiScrapperErrorResponseException;
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ScrapperHttpSender implements ScrapperSender {

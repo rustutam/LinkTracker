@@ -9,8 +9,8 @@ import org.springframework.validation.annotation.Validated;
 
 @Validated
 @EnableAspectJAutoProxy(proxyTargetClass = true)
-@ConfigurationProperties(prefix = "app", ignoreUnknownFields = false)
-public record BotConfig(@NotEmpty String telegramToken, @NotEmpty String scrapperHost, Integer httpTimeout) {
+@ConfigurationProperties(prefix = "app")
+public record BotConfig(@NotEmpty String telegramToken, Integer httpTimeout) {
     @Bean
     public TelegramBot bot() {
         return new TelegramBot(telegramToken());
