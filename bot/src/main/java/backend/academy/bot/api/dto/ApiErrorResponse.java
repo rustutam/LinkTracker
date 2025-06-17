@@ -1,15 +1,12 @@
 package backend.academy.bot.api.dto;
 
-import java.util.ArrayList;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import jakarta.validation.Valid;
+import java.util.List;
 
-@Getter
-@AllArgsConstructor
-public class ApiErrorResponse extends RuntimeException {
-    private final String description;
-    private final String code;
-    private final String exceptionName;
-    private final String exceptionMessage;
-    private final ArrayList<String> stacktrace;
+public record ApiErrorResponse(
+    String description,
+    String code,
+    String exceptionName,
+    String exceptionMessage,
+    @Valid List<String> stacktrace) {
 }

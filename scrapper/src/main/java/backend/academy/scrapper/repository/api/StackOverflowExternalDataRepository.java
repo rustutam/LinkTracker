@@ -1,7 +1,6 @@
 package backend.academy.scrapper.repository.api;
 
 import backend.academy.scrapper.client.StackoverflowClient;
-import backend.academy.scrapper.exceptions.QuestionNotFoundException;
 import backend.academy.scrapper.models.domain.ChangeInfo;
 import backend.academy.scrapper.models.domain.Link;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -12,23 +11,21 @@ import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
 @Repository
 @RequiredArgsConstructor
-@SuppressWarnings("StringSplitter")
 public class StackOverflowExternalDataRepository extends ExternalDataRepository {
     private static final String QUESTION_ANSWERS_DESCRIPTION = "Новый ответ на вопрос";
     private static final String QUESTION_COMMENTS_DESCRIPTION = "Новые комментарии к вопросу";
     private static final String ANSWER_COMMENTS_DESCRIPTION = "Новые комментарии к ответу";
-
-    private static final String JSON_ERROR = "Ошибка при разборе JSON-Ответа";
-    private static final String REQUEST_ERROR = "Ошибка при запросе";
     public static final String ITEMS = "items";
+
     private final StackoverflowClient stackoverflowClient;
     private final ObjectMapper objectMapper;
 
@@ -47,101 +44,105 @@ public class StackOverflowExternalDataRepository extends ExternalDataRepository 
 
     private List<ChangeInfo> parseContentList(String description, String jsonResponse, String url, String title) {
         List<ChangeInfo> allContent = new ArrayList<>();
-
         try {
-            JsonNode jsonNode = objectMapper.readTree(jsonResponse);
+            JsonNode jsonNode = objectMapper.readTree(jsonResponse).get(ITEMS);
 
-            Optional.ofNullable(jsonNode.get(ITEMS))
-                    .ifPresent(items -> items.forEach(item -> {
-                        String ownerName = Optional.ofNullable(item.get("owner"))
-                                .map(owner -> owner.get("display_name"))
-                                .map(JsonNode::asText)
-                                .orElseThrow(() ->
-                                        new HttpMessageNotReadableException("Отсутствует поле owner.display_name"));
+            jsonNode.forEach(content -> {
+                ChangeInfo changeInfo = ChangeInfo.builder()
+                        .description(description)
+                        .title(title)
+                        .username(content.get("user").get("display_name").asText())
+                        .creationTime(OffsetDateTime.parse(
+                                content.get("creation_date").asText()))
+                        .preview(truncatePreview(content.get("body").asText()))
+                        .build();
 
-                        String preview = Optional.ofNullable(item.get("body"))
-                                .map(JsonNode::asText)
-                                .map(this::truncatePreview)
-                                .orElseThrow(() -> new HttpMessageNotReadableException("Отсутствует поле body"));
-
-                        OffsetDateTime creationDate = Optional.ofNullable(item.get("creation_date"))
-                                .map(JsonNode::asText)
-                                .map(OffsetDateTime::parse)
-                                .orElseThrow(() -> new HttpMessageNotReadableException(
-                                        "Отсутствует или неверный формат creation_date"));
-
-                        allContent.add(new ChangeInfo(description, title, ownerName, creationDate, preview));
-                    }));
-
+                allContent.add(changeInfo);
+            });
             return allContent;
-
         } catch (JsonProcessingException e) {
-            log.atError().addKeyValue("link", url).setMessage(JSON_ERROR).log();
-            throw new HttpMessageNotReadableException("Ошибка парсинга JSON по URL " + url, e);
+            log.atError()
+                    .addKeyValue("link", url)
+                    .setMessage("Ошибка при обработке stackoverflow контента")
+                    .setCause(e)
+                    .log();
+            return List.of();
         }
     }
 
-    public String getTitle(URI link) {
+    private String getTitle(URI link) {
         QuestionInfo questionInfo = getQuestionInfo(link);
-        String content = stackoverflowClient.getQuestion(questionInfo.site, questionInfo.questionId);
+        return stackoverflowClient
+                .getQuestion(questionInfo.site, questionInfo.questionId)
+                .map(response -> parseTitle(response, link))
+                .orElse("-");
+    }
+
+    private String parseTitle(String response, URI link) {
         try {
-            JsonNode jsonNode = objectMapper.readTree(content);
+            JsonNode jsonNode = objectMapper.readTree(response);
             return jsonNode.get(ITEMS).get(0).get("title").asText();
-        } catch (HttpMessageNotReadableException | JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             log.atError()
-                    .addKeyValue("link", link.toString())
-                    .setMessage(JSON_ERROR)
+                    .addKeyValue("link", link)
+                    .setMessage("Ошибка при получении stackoverflow title")
+                    .setCause(e)
                     .log();
-            throw new HttpMessageNotReadableException("Ошибка при разборе JSON-ответа по URL " + link.toString());
-        } catch (Exception e) {
-            log.atError()
-                    .addKeyValue("link", link.toString())
-                    .setMessage("Некорректное тело запроса")
-                    .log();
-            throw new RuntimeException("Некорректное тело запроса по URL " + link.toString());
+
+            return "-";
         }
     }
 
     private List<ChangeInfo> getComments(URI link, String title) {
         QuestionInfo questionInfo = getQuestionInfo(link);
-        String questionComments = stackoverflowClient.getQuestionComments(questionInfo.site, questionInfo.questionId);
-        return parseContentList(QUESTION_COMMENTS_DESCRIPTION, questionComments, link.toString(), title);
+        return stackoverflowClient
+                .getQuestionComments(questionInfo.site, questionInfo.questionId)
+                .map(response -> parseContentList(QUESTION_COMMENTS_DESCRIPTION, response, link.toString(), title))
+                .orElse(List.of());
     }
 
     private List<ChangeInfo> getAnswers(URI link, String title) {
         QuestionInfo questionInfo = getQuestionInfo(link);
-        String questionAnswers = stackoverflowClient.getQuestionAnswers(questionInfo.site, questionInfo.questionId);
-        return parseContentList(QUESTION_ANSWERS_DESCRIPTION, questionAnswers, link.toString(), title);
+        return stackoverflowClient
+                .getQuestionAnswers(questionInfo.site, questionInfo.questionId)
+                .map(response -> parseContentList(QUESTION_ANSWERS_DESCRIPTION, response, link.toString(), title))
+                .orElse(List.of());
     }
 
     private List<ChangeInfo> getAnswerComments(URI link, String title) {
-        List<ChangeInfo> content = new ArrayList<>();
         QuestionInfo questionInfo = getQuestionInfo(link);
-        String questionAnswers = stackoverflowClient.getQuestionAnswers(questionInfo.site, questionInfo.questionId);
+        return stackoverflowClient
+                .getQuestionAnswers(questionInfo.site, questionInfo.questionId)
+                .map(response -> parseAnswerComments(questionInfo, response, link, title))
+                .orElse(List.of());
+    }
 
+    private List<ChangeInfo> parseAnswerComments(
+            QuestionInfo questionInfo, String jsonResponse, URI link, String title) {
         try {
-            JsonNode jsonNode = objectMapper.readTree(questionAnswers);
-            jsonNode.get(ITEMS).forEach(item -> {
-                String questionAnswerCommits =
-                        stackoverflowClient.getQuestionAnswerCommits(questionInfo.site, questionInfo.questionId);
-                content.addAll(
-                        parseContentList(ANSWER_COMMENTS_DESCRIPTION, questionAnswerCommits, link.toString(), title));
-            });
-        } catch (HttpMessageNotReadableException | JsonProcessingException e) {
-            log.atError()
-                    .addKeyValue("link", link.toString())
-                    .setMessage(REQUEST_ERROR)
-                    .log();
-            throw new HttpMessageNotReadableException(e.getMessage());
-        } catch (Exception e) {
-            log.atError()
-                    .addKeyValue("link", link.toString())
-                    .setMessage(REQUEST_ERROR)
-                    .log();
-            throw new QuestionNotFoundException(e.getMessage());
-        }
+            JsonNode jsonNode = objectMapper.readTree(jsonResponse).get(ITEMS);
 
-        return content;
+            if (jsonNode == null || !jsonNode.isArray()) {
+                return List.of();
+            }
+
+            return StreamSupport.stream(jsonNode.spliterator(), false)
+                    .map(item ->
+                            stackoverflowClient.getQuestionAnswerCommits(questionInfo.site, questionInfo.questionId))
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    // Парсим список ChangeInfo из каждого JSON‑ответа и «расплющиваем» результат
+                    .flatMap(response ->
+                            parseContentList(ANSWER_COMMENTS_DESCRIPTION, response, link.toString(), title).stream())
+                    .collect(Collectors.toList());
+        } catch (JsonProcessingException e) {
+            log.atError()
+                    .addKeyValue("link", link.toString())
+                    .setMessage("Ошибка при обработке stackoverflow контента")
+                    .setCause(e)
+                    .log();
+            return List.of();
+        }
     }
 
     @Override

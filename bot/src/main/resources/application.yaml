@@ -1,6 +1,8 @@
 app:
   telegram-token: ${TELEGRAM_TOKEN} # env variable
-  scrapper-host: http://localhost:8081
+  http-timeout: 1000
+  scrapper:
+    base-uri: http://localhost:8081
 
 kafka:
   link-updates:
@@ -44,3 +46,47 @@ springdoc:
   swagger-ui:
     enabled: true
     path: /swagger-ui
+
+retry-codes:
+  instances:
+    - scrapper
+  codes:
+    - 500
+    - 429
+
+resilience4j.circuitbreaker:
+  instances:
+    cb1:
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 20
+      slidingWindowSize: 10
+      failureRateThreshold: 50
+      waitDurationInOpenState: 10s
+      permittedNumberOfCallsInHalfOpenState: 5
+
+
+resilience4j.retry:
+  instances:
+    retryRules:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+      ignoreExceptions:
+        - backend.academy.bot.exceptions.ApiScrapperErrorResponseException
+
+resilience4j.ratelimiter:
+  instances:
+    rateLimiter:
+      limitForPeriod: 3
+      timeout-duration: 1s
+      limitRefreshPeriod: 5s
+
+logging:
+  level:
+    io.github.resilience4j.retry: DEBUG
+    io.github.resilience4j.circuitbreaker: DEBUG
+    io.github.resilience4j.bulkhead: DEBUG
+    io.github.resilience4j.timelimiter: DEBUG
+    io.github.resilience4j.ratelimiter: DEBUG
+

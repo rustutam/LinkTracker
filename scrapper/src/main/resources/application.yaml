@@ -1,24 +1,23 @@
 app:
   scheduler:
     check-update-interval: 20s
-    send-update-interval: 99999s
-
-  batch-size: 1000
-
+    send-update-interval: 2s
   github:
     token: ${GITHUB_TOKEN} # env variable
     base-uri: https://api.github.com
-
+    page-size: 100
   stackoverflow:
     key: ${SO_TOKEN_KEY}
     access-token: ${SO_ACCESS_TOKEN}
     base-uri: https://api.stackexchange.com/2.3
-
-  tg-bot:
+    page-size: 100
+  bot:
     base-uri: http://localhost:8080
 
+  batch-size: 1000
   access-type: SQL
-  message-transport: Kafka
+  message-transport: Http
+  http-timeout: 3000
 
 kafka:
   link-updates:
@@ -63,3 +62,60 @@ logging:
   structured:
     format:
       file: ecs
+
+resilience4j.ratelimiter:
+  instances:
+    rateLimiter:
+      limitForPeriod: 3
+      timeout-duration: 1s
+      limitRefreshPeriod: 5s
+
+retry-codes:
+  instances:
+    - github
+    - so
+    - bot
+  codes:
+    - 500
+    - 429
+
+resilience4j.retry:
+  instances:
+    github:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+      ignoreExceptions:
+        - backend.academy.scrapper.exceptions.ApiGitHubErrorResponseException
+    so:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+      ignoreExceptions:
+        - backend.academy.scrapper.exceptions.ApiStackOverflowErrorResponseException
+    bot:
+      maxAttempts: 3
+      waitDuration: 1000
+      exponential-backoff-multiplier: 2
+      enable-exponential-backoff: true
+      ignoreExceptions:
+        - backend.academy.scrapper.exceptions.ApiBotErrorResponseException
+    resistantLinkTracker:
+      maxAttempts: 1
+      ignoreExceptions:
+        - backend.academy.scrapper.exceptions.ApiBotErrorResponseException
+
+resilience4j.circuitbreaker:
+  instances:
+    cb1:
+      slidingWindowType: COUNT_BASED
+      minimumNumberOfCalls: 1
+      slidingWindowSize: 1
+      failureRateThreshold: 100
+      waitDurationInOpenState: 1s
+      permittedNumberOfCallsInHalfOpenState: 1
+
+
+

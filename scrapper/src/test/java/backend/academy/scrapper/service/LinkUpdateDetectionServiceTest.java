@@ -18,12 +18,13 @@ import backend.academy.scrapper.repository.database.SubscriptionRepository;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.assertj.core.api.recursive.comparison.RecursiveComparisonConfiguration;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest
 class LinkUpdateDetectionServiceTest extends IntegrationEnvironment {
@@ -31,10 +32,10 @@ class LinkUpdateDetectionServiceTest extends IntegrationEnvironment {
     @Autowired
     LinkUpdateDetectionService linkUpdateDetectionService;
 
-    @MockBean
+    @MockitoBean
     GithubClient githubClient;
 
-    @MockBean
+    @MockitoBean
     SubscriptionRepository subscriptionRepository;
 
     private RecursiveComparisonConfiguration config;
@@ -69,7 +70,8 @@ class LinkUpdateDetectionServiceTest extends IntegrationEnvironment {
                         "Новый PR/Issue. 11.\n" + "Автор: rustutam. Дата: 2025-05-15T14:00Z.\n" + " Описание: 11",
                         expectedChatIds));
 
-        when(githubClient.issuesRequest(any(), any())).thenReturn(ClientsResponses.githubApiResponseWithTwoIssues);
+        when(githubClient.issuesRequest(any(), any()))
+                .thenReturn(Optional.of(ClientsResponses.githubApiResponseWithTwoIssues));
         when(subscriptionRepository.findByLink(any())).thenReturn(subscriptions);
 
         List<UpdatedLink> updatedLinks = linkUpdateDetectionService.getUpdatedLinks(links);

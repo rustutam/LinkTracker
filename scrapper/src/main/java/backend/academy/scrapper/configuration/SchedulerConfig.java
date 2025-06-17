@@ -1,21 +1,22 @@
 package backend.academy.scrapper.configuration;
 
-import lombok.RequiredArgsConstructor;
+import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.validation.annotation.Validated;
 
-@Configuration
-@RequiredArgsConstructor
-public class SchedulerConfig {
-    private final ScrapperConfig scrapperConfig;
+@Validated
+@ConfigurationProperties(prefix = "app.scheduler")
+public record SchedulerConfig(@NotNull Duration checkUpdateInterval, @NotNull Duration sendUpdateInterval) {
 
     @Bean
     public long checkUpdateIntervalMs() {
-        return scrapperConfig.scheduler().checkUpdateInterval().toMillis();
+        return checkUpdateInterval.toMillis();
     }
 
     @Bean
     public long sendUpdateIntervalMs() {
-        return scrapperConfig.scheduler().sendUpdateInterval().toMillis();
+        return sendUpdateInterval.toMillis();
     }
 }

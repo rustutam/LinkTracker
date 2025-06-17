@@ -25,7 +25,12 @@ import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
+@SpringBootTest(
+        properties = {
+            "resilience4j.ratelimiter.instances.rateLimiter.limitForPeriod=10000",
+            "resilience4j.ratelimiter.instances.rateLimiter.timeout-duration=0",
+            "resilience4j.ratelimiter.instances.rateLimiter.limit-refresh-period=1ms",
+        })
 @AutoConfigureMockMvc
 @TestPropertySource(properties = "app.access-type=ORM")
 class LinksControllerTest extends IntegrationEnvironment {

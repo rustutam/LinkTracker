@@ -162,7 +162,7 @@ public class ClientsResponses {
                 "id": 3027526247,
                 "node_id": "I_kwDOOFKqos60dGJn",
                 "number": 3,
-                "title": "1233434234",
+                "title": "New test issue 1",
                 "user": {
                   "login": "rustutam",
                   "id": 113977718,
@@ -205,7 +205,7 @@ public class ClientsResponses {
                   "completed": 0,
                   "percent_completed": 0
                 },
-                "body": "4324234324",
+                "body": "New test body 1",
                 "closed_by": null,
                 "reactions": {
                   "url": "https://api.github.com/repos/rustutam/TestRepo/issues/3/reactions",
@@ -233,7 +233,7 @@ public class ClientsResponses {
                 "id": 3025426833,
                 "node_id": "I_kwDOOFKqos60VFmR",
                 "number": 2,
-                "title": "wewewq",
+                "title": "New test issue 2",
                 "user": {
                   "login": "rustutam",
                   "id": 113977718,
@@ -276,7 +276,7 @@ public class ClientsResponses {
                   "completed": 0,
                   "percent_completed": 0
                 },
-                "body": "ewqewqewq",
+                "body": "New test body 2",
                 "closed_by": null,
                 "reactions": {
                   "url": "https://api.github.com/repos/rustutam/TestRepo/issues/2/reactions",
@@ -304,7 +304,7 @@ public class ClientsResponses {
                 "id": 2964175381,
                 "node_id": "I_kwDOOFKqos6wrboV",
                 "number": 1,
-                "title": "ывывывы",
+                "title": "New test issue 3",
                 "user": {
                   "login": "rustutam",
                   "id": 113977718,
@@ -347,7 +347,7 @@ public class ClientsResponses {
                   "completed": 0,
                   "percent_completed": 0
                 },
-                "body": "ыфвыфв",
+                "body": "New test body 3",
                 "closed_by": null,
                 "reactions": {
                   "url": "https://api.github.com/repos/rustutam/TestRepo/issues/1/reactions",

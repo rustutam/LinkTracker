@@ -7,6 +7,7 @@ import backend.academy.scrapper.exceptions.NotExistLinkException;
 import backend.academy.scrapper.exceptions.NotExistUserException;
 import backend.academy.scrapper.exceptions.NotTrackLinkException;
 import dto.response.ApiErrorResponse;
+import io.github.resilience4j.ratelimiter.RequestNotPermitted;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -206,5 +207,18 @@ public class ExceptionScrapperControllerAdvice {
                                 .map(StackTraceElement::toString)
                                 .toList())
                         .build());
+    }
+
+    @ExceptionHandler(RequestNotPermitted.class)
+    public ResponseEntity<ApiErrorResponse> handleRateLimitException(RequestNotPermitted ex) {
+        var response = new ApiErrorResponse(
+                "Too many requests.",
+                Integer.toString(HttpStatus.TOO_MANY_REQUESTS.value()),
+                ex.getClass().getName(),
+                "Too many requests.",
+                Arrays.stream(ex.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .toList());
+        return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).body(response);
     }
 }

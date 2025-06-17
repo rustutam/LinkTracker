@@ -2,48 +2,42 @@ package backend.academy.bot.api.services.commands;
 
 import backend.academy.bot.api.cache.CacheStorage;
 import backend.academy.bot.api.cache.KeyGenerator;
-import backend.academy.bot.api.dto.ApiErrorResponse;
 import backend.academy.bot.api.dto.ListLinksItem;
 import backend.academy.bot.api.dto.ListLinksResponse;
-import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.api.tg.BotMessager;
-import backend.academy.bot.api.tg.FSM;
-import backend.academy.bot.api.tg.States;
-import backend.academy.bot.api.tg.TgCommand;
+import backend.academy.bot.api.tg.BotContext;
+import backend.academy.bot.exceptions.ApiScrapperErrorResponseException;
+import backend.academy.bot.models.Update;
+import backend.academy.bot.sender.BotSender;
+import backend.academy.bot.sender.ScrapperSender;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.model.request.ParseMode;
-import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import static backend.academy.bot.utils.LogMessages.CHAT_ID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class ListCommand implements Command {
-    private final ApiScrapper scrapper;
-    private final BotMessager messager;
+    private final ScrapperSender scrapperSender;
+    private final BotSender botSender;
     private final CacheStorage cache;
     private final KeyGenerator keyGenerator;
 
     @Override
-    public int priority() {
-        return 0;
-    }
+    public void execute(Update update, BotContext botContext) {
+        Long chatId = update.chatId();
 
-    @Override
-    public boolean shouldBeExecuted(String command, FSM fsm) {
-        return Objects.equals(command, TgCommand.LIST.cmdName());
-    }
-
-    @Override
-    public void execute(Message message, FSM fsm, Map<Long, Map<String, String>> userData) {
-        fsm.setCurrentState(States.None);
+        log.atInfo()
+            .addKeyValue(CHAT_ID, chatId)
+            .setMessage("Выполняется команда /list")
+            .log();
 
         ListLinksResponse response = null;
         ObjectMapper objectMapper = new ObjectMapper();
-        String key = keyGenerator.listCommand(message);
+        String key = keyGenerator.listCommand(chatId);
         if (cache.hasKey(key)) {
             try {
                 response = objectMapper.readValue(cache.get(key), ListLinksResponse.class);
@@ -53,35 +47,38 @@ public class ListCommand implements Command {
         }
         if (response == null) {
             try {
-                response = scrapper.getLinks(message.chat().id());
+                response = scrapperSender.getLinks(chatId);
                 cache.store(key, objectMapper.writeValueAsString(response));
-            } catch (ApiErrorResponse ex) {
-                messager.sendMessage(
-                        message.chat().id(),
-                        "_An error occured during request!_\n" + ex.description(),
-                        ParseMode.Markdown);
+            } catch (ApiScrapperErrorResponseException ex) {
+                botSender.sendMessage(
+                    chatId,
+                    ex.description(),
+                    ParseMode.Markdown);
                 return;
             } catch (JsonProcessingException ex) {
-                messager.sendMessage(
-                        message.chat().id(),
-                        "_An error occured during request!_\n" + ex.getMessage(),
-                        ParseMode.Markdown);
+                botSender.sendMessage(
+                    chatId,
+                    "Ошибка получения списка подписок\n" + ex.getMessage(),
+                    ParseMode.Markdown);
                 return;
             }
         }
 
         StringBuilder msg = new StringBuilder();
         if (response.links().isEmpty()) {
-            msg.append("You didnt subscribe to any link.");
+            msg.append("Список отслеживаемых ссылок пуст.");
         }
-        for (ListLinksItem i : response.links()) {
-            msg.append(i.url())
-                    .append(" | ")
-                    .append(i.filters())
-                    .append(" | ")
-                    .append(i.tags())
-                    .append("\n");
+        for (ListLinksItem link : response.links()) {
+            msg
+                .append(link.url())
+                .append("\n")
+                .append("Теги: ")
+                .append(link.tags().isEmpty() ? "отсутствуют" : String.join(", ", link.tags()))
+                .append("\nФильтры: ")
+                .append(link.filters().isEmpty() ? "отсутствуют" : String.join(", ", link.filters()))
+                .append("\n\n");
+
         }
-        messager.sendMessage(message.chat().id(), msg.toString(), ParseMode.Markdown);
+        botSender.sendMessage(chatId, msg.toString(), ParseMode.Markdown);
     }
 }

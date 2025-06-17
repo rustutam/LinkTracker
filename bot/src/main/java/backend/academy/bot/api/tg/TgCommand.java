@@ -6,11 +6,11 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum TgCommand {
-    START("start"),
-    HELP("help"),
-    TRACK("track"),
-    UNTRACK("untrack"),
-    LIST("list");
+    START("/start"),
+    HELP("/help"),
+    TRACK("/track"),
+    UNTRACK("/untrack"),
+    LIST("/list");
 
-    private final String cmdName;
+    private final String value;
 }

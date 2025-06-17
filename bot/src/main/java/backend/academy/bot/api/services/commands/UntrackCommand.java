@@ -2,51 +2,85 @@ package backend.academy.bot.api.services.commands;
 
 import backend.academy.bot.api.cache.CacheStorage;
 import backend.academy.bot.api.cache.KeyGenerator;
-import backend.academy.bot.api.dto.ApiErrorResponse;
-import backend.academy.bot.api.services.scrapper.ApiScrapper;
-import backend.academy.bot.api.tg.BotMessager;
-import backend.academy.bot.api.tg.FSM;
-import backend.academy.bot.api.tg.States;
 import backend.academy.bot.api.tg.TgCommand;
-import com.pengrad.telegrambot.model.Message;
+import backend.academy.bot.exceptions.ApiScrapperErrorResponseException;
+import backend.academy.bot.models.Update;
+import backend.academy.bot.sender.BotSender;
+import backend.academy.bot.api.tg.BotContext;
+import backend.academy.bot.api.tg.BotState;
+import backend.academy.bot.sender.ScrapperSender;
 import com.pengrad.telegrambot.model.request.ParseMode;
-import java.util.Map;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import static backend.academy.bot.utils.LogMessages.CHAT_ID;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class UntrackCommand implements Command {
-    private final ApiScrapper scrapper;
-    private final BotMessager messager;
+    private final BotSender botSender;
     private final CacheStorage cache;
     private final KeyGenerator keyGenerator;
+    private final ScrapperSender scrapperSender;
 
     @Override
-    public int priority() {
-        return 0;
+    public void execute(Update update, BotContext botContext) {
+        Long chatId = update.chatId();
+
+        log.atInfo()
+            .addKeyValue(CHAT_ID, chatId)
+            .setMessage("Выполняется команда /untrack")
+            .log();
+
+        BotState currentBotState = botContext.botState();
+        switch (currentBotState) {
+            case AWAIT_COMMAND -> startHandle(update, botContext);
+            case AWAIT_URL -> waitingForUrlHandle(update, botContext);
+            default -> {
+            }
+        }
     }
 
-    @Override
-    public boolean shouldBeExecuted(String command, FSM fsm) {
-        return Objects.equals(command, TgCommand.UNTRACK.cmdName());
+    private void startHandle(Update update, BotContext botContext) {
+        Long chatId = update.chatId();
+
+        log.atInfo()
+            .addKeyValue(CHAT_ID, chatId)
+            .setMessage("Пользователя просят ввести url для прекращения отслеживания")
+            .log();
+
+        botContext.currentCommand(TgCommand.UNTRACK);
+        botContext.botState(BotState.AWAIT_URL);
+        botSender.sendMessage(chatId, "Введите url для прекращения отслеживания или введите /stop чтобы выйти", ParseMode.Markdown);
     }
 
-    @Override
-    public void execute(Message message, FSM fsm, Map<Long, Map<String, String>> userData) {
-        String[] args = message.text().split(" ");
-        if (args.length != 2) {
-            messager.sendMessage(message.chat().id(), "Args:\n/untrack <url>", ParseMode.Markdown);
+    private void waitingForUrlHandle(Update update, BotContext context) {
+        Long chatId = update.chatId();
+        String message = update.message();
+        if (message.trim().equals("/stop")) {
+            context.reset();
+            botSender.sendMessage(chatId, "Вы вышли из меню ввода ссылки", ParseMode.Markdown);
+            log.atInfo()
+                .addKeyValue(CHAT_ID, chatId)
+                .setMessage("Пользователь вышел из меню ввода ссылки для прекращения отслеживания")
+                .log();
             return;
         }
+
         try {
-            scrapper.unSubscribeToLink(message.chat().id(), args[1]);
-        } catch (ApiErrorResponse ex) {
-            messager.sendMessage(
-                    message.chat().id(), "_An error occured during request!_\n" + ex.description(), ParseMode.Markdown);
+            scrapperSender.unSubscribeToLink(chatId, message);
+
+            botSender.sendMessage(chatId, "Отслеживание ссылки прекращено", ParseMode.Markdown);
+            cache.delete(keyGenerator.listCommand(chatId));
+            context.reset();
+            log.atInfo()
+                .addKeyValue(CHAT_ID, chatId)
+                .addKeyValue("userMessage", message)
+                .setMessage("Отслеживание ссылки прекращено")
+                .log();
+        } catch (ApiScrapperErrorResponseException ex) {
+            botSender.sendMessage(chatId, ex.description() + " Введите заново, либо введите /stop", ParseMode.Markdown);
         }
-        cache.delete(keyGenerator.listCommand(message));
-        fsm.setCurrentState(States.None);
     }
 }

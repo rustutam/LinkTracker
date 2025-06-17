@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.stereotype.Repository;
 
 @Slf4j
@@ -27,33 +26,38 @@ public class GitHubExternalDataRepository extends ExternalDataRepository {
 
     @Override
     public List<ChangeInfo> getChangeInfoByLink(Link link) {
-        // TODO написано на скорую руку, переделать
-        List<ChangeInfo> allContent = new ArrayList<>();
         RepoInfo repoInfo = getRepoInfo(link.uri());
-        String responce = githubClient.issuesRequest(repoInfo.owner, repoInfo.repo);
+        return githubClient
+            .issuesRequest(repoInfo.owner, repoInfo.repo)
+            .map(response -> parseIssues(link, response))
+            .orElse(List.of());
+    }
 
+    private List<ChangeInfo> parseIssues(Link link, String response) {
+        List<ChangeInfo> allContent = new ArrayList<>();
         try {
-            JsonNode jsonResponse = objectMapper.readTree(responce);
+            JsonNode jsonResponse = objectMapper.readTree(response);
 
             jsonResponse.forEach(content -> {
                 ChangeInfo changeInfo = ChangeInfo.builder()
-                        .description(PR_ISSUE_DESCRIPTION)
-                        .title(content.get("title").asText())
-                        .username(content.get("user").get("login").asText())
-                        .creationTime(
-                                OffsetDateTime.parse(content.get("created_at").asText()))
-                        .preview(truncatePreview(content.get("body").asText()))
-                        .build();
+                    .description(PR_ISSUE_DESCRIPTION)
+                    .title(content.get("title").asText())
+                    .username(content.get("user").get("login").asText())
+                    .creationTime(
+                        OffsetDateTime.parse(content.get("created_at").asText()))
+                    .preview(truncatePreview(content.get("body").asText()))
+                    .build();
 
                 allContent.add(changeInfo);
             });
             return allContent;
-        } catch (HttpMessageNotReadableException | JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             log.atError()
-                    .addKeyValue("link", link.uri().toString())
-                    .setMessage("Ошибка при получении github контента")
-                    .log();
-            throw new HttpMessageNotReadableException("Не удаётся прочитать поле 'updated_at'");
+                .addKeyValue("link", link.uri().toString())
+                .setMessage("Ошибка при обработке github контента")
+                .setCause(e)
+                .log();
+            return List.of();
         }
     }
     //    Для GitHub новый PR или Issue, сообщение включает:

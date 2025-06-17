@@ -5,7 +5,7 @@ import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.verify;
 
 import backend.academy.bot.api.kafka.UpdatesMessageConsumer;
-import backend.academy.bot.api.services.UpdatesService;
+import backend.academy.bot.api.services.UpdateService;
 import backend.academy.bot.config.KafkaConsumerConfig;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -27,7 +27,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 @Import({TestcontainersConfiguration.class, KafkaConfiguration.class, KafkaConsumerConfig.class})
 public class UpdatesListenerTests {
     @MockitoBean
-    private UpdatesService mockUpdatesService;
+    private UpdateService mockUpdateService;
 
     @Autowired
     private KafkaTemplate<Long, String> kafkaTemplate;
@@ -47,6 +47,6 @@ public class UpdatesListenerTests {
 
         Thread.sleep(10000);
 
-        verify(mockUpdatesService, timeout(15000)).notifySubscribers(any());
+        verify(mockUpdateService, timeout(15000)).sendUpdate(any());
     }
 }

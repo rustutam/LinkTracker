@@ -5,6 +5,7 @@ import dto.request.AddLinkRequest;
 import dto.request.RemoveLinkRequest;
 import dto.response.LinkResponse;
 import dto.response.ListLinksResponse;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 public class LinksController {
     private final LinkHandler linkHandler;
 
+    @RateLimiter(name = "rateLimiter")
     @GetMapping("/links")
     public ResponseEntity<ListLinksResponse> getLinks(
             @RequestHeader(value = "Tg-Chat-Id", required = true) Long tgChatId) {
@@ -25,6 +27,7 @@ public class LinksController {
         return ResponseEntity.ok().body(listLinksResponse);
     }
 
+    @RateLimiter(name = "rateLimiter")
     @PostMapping("/links")
     public ResponseEntity<LinkResponse> addLinks(
             @RequestHeader(value = "Tg-Chat-Id", required = true) Long tgChatId,
@@ -34,6 +37,7 @@ public class LinksController {
         return ResponseEntity.ok().body(linkResponse);
     }
 
+    @RateLimiter(name = "rateLimiter")
     @DeleteMapping("/links")
     public ResponseEntity<LinkResponse> deleteLinks(
             @RequestHeader(value = "Tg-Chat-Id", required = true) Long tgChatId,
